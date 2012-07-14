@@ -1,10 +1,98 @@
+---
+---
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8" />
-  <title>Data Transformer</title>
-  <meta name="description" content="The Recline Transformer">
+  <meta charset='UTF-8'/>
+  <title>Prose &middot; A Content Editor for GitHub</title>
+  <link rel='shortcut icon' href='/{{site.baseurl}}images/favicon.ico' type='image/x-icon' />
+  <link rel='stylesheet' href='/{{site.baseurl}}fonts/open-sans.css'>
+  <link rel='stylesheet' href='/{{site.baseurl}}app.css'>
 
+
+  <!-- templates -->
+  <script name='start' type='text/html'>
+    <% if (authenticated) { %>
+      <form class="js-load-url form-horizontal" id="load_dataset_form">
+        <fieldset>
+          <legend>Load a CSV or GitHub repo</legend>
+          <div class="control-group">
+            <label for="source" class="control-label">CSV file</label>
+            <div class="controls">
+              <input type="text" name="source" class="input span4" placeholder="URL to CSV sheet" value="https://github.com/datasets/standard-and-poors-500-shiller/blob/master/data/data.csv" />
+              <p class="help-block"></p>
+            </div>
+          </div>
+        </fieldset>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Load &raquo;</button>
+        </div>
+      </form>
+
+      <h1 style="text-align: center; margin: 30px;">~ Instructions ~</h1>
+      <div class="row instructions">
+        <div class="span4">
+          <div class="well">
+            <h3>1. Load Some Data</h3>
+            <p>We suggest getting it from CSVs on GitHub or from the DataHub.</p>
+          </div>
+        </div>
+        <div class="span4">
+          <div class="well">
+            <h3>2. Clean It Up</h2>
+            <p>Write simple javascript or use the built-in functions to clean up the data.</p>
+          </div>
+        </div>
+        <div class="span4">
+          <div class="well">
+            <h3>3. Save the Result</h3>
+            <p>...</p>
+          </div>
+        </div>
+      </div>
+    <% } else { %>
+      <div class="splash">
+        <div class="authorize">
+          <h1>Transformer</h1>
+          <p>Transformer is a tool for cleaning up data.</p>
+          <a class="button" href="https://github.com/login/oauth/authorize?client_id={{site.oauth_client_id}}&scope=repo, user">Authorize with GitHub</a>
+        </div>
+      </div>
+    <% } %>
+  </script>
+
+  <script name='dataset' type='text/html'>
+    <div class="dataset">
+      <button class="save-dataset btn btn-primary">Save to GitHub</button>
+      <h1>Ladies and gentleman.. the dataset:</h1>
+      <div id="records">
+
+      </div>
+    </div>
+  </script>
+
+  <script name='header' type='text/html'>
+    <div class="navigation clearfix">
+      <a href='/{{site.baseurl}}' class='title'><span>Prose</span></a>
+
+      <div class='user-status<%= !window.authenticated ? " logged-out" : "" %>'>
+      <% if (window.authenticated) { %>
+        <%= app.username %> <a class="logout" href="#">Logout</a>
+      <% } else { %>
+          <a class="button" href="https://github.com/login/oauth/authorize?client_id={{site.oauth_client_id}}&scope=repo, user&redirect_uri=<%= window.location.href %>">Sign in using Github</a>
+      <% } %>
+      </div>
+    </div>
+  </script>
+
+  <!-- scripts -->
+  <script src='/vendor/jquery.js'></script>
+  <script src='/vendor/jquery.cookie.js'></script>
+  <script src='/vendor/underscore.js'></script>
+  <script src='/vendor/backbone.js'></script>
+  <script src='/vendor/github.js'></script>
+
+  <!-- Recline -->
   <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
   <!--[if lt IE 9]>
     <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
@@ -26,85 +114,35 @@
   <link rel="stylesheet" href="vendor/recline/vendor/bootstrap/2.0.2/css/bootstrap-responsive.css">
 
   <!-- 3rd party JS libraries -->
-  <script type="text/javascript" src="vendor/recline/vendor/jquery/1.7.1/jquery.js"></script>
-  <script type="text/javascript" src="vendor/recline/vendor/underscore/1.1.6/underscore.js"></script>
-  <script type="text/javascript" src="vendor/recline/vendor/backbone/0.5.1/backbone.js"></script>
   <script type="text/javascript" src="vendor/recline/vendor/moment/1.6.2/moment.js"></script>
   <script type="text/javascript" src="vendor/recline/vendor/mustache/0.5.0-dev/mustache.js"></script>
   <script type="text/javascript" src="vendor/recline/vendor/bootstrap/2.0.2/bootstrap.js"></script>
 
   <script type="text/javascript" src="vendor/recline/dist/recline.js"></script>
 
-  <!-- non-library javascript specific to this demo -->
-  <script type="text/javascript" src="js/app.js"></script>
+
+  <!-- Application-specific -->
+  <script src='/src/model.js'></script>
+  <script src='/src/boot.js'></script>
+
+  <script src='/src/views/application.js'></script>
+  <script src='/src/views/start.js'></script>
+  <script src='/src/views/header.js'></script>
+  <script src='/src/views/dataset.js'></script>
+
 </head>
 <body>
-<div class="recline-app">
-  <div class="navbar navbar-fixed-top">
-    <div class="navbar-inner">
-      <div class="container-fluid">
-        <a class="brand" href="#">Recline Transformer</a>
-        <ul class="nav pull-right">
-          <li><a href="http://reclinejs.com/">ReclineJS</a>
-          <li><a href="https://github.com/okfn/timeliner">Source</a></li>
-        </ul>
-      </div>
-    </div>
+  <div id='container'>
+    <div id='main'>{{content}}</div>
   </div>
 
-  <div class="container-fluid">
-    <div class="content">
-
-      <div class="page-home backbone-page">
-        <div class="row">
-          <div class="span6 offset3">
-            <form class="js-load-url form-horizontal">
-              <fieldset>
-                <legend>Load a CSV or GitHub repo</legend>
-                <div class="control-group">
-                  <label for="source" class="control-label">CSV file</label>
-                  <div class="controls">
-                    <input type="text" value="" name="source" class="input span4" placeholder="URL to CSV sheet" value="http://data.london.gov.uk/datafiles/transport/tfl_passengers.csv" />
-                    <p class="help-block"></p>
-                  </div>
-                </div>
-              </fieldset>
-              <div class="form-actions">
-                <button type="submit" class="btn btn-primary">Load &raquo;</button>
-              </div>
-            </form>
-          </div>
-        </div>
-        <h1 style="text-align: center; margin: 30px;">~ Instructions ~</h1>
-        <div class="row instructions">
-          <div class="span4">
-            <div class="well">
-              <h3>1. Load Some Data</h3>
-              <p>We suggest getting it from CSVs on GitHub or from the DataHub.</p>
-            </div>
-          </div>
-          <div class="span4">
-            <div class="well">
-              <h3>2. Clean It Up</h2>
-              <p>Write simple javascript or use the built-in functions to clean up the data.</p>
-            </div>
-          </div>
-          <div class="span4">
-            <div class="well">
-              <h3>3. Save the Result</h3>
-              <p>...</p>
-            </div>
-          </div>
-        </div>
+  <div id='footer'>
+    <div class="footer-content">
+      <a class='help' href="/{{site.baseurl}}help.html">Help</a><a class='about' href="/{{site.baseurl}}about.html">About</a>
+      <div class="fr brand">
+        <a href="/{{site.baseurl}}#prose/prose/blob/gh-pages/README.md">Transformer 0.1.0</a>
       </div>
-
-      <div class="page-explorer backbone-page">
-        <div class="data-explorer-here"></div>
-      </div>
-
-    </div> <!-- /content -->
-  </div> <!-- / container-fluid -->
-</div>
+   </div>
+  </div>
 </body>
 </html>
-
