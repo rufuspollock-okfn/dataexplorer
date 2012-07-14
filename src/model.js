@@ -69,7 +69,6 @@ function loadApplication(cb) {
   }
 }
 
-
 // Authentication
 // -------
 
@@ -108,7 +107,6 @@ function loadDataset(user, repo, branch, cb) {
   repo.read(branch, 'data/data.csv', function(err, raw_csv) {
     var dataset = new recline.Model.Dataset({data: raw_csv, backend: 'csv'});
     dataset.fetch();
-    // console.log(dataset);
     cb(err, dataset);
   });
 }
@@ -116,6 +114,11 @@ function loadDataset(user, repo, branch, cb) {
 // Save Dataset
 // -------
 
-function saveDataset(username, repo) {
-  // TO BE IMPLEMENTED
+function saveDataset(user, repo, branch, data, commitMessage, cb) {
+  var repo = getRepo(user, repo);
+
+  return cb(null);
+  // repo.write(branch, 'data/data.csv', data, commitMessage, function(err) {
+  //   cb(err);
+  // });
 }

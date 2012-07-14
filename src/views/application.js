@@ -11,6 +11,7 @@ views.Application = Backbone.View.extend({
     'click .toggle-view': 'toggleView'
   },
 
+
   toggleView: function (e) {
     e.preventDefault();
     e.stopPropagation();
@@ -80,17 +81,12 @@ views.Application = Backbone.View.extend({
       if (err) return this.notify('error', 'The requested resource could not be found.');
       this.header.render();
 
-      var view = new recline.View.Grid({model: dataset, id: 'dataset'});
-      var editor = new recline.View.Transform({model: dataset, id: 'dataset'});
-
-      this.replaceMainView('dataset', editor);
-      dataset.query();
+      this.replaceMainView("dataset", new views.Dataset({model: dataset, id: 'dataset', user: user, repo: repo, branch: branch }).render());
     }, this));
   },
 
   start: function(username) {
     var that = this;
-
     this.replaceMainView("start", new views.Start({
       id: "start",
       model: _.extend(this.model, { authenticated: !!window.authenticated} )

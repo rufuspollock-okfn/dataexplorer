@@ -63,16 +63,11 @@
 
   <script name='dataset' type='text/html'>
     <div class="dataset">
-      <textarea id="transform_function">
-        function(doc) {
-          doc.name = "hello";
-        }
-      </textarea>
-      <h1>The Dataset</h1>
-      <div>Display data in a table here...</div>
-      <pre>
-        <%= file_content %>
-      </pre>
+      <button class="save-dataset btn btn-primary">Save to GitHub</button>
+      <h1>Ladies and gentleman.. the dataset:</h1>
+      <div id="records">
+
+      </div>
     </div>
   </script>
 
