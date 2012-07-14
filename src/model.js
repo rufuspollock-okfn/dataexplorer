@@ -94,23 +94,28 @@ function authenticate() {
   }
 }
 
-
 function logout() {
   window.authenticated = false;
   $.cookie("oauth-token", null);
 }
 
-
 // Load Dataset
 // -------
 
-function loadDataset(username, repo, dataset) {
+function loadDataset(user, repo, branch, cb) {
+  var repo = getRepo(user, repo);
 
+  repo.read(branch, 'data/data.csv', function(err, raw_csv) {
+    var dataset = new recline.Model.Dataset({data: raw_csv, backend: 'csv'});
+    dataset.fetch();
+    // console.log(dataset);
+    cb(err, dataset);
+  });
 }
 
 // Save Dataset
 // -------
 
-function saveDataset(username, repo, dataset) {
-
+function saveDataset(username, repo) {
+  // TO BE IMPLEMENTED
 }

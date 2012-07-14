@@ -5,9 +5,15 @@ views.Start = Backbone.View.extend({
 
   events: {
     'submit #login_form': '_login',
+    'submit #load_dataset_form': '_loadDataset',
   },
 
   initialize: function(options) {},
+
+  _loadDataset: function() {
+    app.instance.dataset("datasets", "standard-and-poors-500-shiller", "master");
+    return false;
+  },
 
   _login: function() {
     var self = this;

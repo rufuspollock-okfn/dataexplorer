@@ -13,13 +13,13 @@
   <!-- templates -->
   <script name='start' type='text/html'>
     <% if (authenticated) { %>
-      <form class="js-load-url form-horizontal">
+      <form class="js-load-url form-horizontal" id="load_dataset_form">
         <fieldset>
           <legend>Load a CSV or GitHub repo</legend>
           <div class="control-group">
             <label for="source" class="control-label">CSV file</label>
             <div class="controls">
-              <input type="text" value="" name="source" class="input span4" placeholder="URL to CSV sheet" value="http://data.london.gov.uk/datafiles/transport/tfl_passengers.csv" />
+              <input type="text" name="source" class="input span4" placeholder="URL to CSV sheet" value="https://github.com/datasets/standard-and-poors-500-shiller/blob/master/data/data.csv" />
               <p class="help-block"></p>
             </div>
           </div>
@@ -63,7 +63,16 @@
 
   <script name='dataset' type='text/html'>
     <div class="dataset">
-      <h1>The Dataset View</h1>
+      <textarea id="transform_function">
+        function(doc) {
+          doc.name = "hello";
+        }
+      </textarea>
+      <h1>The Dataset</h1>
+      <div>Display data in a table here...</div>
+      <pre>
+        <%= file_content %>
+      </pre>
     </div>
   </script>
 

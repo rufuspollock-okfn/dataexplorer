@@ -72,59 +72,20 @@ views.Application = Backbone.View.extend({
     // No-op ;-)
   },
 
-  posts: function (user, repo, branch, path) {
-    this.loading('Loading posts ...');
-    loadPosts(user, repo, branch, path, _.bind(function (err, data) {
+
+  dataset: function(user, repo, branch) {
+    this.loading('Loading dataset ...');
+    loadDataset(user, repo, branch, _.bind(function (err, dataset) {
       this.loaded();
       if (err) return this.notify('error', 'The requested resource could not be found.');
       this.header.render();
-      this.replaceMainView("posts", new views.Posts({ model: data, id: 'posts' }).render());
-    }, this));
-  },
 
-  post: function (user, repo, branch, path, file, mode) {
-    this.loading('Loading post ...');
-    loadPosts(user, repo, branch, path, _.bind(function (err, data) {
-      if (err) return this.notify('error', 'The requested resource could not be found.');
-      loadPost(user, repo, branch, path, file, _.bind(function (err, data) {
-        this.loaded();
-        this.header.render();
-        if (err) return this.notify('error', 'The requested resource could not be found.');
-        data.preview = !(mode === "edit") || !window.authenticated;
-        data.lang = _.mode(file);
-        this.replaceMainView(window.authenticated ? "post" : "read-post", new views.Post({ model: data, id: 'post' }).render());
-        var that = this;
-      }, this));
-      this.header.render();
-    }, this));
-  },
+      var view = new recline.View.Grid({model: dataset, id: 'dataset'});
+      var editor = new recline.View.Transform({model: dataset, id: 'dataset'});
 
-  newPost: function (user, repo, branch, path) {
-    this.loading('Creating file ...');
-    loadPosts(user, repo, branch, path, _.bind(function (err, data) {
-      emptyPost(user, repo, branch, path, _.bind(function(err, data) {
-        this.loaded();
-        data.jekyll = _.jekyll(path, data.file);
-        data.preview = false;
-        data.markdown = _.markdown(data.file);
-        this.replaceMainView("post", new views.Post({ model: data, id: 'post' }).render());
-        this.mainView._makeDirty();
-        app.state.file = data.file;
-        this.header.render();
-      }, this));
+      this.replaceMainView('dataset', editor);
+      dataset.query();
     }, this));
-  },
-
-  profile: function(username) {
-    var that = this;
-    app.state.title = username;
-    this.loading('Loading profile ...');
-    loadRepos(username, function(err, data) {
-      that.header.render();
-      that.loaded();
-      data.authenticated = !!window.authenticated;
-      that.replaceMainView("start", new views.Profile({id: "start", model: data}).render());
-    });
   },
 
   start: function(username) {

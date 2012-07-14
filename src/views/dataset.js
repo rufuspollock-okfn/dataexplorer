@@ -4,14 +4,18 @@ views.Dataset = Backbone.View.extend({
   id: 'start',
 
   events: {
-    'click .select-repo': '_selectRepo'
+    'click .save-dataset': '_saveDataset'
+  },
+
+  _saveDataset: function() {
+  	// TODO:
   },
 
   initialize: function(options) {},
 
-
   render: function() {
-    $(this.el).html(templates.profile(this.model));
+  	console.log(this.model);
+    $(this.el).html(templates.dataset(this.model));
     return this;
   }
 });
