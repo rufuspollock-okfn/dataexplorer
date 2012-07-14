@@ -12,15 +12,53 @@
 
   <!-- templates -->
   <script name='start' type='text/html'>
-    <div class="splash">
-      
+    <% if (authenticated) { %>
+      <form class="js-load-url form-horizontal">
+        <fieldset>
+          <legend>Load a CSV or GitHub repo</legend>
+          <div class="control-group">
+            <label for="source" class="control-label">CSV file</label>
+            <div class="controls">
+              <input type="text" value="" name="source" class="input span4" placeholder="URL to CSV sheet" value="http://data.london.gov.uk/datafiles/transport/tfl_passengers.csv" />
+              <p class="help-block"></p>
+            </div>
+          </div>
+        </fieldset>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Load &raquo;</button>
+        </div>
+      </form>
 
-      <div class="authorize">
-        <h1>Transformer</h1>
-        <p>Transformer is a tool for cleaning up data.</p>
-        <a class="button" href="https://github.com/login/oauth/authorize?client_id={{site.oauth_client_id}}&scope=repo, user">Authorize with GitHub</a>
+      <h1 style="text-align: center; margin: 30px;">~ Instructions ~</h1>
+      <div class="row instructions">
+        <div class="span4">
+          <div class="well">
+            <h3>1. Load Some Data</h3>
+            <p>We suggest getting it from CSVs on GitHub or from the DataHub.</p>
+          </div>
+        </div>
+        <div class="span4">
+          <div class="well">
+            <h3>2. Clean It Up</h2>
+            <p>Write simple javascript or use the built-in functions to clean up the data.</p>
+          </div>
+        </div>
+        <div class="span4">
+          <div class="well">
+            <h3>3. Save the Result</h3>
+            <p>...</p>
+          </div>
+        </div>
       </div>
-    </div>
+    <% } else { %>
+      <div class="splash">
+        <div class="authorize">
+          <h1>Transformer</h1>
+          <p>Transformer is a tool for cleaning up data.</p>
+          <a class="button" href="https://github.com/login/oauth/authorize?client_id={{site.oauth_client_id}}&scope=repo, user">Authorize with GitHub</a>
+        </div>
+      </div>
+    <% } %>
   </script>
 
   <script name='dataset' type='text/html'>
@@ -49,6 +87,37 @@
   <script src='/vendor/underscore.js'></script>
   <script src='/vendor/backbone.js'></script>
   <script src='/vendor/github.js'></script>
+
+  <!-- Recline -->
+  <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+  <!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <link rel="stylesheet" href="vendor/recline/vendor/bootstrap/2.0.2/css/bootstrap.css">
+  <link rel="stylesheet" href="vendor/recline/vendor/leaflet/0.3.1/leaflet.css">
+  <!--[if lte IE 8]>
+  <link rel="stylesheet" href="vendor/recline/vendor/leaflet/0.3.1/leaflet.ie.css" />
+  <![endif]-->
+  <link rel="stylesheet" href="vendor/recline/vendor/timeline/20120520/css/timeline.css">
+
+  <!-- Recline CSS components -->
+  <link rel="stylesheet" href="vendor/recline/dist/recline.css">
+  <!-- /Recline CSS components -->
+
+  <!-- Custom CSS for the Transformer Online App -->
+  <link rel="stylesheet" href="css/style.css">
+
+  <link rel="stylesheet" href="vendor/recline/vendor/bootstrap/2.0.2/css/bootstrap-responsive.css">
+
+  <!-- 3rd party JS libraries -->
+  <script type="text/javascript" src="vendor/recline/vendor/moment/1.6.2/moment.js"></script>
+  <script type="text/javascript" src="vendor/recline/vendor/mustache/0.5.0-dev/mustache.js"></script>
+  <script type="text/javascript" src="vendor/recline/vendor/bootstrap/2.0.2/bootstrap.js"></script>
+
+  <script type="text/javascript" src="vendor/recline/dist/recline.js"></script>
+
+
+  <!-- Application-specific -->
   <script src='/src/model.js'></script>
   <script src='/src/boot.js'></script>
 
