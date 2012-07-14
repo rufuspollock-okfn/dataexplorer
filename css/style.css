@@ -1,0 +1,17 @@
+body {
+  padding-top: 60px;
+}
+
+/* we do not have a LH sidebar */
+.container-fluid > .content {
+  margin-left: 0;
+}
+
+.recline-grid-container {
+  height: 550px;
+}
+
+.page-home .row.instructions .span4 .well {
+  height: 100px;
+}
+
