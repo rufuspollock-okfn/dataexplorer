@@ -1,0 +1,75 @@
+---
+---
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset='UTF-8'/>
+  <title>Prose &middot; A Content Editor for GitHub</title>
+  <link rel='shortcut icon' href='/{{site.baseurl}}images/favicon.ico' type='image/x-icon' />
+  <link rel='stylesheet' href='/{{site.baseurl}}fonts/open-sans.css'>
+  <link rel='stylesheet' href='/{{site.baseurl}}app.css'>
+
+
+  <!-- templates -->
+  <script name='start' type='text/html'>
+    <div class="splash">
+      
+
+      <div class="authorize">
+        <h1>Transformer</h1>
+        <p>Transformer is a tool for cleaning up data.</p>
+        <a class="button" href="https://github.com/login/oauth/authorize?client_id={{site.oauth_client_id}}&scope=repo, user">Authorize with GitHub</a>
+      </div>
+    </div>
+  </script>
+
+  <script name='dataset' type='text/html'>
+    <div class="dataset">
+      <h1>The Dataset View</h1>
+    </div>
+  </script>
+
+  <script name='header' type='text/html'>
+    <div class="navigation clearfix">
+      <a href='/{{site.baseurl}}' class='title'><span>Prose</span></a>
+
+      <div class='user-status<%= !window.authenticated ? " logged-out" : "" %>'>
+      <% if (window.authenticated) { %>
+        <%= app.username %> <a class="logout" href="#">Logout</a>
+      <% } else { %>
+          <a class="button" href="https://github.com/login/oauth/authorize?client_id={{site.oauth_client_id}}&scope=repo, user&redirect_uri=<%= window.location.href %>">Sign in using Github</a>
+      <% } %>
+      </div>
+    </div>
+  </script>
+
+  <!-- scripts -->
+  <script src='/vendor/jquery.js'></script>
+  <script src='/vendor/jquery.cookie.js'></script>
+  <script src='/vendor/underscore.js'></script>
+  <script src='/vendor/backbone.js'></script>
+  <script src='/vendor/github.js'></script>
+  <script src='/src/model.js'></script>
+  <script src='/src/boot.js'></script>
+
+  <script src='/src/views/application.js'></script>
+  <script src='/src/views/start.js'></script>
+  <script src='/src/views/header.js'></script>
+  <script src='/src/views/dataset.js'></script>
+
+</head>
+<body>
+  <div id='container'>
+    <div id='main'>{{content}}</div>
+  </div>
+
+  <div id='footer'>
+    <div class="footer-content">
+      <a class='help' href="/{{site.baseurl}}help.html">Help</a><a class='about' href="/{{site.baseurl}}about.html">About</a>
+      <div class="fr brand">
+        <a href="/{{site.baseurl}}#prose/prose/blob/gh-pages/README.md">Transformer 0.1.0</a>
+      </div>
+   </div>
+  </div>
+</body>
+</html>
