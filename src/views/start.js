@@ -11,7 +11,7 @@ views.Start = Backbone.View.extend({
   initialize: function(options) {},
 
   _loadDataset: function() {
-    app.instance.dataset("datasets", "standard-and-poors-500-shiller", "master");
+    app.instance.dataset("datasets", "transformer-test", "master");
     return false;
   },
 
