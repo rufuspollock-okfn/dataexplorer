@@ -3,3 +3,46 @@
 {% include styles/reset.css %}
 {% include styles/style.css %}
 {% include styles/codemirror.css %}
+
+
+#main {
+	padding-top: 0;
+}
+
+#editor {
+  display: none;
+}
+
+#grid {
+  display: none;
+}
+
+#editor.active {
+	display: block;
+}
+
+#grid.active {
+	display: block;
+}
+
+#main .dataset-content {
+	width: 920px;
+	margin: 0 auto;
+}
+
+#main .dataset-menu-wrapper {
+	background: #eee;
+}
+#main .dataset-menu {
+	line-height: 40px;
+	width: 920px;
+	margin: 0 auto;
+	padding: 10px;
+	height: 60px;
+	overflow: auto;
+}
+
+#main .dataset-menu > div {
+	float: left;
+	margin-right: 30px;
+}

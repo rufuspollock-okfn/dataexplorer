@@ -9,7 +9,6 @@
   <link rel='stylesheet' href='/{{site.baseurl}}fonts/open-sans.css'>
   <link rel='stylesheet' href='/{{site.baseurl}}app.css'>
 
-
   <!-- templates -->
   <script name='start' type='text/html'>
     <% if (authenticated) { %>
@@ -63,10 +62,22 @@
 
   <script name='dataset' type='text/html'>
     <div class="dataset">
-      <button class="save-dataset btn btn-primary">Save to GitHub</button>
-      <h1>Ladies and gentleman.. the dataset:</h1>
-      <div id="records">
+      
+      <div class="dataset-menu-wrapper">
+        <div class="dataset-menu">
+          <div class="name"><%= name %></div>
+          <div class="views"><button class="toggle-transform btn btn-primary">Transform</button></div>
+          <div class="save"><button class="save-dataset btn btn-primary">Save</button></div>
+        </div>
+      </div>
 
+      <div class="dataset-content">
+        <div id="grid" class="active">
+
+        </div>
+        <div id="editor">
+
+        </div>
       </div>
     </div>
   </script>

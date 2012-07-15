@@ -33,12 +33,10 @@ function getRepo(user, repo) {
 }
 
 
-
 // Load Application
 // -------
 // 
 // Load everything that's needed for the app + header
-
 
 function loadApplication(cb) {
   if (window.authenticated) {
@@ -117,8 +115,7 @@ function loadDataset(user, repo, branch, cb) {
 function saveDataset(user, repo, branch, data, commitMessage, cb) {
   var repo = getRepo(user, repo);
 
-  return cb(null);
-  // repo.write(branch, 'data/data.csv', data, commitMessage, function(err) {
-  //   cb(err);
-  // });
+  repo.write(branch, 'data/data.csv', data, commitMessage, function(err) {
+    cb(err);
+  });
 }

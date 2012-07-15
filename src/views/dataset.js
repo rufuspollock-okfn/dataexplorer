@@ -4,13 +4,41 @@ views.Dataset = Backbone.View.extend({
   id: 'start',
 
   events: {
-    'click .save-dataset': '_saveDataset'
+    'click .save-dataset': '_saveDataset',
+    'click .toggle-transform': '_toggleTransform'
+  },
+
+  _toggleTransform: function() {
+  	if ($('#grid').hasClass('active')) {
+  		$('#grid').removeClass();
+  		$('#editor').addClass('active');
+  	} else {
+  		$('#editor').removeClass();
+  		$('#grid').addClass('active');
+  	}
+  	return false;
   },
 
   _saveDataset: function() {
-  	var data = "RAW_CSV_TO_WRITE_BACK to GitHub";
+
+  	function serializeCSV(dataset) {
+  		var records = [];
+  		records.push(dataset.fields.pluck('id'));
+
+  		_.each(dataset._store.data, function(record) {
+  			var tmp = [];
+  			dataset.fields.each(function(field) {
+  				tmp.push(record[field.id]);
+  			});
+  			records.push(tmp);
+  		});
+  		return recline.Backend.CSV.serializeCSV(records);
+  	}
+
+  	var rawCSV = serializeCSV(this.model);
+
   	// TODO: find a way to serialize data as CSV again
-  	saveDataset(this.user, this.repo, this.branch, data, "updated file", function() {
+  	saveDataset(this.user, this.repo, this.branch, rawCSV, "updated file", function() {
   		alert('saved. yay!');
   	});
   	return false;
@@ -21,14 +49,17 @@ views.Dataset = Backbone.View.extend({
   	this.repo   = options.repo;
   	this.branch = options.branch;
 
-		// this.view = new recline.View.Grid({model: this.model, id: 'dataset'});
-		this.editor = new recline.View.Transform({model: this.model, id: 'editor'});
+		this.grid = new recline.View.Grid({model: this.model, id: 'dataset'});
+		this.editor = new recline.View.Transform({model: this.model });
 		this.model.query();
   },
 
   render: function() {
-    $(this.el).html(templates.dataset(this.model));
-    this.$('#records').empty().append(this.editor.el);
+    $(this.el).html(templates.dataset({
+    	name: this.user + " / " + this.repo
+    }));
+    this.$('#grid').empty().append(this.grid.el);
+    this.$('#editor').empty().append(this.editor.el);
     return this;
   }
 });
