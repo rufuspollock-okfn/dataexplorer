@@ -24,8 +24,10 @@ views.Dataset = Backbone.View.extend({
   	function serializeCSV(dataset) {
   		var records = [];
   		records.push(dataset.fields.pluck('id'));
-
-  		_.each(dataset._store.data, function(record) {
+  		_.each(dataset._store.data, function(record, index) {
+  			// TODO: WTF?!
+  			if (index > 20) return;
+  			// TODO: WTF?! END
   			var tmp = [];
   			dataset.fields.each(function(field) {
   				tmp.push(record[field.id]);
