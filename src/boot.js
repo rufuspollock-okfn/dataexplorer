@@ -1,5 +1,8 @@
 window.app = {
-    config: {},
+    config: {
+      gatekeeper_url: 'http://transformer-gatekeeper.herokuapp.com',
+      oauth_client_id: '2bab62e2f6b27c3ebe1f'
+    },
     models: {},
     views: {},
     routers: {},

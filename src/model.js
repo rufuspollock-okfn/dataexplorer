@@ -1,5 +1,3 @@
----
----
 // Gimme a Github object! Please.
 function github() {
   return new Github({
@@ -77,7 +75,7 @@ function authenticate() {
 
   // Handle Code
   if (match) {
-    $.getJSON('{{site.gatekeeper_url}}/authenticate/'+match[1], function(data) {
+    $.getJSON(window.app.config.gatekeeper_url + '/authenticate/'+match[1], function(data) {
       $.cookie('oauth-token', data.token);
       window.authenticated = true;
       // Adjust URL
