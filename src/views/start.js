@@ -29,6 +29,8 @@ views.Start = Backbone.View.extend({
   },
 
   render: function() {
+    this.model.oauth_client_id = window.app.config.oauth_client_id;
+    console.log(this.model);
     $(this.el).html(templates.start(this.model));
     return this;
   }

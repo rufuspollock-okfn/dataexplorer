@@ -24,7 +24,7 @@ views.Header = Backbone.View.extend({
   },
 
   render: function() {
-    $(this.el).html(templates.header(_.extend(this.model, {state: app.state})));
+    // $(this.el).html(templates.header(_.extend(this.model, {state: app.state})));
     
     return this;
   }
