@@ -23,7 +23,7 @@ window.args = _(window.app).toArray();
     if (authenticate()) {
       loadApplication(function(err, data) {
         // Start the engines
-        window.app.instance = new views.Application({ el: '#container', model: {} }).render();
+        window.app.instance = new views.Application({ el: '.transformer-app', model: {} }).render();
 
         app.instance.start();
         // Initialize router

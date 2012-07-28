@@ -8,9 +8,21 @@ views.Application = Backbone.View.extend({
   // ------
 
   events: {
-    'click .toggle-view': 'toggleView'
+    'click .toggle-view': 'toggleView',
+    'click a.logout': '_logout'
   },
 
+  _logout: function() {
+    logout();
+    app.instance.render();
+    if ($('#start').length > 0) {
+      app.instance.start();
+    } else {
+      window.location.reload();
+    }
+    
+    return false;
+  },
 
   toggleView: function (e) {
     e.preventDefault();
@@ -28,21 +40,21 @@ views.Application = Backbone.View.extend({
   // ----------
 
   initialize: function () {
+    this.el = $(this.el);
     _.bindAll(this);
-    this.header = new views.Header({model: this.model});
-
-    $(window).on('scroll', function() {
-      if ($(window).scrollTop()>60) {
-        $('#post').addClass('sticky-menu');
-      } else {
-        $('#post').removeClass('sticky-menu');
-      }
-    });
   },
 
   // Should be rendered just once
   render: function () {
-    $(this.header.render().el).prependTo(this.el);
+    var loginUrl = 'https://github.com/login/oauth/authorize?client_id=' + config.oauth_client_id + '&scope=repo, user&redirect_uri=' + window.location.href;
+    this.el.find('.user-status login a').attr('href', loginUrl);
+    if (!window.authenticated) {
+      this.el.find('.user-status').addClass('logged-out');
+    } else {
+      this.el.find('.user-status').removeClass('logged-out');
+    }
+    this.el.find('.user-status .username').text(app.username);
+    
     return this;
   },
 
@@ -73,13 +85,11 @@ views.Application = Backbone.View.extend({
     // No-op ;-)
   },
 
-
   dataset: function(user, repo, branch) {
     this.loading('Loading dataset ...');
     loadDataset(user, repo, branch, _.bind(function (err, dataset) {
       this.loaded();
       if (err) return this.notify('error', 'The requested resource could not be found.');
-      this.header.render();
 
       this.replaceMainView("dataset", new views.Dataset({model: dataset, id: 'dataset', user: user, repo: repo, branch: branch }).render());
     }, this));
