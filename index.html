@@ -83,6 +83,20 @@
     </div>
   </script>
 
+  <script name='header' type='text/html'>
+    <div class="navigation clearfix">
+      <a href='' class='title'><span>Transformer</span></a>
+
+      <div class='user-status<%= !window.authenticated ? " logged-out" : "" %>'>
+      <% if (window.authenticated) { %>
+        <%= app.username %> <a class="logout" href="#">Logout</a>
+      <% } else { %>
+          <a class="button" href="https://github.com/login/oauth/authorize?client_id=<%= oauth_client_id %>&scope=repo, user&redirect_uri=<%= window.location.href %>">Sign in using Github</a>
+      <% } %>
+      </div>
+    </div>
+  </script>
+
   <!-- scripts -->
   <script src='vendor/jquery.js'></script>
   <script src='vendor/jquery.cookie.js'></script>
