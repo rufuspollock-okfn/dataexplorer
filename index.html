@@ -2,13 +2,24 @@
 <html>
 <head>
   <meta charset='UTF-8'/>
-  <title>Transformer &middot; Transform Data in Pure Javascript</title>
+  <title>Data Transformer &middot; Transform Data in Pure Javascript</title>
   <link rel='shortcut icon' href='images/favicon.ico' type='image/x-icon' />
   <link rel='stylesheet' href='fonts/open-sans.css'>
-  <link rel='stylesheet' href='styles/reset.css'>
-  <link rel='stylesheet' href='styles/style.css'>
-  <link rel='stylesheet' href='styles/codemirror.css'>
-  <link rel='stylesheet' href='styles/app.css'>
+
+  <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+  <!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <link rel="stylesheet" href="vendor/recline/vendor/bootstrap/2.0.2/css/bootstrap.css">
+
+  <!-- Recline CSS components -->
+  <link rel="stylesheet" href="vendor/recline/dist/recline.css">
+  <!-- /Recline CSS components -->
+
+  <!-- Custom CSS for the Transformer Online App -->
+  <link rel="stylesheet" href="css/style.css">
+
+  <link rel="stylesheet" href="vendor/recline/vendor/bootstrap/2.0.2/css/bootstrap-responsive.css">
 
   <!-- templates -->
   <script name='start' type='text/html'>
@@ -63,20 +74,22 @@
 
   <script name='dataset' type='text/html'>
     <div class="dataset">
-      
       <div class="dataset-menu-wrapper">
         <div class="dataset-menu">
           <div class="name"><%= name %></div>
-          <div class="views"><button class="toggle-transform btn btn-primary">Transform</button></div>
-          <div class="save"><button class="save-dataset btn btn-primary">Save</button></div>
+          <div class="btn-group views" data-toggle="buttons-radio">
+            <a class="toggle-transform btn active" data-view="grid" href="#">Grid</a>
+            <a class="toggle-transform btn" data-view="transform" href="#">Transform</a>
+          </div>
+          <a class="save-dataset btn btn-primary">Save</a>
         </div>
       </div>
 
       <div class="dataset-content">
-        <div id="grid" class="active">
+        <div id="grid">
 
         </div>
-        <div id="editor">
+        <div id="editor" style="display: none;">
 
         </div>
       </div>
@@ -84,17 +97,13 @@
   </script>
 
   <script name='header' type='text/html'>
-    <div class="navigation clearfix">
-      <a href='' class='title'><span>Transformer</span></a>
-
       <div class='user-status<%= !window.authenticated ? " logged-out" : "" %>'>
       <% if (window.authenticated) { %>
-        <%= app.username %> <a class="logout" href="#">Logout</a>
+        <%= app.username %> <i class="icon-off"></i><a class="logout" href="#">Logout</a>
       <% } else { %>
-          <a class="button" href="https://github.com/login/oauth/authorize?client_id=<%= oauth_client_id %>&scope=repo, user&redirect_uri=<%= window.location.href %>">Sign in using Github</a>
+          <a class="btn" href="https://github.com/login/oauth/authorize?client_id=<%= oauth_client_id %>&scope=repo, user&redirect_uri=<%= window.location.href %>">Sign in using Github</a>
       <% } %>
       </div>
-    </div>
   </script>
 
   <!-- scripts -->
@@ -103,22 +112,6 @@
   <script src='vendor/underscore.js'></script>
   <script src='vendor/backbone.js'></script>
   <script src='vendor/github.js'></script>
-
-  <!-- Recline -->
-  <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
-  <!--[if lt IE 9]>
-    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-  <![endif]-->
-  <link rel="stylesheet" href="vendor/recline/vendor/bootstrap/2.0.2/css/bootstrap.css">
-
-  <!-- Recline CSS components -->
-  <link rel="stylesheet" href="vendor/recline/dist/recline.css">
-  <!-- /Recline CSS components -->
-
-  <!-- Custom CSS for the Transformer Online App -->
-  <link rel="stylesheet" href="css/style.css">
-
-  <link rel="stylesheet" href="vendor/recline/vendor/bootstrap/2.0.2/css/bootstrap-responsive.css">
 
   <!-- 3rd party JS libraries -->
   <script type="text/javascript" src="vendor/recline/vendor/moment/1.6.2/moment.js"></script>
@@ -139,11 +132,28 @@
 
 </head>
 <body>
-  <div id='container'>
-    <div id='main'>{{content}}</div>
+<div class="transformer-app">
+  <div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+      <div class="container">
+        <a class="brand" href="#">Data Transformer</a>
+        <ul class="nav pull-right user-status">
+          <li class="logged-in"><a class="username"></a></li>
+          <li class="logged-in"><a class="logout" href="#" title="sign out"><i class="icon-off icon-white"></i></a></li>
+          <li class="login">
+            <a class="" href="">Sign in using Github</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class='container'>
+    <div id='main'></div>
   </div>
 
   <div id='footer'>
   </div>
+</div>
 </body>
 </html>

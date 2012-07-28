@@ -8,14 +8,18 @@ views.Dataset = Backbone.View.extend({
     'click .toggle-transform': '_toggleTransform'
   },
 
-  _toggleTransform: function() {
-  	if ($('#grid').hasClass('active')) {
-  		$('#grid').removeClass();
-  		$('#editor').addClass('active');
-  	} else {
-  		$('#editor').removeClass();
-  		$('#grid').addClass('active');
-  	}
+  _toggleTransform: function(e) {
+    e.preventDefault();
+    var viewName = $(e.target).attr('data-view');
+    this.el.find('.dataset-menu .views a').removeClass('active');
+    this.el.find('.dataset-menu .views a[data-view="' + viewName + '"]').addClass('active');
+    if (viewName == 'grid') {
+  		$('#editor').hide();
+  		$('#grid').show();
+    } else {
+  		$('#grid').hide();
+  		$('#editor').show();
+    }
   	return false;
   },
 
@@ -47,6 +51,7 @@ views.Dataset = Backbone.View.extend({
   },
 
   initialize: function(options) {
+    this.el = $(this.el);
   	this.user   = options.user;
   	this.repo   = options.repo;
   	this.branch = options.branch;
