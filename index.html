@@ -23,6 +23,14 @@
   <!-- templates -->
   <script name='start' type='text/html'>
     <% if (authenticated) { %>
+
+
+    <ul class="nav nav-tabs">
+      <li class="active"><a href="#" data-toggle="tab">Dataset</a></li>
+      <li><a href="#grid" data-toggle="tab">Grid</a></li>
+      <li><a href="#transformations" data-toggle="tab">Transformations</a></li>
+    </ul>
+
       <form class="js-load-url form-horizontal" id="load_dataset_form">
         <fieldset>
           <legend>Load a CSV or GitHub repo</legend>
@@ -35,7 +43,8 @@
           </div>
         </fieldset>
         <div class="form-actions">
-          <button type="submit" class="btn btn-primary">Load &raquo;</button>
+          <button type="submit" class="btn btn-primary">Load</button>
+          <button type="submit" class="save-dataset btn">Save</button>
         </div>
       </form>
 
