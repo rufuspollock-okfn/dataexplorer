@@ -11,7 +11,12 @@ views.Start = Backbone.View.extend({
   initialize: function(options) {},
 
   _loadDataset: function() {
-    app.instance.dataset("datasets", "transformer-test", "master");
+    var url = $("div.control-group input[name=source]").first().val();
+    var user = url.split("/")[3];
+    var repo = url.split("/")[4];
+    var branch = url.split("/")[6];
+    app.instance.dataset(user, repo, branch);
+//  app.instance.dataset("datasets", "transformer-test", "master");
     return false;
   },
 
