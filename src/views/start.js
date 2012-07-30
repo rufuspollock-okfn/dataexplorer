@@ -5,10 +5,15 @@ views.Start = Backbone.View.extend({
 
   events: {
     'submit #login_form': '_login',
-    'submit #load_dataset_form': '_loadDataset',
+    'click .load-dataset': '_loadDataset',
+    'click .save-dataset': '_saveDataset',
   },
 
   initialize: function(options) {},
+
+  _saveDataset: function() {
+	return false;
+  },
 
   _loadDataset: function() {
     var url = $("div.control-group input[name=source]").first().val();
