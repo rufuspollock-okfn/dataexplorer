@@ -63,6 +63,11 @@ views.Application = Backbone.View.extend({
   // -------
 
   replaceMainView: function (name, view) {
+	console.log("rMV called");
+	console.log(name);
+	console.log(view);
+//	return;
+
     $('body').removeClass().addClass('current-view '+name);
     // Make sure the header gets shown
     if (name !== "start") $('#header').show();
@@ -86,12 +91,22 @@ views.Application = Backbone.View.extend({
   },
 
   dataset: function(user, repo, branch) {
-    this.loading('Loading dataset ...');
+    //this.loading('Loading dataset ...');
+	$('#main-menu a.grid-selector').tab('show');
+
     loadDataset(user, repo, branch, _.bind(function (err, dataset) {
       this.loaded();
       if (err) return this.notify('error', 'The requested resource could not be found.');
 
-      this.replaceMainView("dataset", new views.Dataset({model: dataset, id: 'dataset', user: user, repo: repo, branch: branch }).render());
+	  var ds = new views.Dataset({
+		model: dataset, 
+		id: 'dataset', 
+		user: user, 
+		repo: repo, 
+		branch: branch 
+	  });
+	  var ds_r = ds.render();
+      this.replaceMainView("dataset", ds_r);
     }, this));
   },
 

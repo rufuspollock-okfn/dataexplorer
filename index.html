@@ -25,12 +25,14 @@
     <% if (authenticated) { %>
 
 
-    <ul class="nav nav-tabs">
-      <li class="active"><a href="#" data-toggle="tab">Dataset</a></li>
-      <li><a href="#grid" data-toggle="tab">Grid</a></li>
+    <ul id="main-menu" class="nav nav-tabs">
+      <li class="active"><a href="#dataset" data-toggle="tab">Dataset</a></li>
+      <li><a class="grid-selector" href="#grid" data-toggle="tab">Grid</a></li>
       <li><a href="#transformations" data-toggle="tab">Transformations</a></li>
     </ul>
 
+	<div class="tab-content">
+	  <div class="tab-pane active" id="dataset">
       <form class="js-load-url form-horizontal" id="load_dataset_form">
         <fieldset>
           <legend>Load a CSV or GitHub repo</legend>
@@ -45,8 +47,10 @@
         <div class="form-actions">
           <button type="submit" class="btn btn-primary">Load</button>
           <button type="submit" class="save-dataset btn">Save</button>
+          <button type="submit" class="test-navigate btn">Navigate</button>
         </div>
       </form>
+
 
       <h1 style="text-align: center; margin: 30px;">~ Instructions ~</h1>
       <div class="row instructions">
@@ -69,6 +73,18 @@
           </div>
         </div>
       </div>
+
+	  </div>
+	  <div class="tab-pane" id="grid">.g..
+        <div id="grid">
+
+        </div>
+
+	  </div>
+	  <div class="tab-pane" id="transformations">t...
+	  </div>
+	</div>
+
     <% } else { %>
       <div class="splash">
         <div class="authorize">
@@ -94,12 +110,12 @@
       </div>
 
       <div class="dataset-content">
-        <div id="grid">
+       <!-- <div id="grid">
 
         </div>
         <div id="editor" style="display: none;">
 
-        </div>
+        </div> -->
       </div>
     </div>
   </script>
