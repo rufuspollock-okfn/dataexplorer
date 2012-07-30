@@ -63,11 +63,6 @@ views.Application = Backbone.View.extend({
   // -------
 
   replaceMainView: function (name, view) {
-	console.log("rMV called");
-	console.log(name);
-	console.log(view);
-//	return;
-
     $('body').removeClass().addClass('current-view '+name);
     // Make sure the header gets shown
     if (name !== "start") $('#header').show();
@@ -106,7 +101,6 @@ views.Application = Backbone.View.extend({
 		branch: branch 
 	  });
 	  var ds_r = ds.render();
-      this.replaceMainView("dataset", ds_r);
     }, this));
   },
 

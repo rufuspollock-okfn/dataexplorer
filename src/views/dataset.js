@@ -65,8 +65,8 @@ views.Dataset = Backbone.View.extend({
     $(this.el).html(templates.dataset({
     	name: this.user + " / " + this.repo
     }));
-    this.$('#grid').empty().append(this.grid.el);
-    this.$('#editor').empty().append(this.editor.el);
+    $('#grid').empty().append(this.grid.el);
+    $('#editor').empty().append(this.editor.el);
     return this;
   }
 });
