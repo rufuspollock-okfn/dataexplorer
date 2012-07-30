@@ -5,16 +5,10 @@ views.Start = Backbone.View.extend({
 
   events: {
     'submit #login_form': '_login',
-	'click .test-navigate': '_testNav',
     'submit #load_dataset_form': '_loadDataset',
   },
 
   initialize: function(options) {},
-
-  _testNav: function() { 
-	$('#main-menu a.grid-selector').tab('show');
-	return false;
-  },
 
   _loadDataset: function() {
     var url = $("div.control-group input[name=source]").first().val();
