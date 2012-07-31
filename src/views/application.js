@@ -101,6 +101,7 @@ views.Application = Backbone.View.extend({
 		branch: branch 
 	  });
 	  var ds_r = ds.render();
+	  this.mainView = ds_r;
     }, this));
   },
 

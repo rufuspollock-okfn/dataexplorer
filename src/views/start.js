@@ -11,16 +11,29 @@ views.Start = Backbone.View.extend({
 
   initialize: function(options) {},
 
+  _locateDataset: function() {
+	return $("div.control-group input[name=source]").first().val();
+  },
+
+  _datasetDetails: function(url) {
+    return { 
+	  user: url.split("/")[3],
+	  repo: url.split("/")[4],
+	  branch: url.split("/")[6]
+	};
+  },
+
   _saveDataset: function() {
+    var url = this._locateDataset();
+	var ds = this._datasetDetails(url);
+	app.instance.mainView.saveDataset(ds); // this can't be the right way
 	return false;
   },
 
   _loadDataset: function() {
-    var url = $("div.control-group input[name=source]").first().val();
-    var user = url.split("/")[3];
-    var repo = url.split("/")[4];
-    var branch = url.split("/")[6];
-    app.instance.dataset(user, repo, branch);
+    var url = this._locateDataset();
+	var ds = this._datasetDetails(url);
+    app.instance.dataset(ds.user, ds.repo, ds.branch);
 //  app.instance.dataset("datasets", "transformer-test", "master");
     return false;
   },
