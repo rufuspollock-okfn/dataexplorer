@@ -332,12 +332,23 @@
       this.write = function(branch, path, content, message, cb) {
         updateTree(branch, function(err, latestCommit) {
           that.postBlob(content, function(err, blob) {
-            that.updateTree(latestCommit, path, blob, function(err, tree) {
-              that.commit(latestCommit, tree, message, function(err, commit) {
-                that.updateHead(branch, commit, cb);
+            if(err === null) {
+              that.updateTree(latestCommit, path, blob, function(err, tree) {
+                that.commit(latestCommit, tree, message, function(err, commit) {
+                  that.updateHead(branch, commit, cb);
+                });
               });
-            });
-          });
+            } else {
+              alert("Error saving: " + (function() { switch(err.status) {
+              case 404:
+                // github returns 404 (not 403) to mask the (non)-existence
+                // of private members of the namespace, when access is denied
+                return "permission denied or repo not found";
+              default:
+                return "unknown error";
+              }})());
+            }
+          })
         });
       };
     };

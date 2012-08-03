@@ -86,12 +86,22 @@ views.Application = Backbone.View.extend({
   },
 
   dataset: function(user, repo, branch) {
-    this.loading('Loading dataset ...');
+    //this.loading('Loading dataset ...');
+	$('#main-menu a.grid-selector').tab('show');
+
     loadDataset(user, repo, branch, _.bind(function (err, dataset) {
       this.loaded();
       if (err) return this.notify('error', 'The requested resource could not be found.');
 
-      this.replaceMainView("dataset", new views.Dataset({model: dataset, id: 'dataset', user: user, repo: repo, branch: branch }).render());
+	  var ds = new views.Dataset({
+		model: dataset, 
+		id: 'dataset', 
+		user: user, 
+		repo: repo, 
+		branch: branch 
+	  });
+	  var ds_r = ds.render();
+	  this.mainView = ds_r;
     }, this));
   },
 

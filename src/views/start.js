@@ -5,13 +5,36 @@ views.Start = Backbone.View.extend({
 
   events: {
     'submit #login_form': '_login',
-    'submit #load_dataset_form': '_loadDataset',
+    'click .load-dataset': '_loadDataset',
+    'click .save-dataset': '_saveDataset',
   },
 
   initialize: function(options) {},
 
+  _locateDataset: function() {
+	return $("div.control-group input[name=source]").first().val();
+  },
+
+  _datasetDetails: function(url) {
+    return { 
+	  user: url.split("/")[3],
+	  repo: url.split("/")[4],
+	  branch: url.split("/")[6]
+	};
+  },
+
+  _saveDataset: function() {
+    var url = this._locateDataset();
+	var ds = this._datasetDetails(url);
+	app.instance.mainView.saveDataset(ds); // this can't be the right way
+	return false;
+  },
+
   _loadDataset: function() {
-    app.instance.dataset("datasets", "transformer-test", "master");
+    var url = this._locateDataset();
+	var ds = this._datasetDetails(url);
+    app.instance.dataset(ds.user, ds.repo, ds.branch);
+//  app.instance.dataset("datasets", "transformer-test", "master");
     return false;
   },
 
