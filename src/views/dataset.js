@@ -51,10 +51,10 @@ views.Dataset = Backbone.View.extend({
 
   saveDataset: function(location) {
   	var rawCSV = this._serializeCSV(this.model);
-	saveDataset(location.user, location.repo, location.branch, rawCSV, "updated file", function() {
-	  alert("Saved.");
-	});
-	return false;
+    saveDataset(location.user, location.repo, location.branch, rawCSV, "updated file", function() {
+      alert("Saved.");
+    });
+    return false;
   },
 
   initialize: function(options) {
@@ -65,6 +65,7 @@ views.Dataset = Backbone.View.extend({
 
 		this.grid = new recline.View.Grid({model: this.model, id: 'dataset'});
 		this.editor = new recline.View.Transform({model: this.model });
+    this.editor.render();
 		this.model.query();
   },
 
