@@ -4,7 +4,6 @@ views.Dataset = Backbone.View.extend({
   id: 'start',
 
   events: {
-    'click .save-dataset': '_saveDataset',
     'click .toggle-transform': '_toggleTransform'
   },
 
@@ -21,40 +20,6 @@ views.Dataset = Backbone.View.extend({
   		$('#editor').show();
     }
   	return false;
-  },
-
-  _serializeCSV: function (dataset) {
-  	var records = [];
-  	records.push(dataset.fields.pluck('id'));
-  	_.each(dataset._store.data, function(record, index) {
-  	  // TODO: WTF?!
-  	  if (index > 20) return;
-  	  // TODO: WTF?! END
-  	  var tmp = [];
-  	  dataset.fields.each(function(field) {
-  		tmp.push(record[field.id]);
-  	  });
-  	  records.push(tmp);
-  	});
-  	return recline.Backend.CSV.serializeCSV(records);
-  },
-
-  _saveDataset: function() {
-  	var rawCSV = this._serializeCSV(this.model);
-
-  	// TODO: find a way to serialize data as CSV again
-  	saveDataset(this.user, this.repo, this.branch, rawCSV, "updated file", function() {
-  		alert('saved. yay!');
-  	});
-  	return false;
-  },
-
-  saveDataset: function(location) {
-  	var rawCSV = this._serializeCSV(this.model);
-    saveDataset(location.user, location.repo, location.branch, rawCSV, "updated file", function() {
-      alert("Saved.");
-    });
-    return false;
   },
 
   initialize: function(options) {

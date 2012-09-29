@@ -12,7 +12,7 @@ window.app = {
       return memo;
     }, {}),
     state: {'repo': ''},
-    instance: {}
+    instance: null
 };
 
 window.args = _(window.app).toArray();
@@ -26,11 +26,9 @@ window.args = _(window.app).toArray();
         window.app.instance = new views.Application({ el: '.transformer-app', model: {} }).render();
 
         app.instance.start();
-        // Initialize router
-        // window.router = new routers.Application({});
 
-        // // Start responding to routes
-        // Backbone.history.start();
+        // Start responding to routes
+        Backbone.history.start();
       });
     }
   });

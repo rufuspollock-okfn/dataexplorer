@@ -22,6 +22,7 @@
 
   <!-- templates -->
   <script name='start' type='text/html'>
+    <div class="view start">
     <% if (authenticated) { %>
 
 
@@ -98,6 +99,7 @@
         </div>
       </div>
     <% } %>
+    </div>
   </script>
 
   <script name='dataset' type='text/html'>
@@ -156,6 +158,8 @@
   <script src='src/views/application.js'></script>
   <script src='src/views/start.js'></script>
   <script src='src/views/dataset.js'></script>
+  <script src='src/views/load.js'></script>
+  <script src='src/views/save.js'></script>
 
 </head>
 <body>
@@ -166,6 +170,10 @@
         <a class="brand" href="#">
           Data Transformer - clean and transform data in the browser
         </a>
+        <ul class="nav">
+          <li><a href="#load">Load</a></li>
+          <li><a href="#save">Save</a></li>
+        </ul>
         <ul class="nav pull-right user-status">
           <li class="logged-in"><a class="username"></a></li>
           <li class="logged-in"><a class="logout" href="#" title="sign out"><i class="icon-off icon-white"></i></a></li>

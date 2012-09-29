@@ -40,8 +40,16 @@ views.Application = Backbone.View.extend({
   // ----------
 
   initialize: function () {
+    var self = this;
     this.el = $(this.el);
     _.bindAll(this);
+    this.router = new Backbone.Router();
+    this.router.route('load', 'load', function() {
+      self.switchView('load');
+    });
+    this.router.route('save', 'save', function() {
+      self.switchView('save');
+    });
   },
 
   // Should be rendered just once
@@ -54,6 +62,18 @@ views.Application = Backbone.View.extend({
       this.el.find('.user-status').removeClass('logged-out');
     }
     this.el.find('.user-status .username').text(app.username);
+
+    // now append views
+    this.loadView = new views.Load({});
+    this.loadView.render();
+    $('#main').append(this.loadView.el);
+
+    this.startView = new views.Start({
+      id: "start",
+      model: _.extend(this.model, { authenticated: !!window.authenticated} )
+    });
+    this.startView.render();
+    $('#main').append(this.startView.el);
     
     return this;
   },
@@ -62,20 +82,12 @@ views.Application = Backbone.View.extend({
   // Helpers
   // -------
 
-  replaceMainView: function (name, view) {
+  switchView: function(name) {
     $('body').removeClass().addClass('current-view '+name);
-    // Make sure the header gets shown
-    if (name !== "start") $('#header').show();
-
-    if (this.mainView) {
-      this.mainView.remove();
-    } else {
-      $('#main').empty();
-    }
-    this.mainView = view;
-    $(view.el).appendTo(this.$('#main'));
+    $('#main .view').hide();
+    $('#main .view.' + name).show();
+    this.router.navigate(name);
   },
-
 
   // Main Views
   // ----------
@@ -86,36 +98,39 @@ views.Application = Backbone.View.extend({
   },
 
   dataset: function(user, repo, branch) {
+    var self = this;
     //this.loading('Loading dataset ...');
-	$('#main-menu a.grid-selector').tab('show');
+    $('#main-menu a.grid-selector').tab('show');
 
     loadDataset(user, repo, branch, _.bind(function (err, dataset) {
       this.loaded();
       if (err) return this.notify('error', 'The requested resource could not be found.');
 
-	  var ds = new views.Dataset({
-		model: dataset, 
-		id: 'dataset', 
-		user: user, 
-		repo: repo, 
-		branch: branch 
-	  });
-	  var ds_r = ds.render();
-	  this.mainView = ds_r;
+      var ds = new views.Dataset({
+        model: dataset, 
+        id: 'dataset', 
+        user: user, 
+        repo: repo, 
+        branch: branch 
+      });
+      ds.render();
+
+      var saveView = new views.Save({
+        model: dataset
+      });
+      saveView.render();
+      $('#main').append(saveView.el);
+
+      self.switchView('start');
     }, this));
   },
 
-  start: function(username) {
-    var that = this;
-    this.replaceMainView("start", new views.Start({
-      id: "start",
-      model: _.extend(this.model, { authenticated: !!window.authenticated} )
-    }).render());
+  start: function() {
+    this.switchView('start');
   },
 
   notify: function(type, message) {
-    this.header.render();
-    this.replaceMainView("notification", new views.Notification(type, message).render());
+    $('#main').append(new views.Notification(type, message).render().el);
   },
 
   loading: function(msg) {
