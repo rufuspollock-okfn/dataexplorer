@@ -27,40 +27,16 @@
 
 
     <ul id="main-menu" class="nav nav-tabs">
-      <li class="active"><a href="#dataset" data-toggle="tab">Dataset</a></li>
       <li><a class="grid-selector" href="#grid" data-toggle="tab">Grid</a></li>
       <li><a href="#transformations" data-toggle="tab">Transformations</a></li>
     </ul>
 
-	<div class="tab-content">
-	  <div class="tab-pane active" id="dataset">
-      <form class="js-load-url form-horizontal" id="load_dataset_form">
-        <fieldset>
-          <legend>Load a CSV or GitHub repo</legend>
-          <div class="control-group">
-            <label for="source" class="control-label">CSV file</label>
-            <div class="controls">
-              <input type="text" name="source" class="input span4" placeholder="URL to CSV sheet" value="https://github.com/datasets/transformer-test/blob/master/data/data.csv" />
-              <p class="help-block"></p>
-            </div>
-          </div>
-        </fieldset>
-        <div class="form-actions">
-          <button type="submit" class="btn btn-primary load-dataset">Load</button>
-          <button class="save-dataset btn">Save</button>
-        </div>
-      </form>
-
-
-	  </div>
-	  <div class="tab-pane" id="grid">
-	  </div>
-	  <div class="tab-pane" id="transformations">
-		<div id="editor">
-		</div>
-
-	  </div>
-	</div>
+    <div class="tab-content">
+      <div class="tab-pane" id="grid"></div>
+      <div class="tab-pane" id="transformations">
+        <div id="editor"></div>
+      </div>
+    </div>
 
     <% } else { %>
       <h1 style="text-align: center; margin: 30px;">How It Works</h1>
