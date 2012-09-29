@@ -44,11 +44,24 @@ views.Application = Backbone.View.extend({
     this.el = $(this.el);
     _.bindAll(this);
     this.router = new Backbone.Router();
+    this.router.route('', 'home', function() {
+      if (!window.authenticated) {
+        self.router.navigate('login', {trigger: true});
+      } else {
+        self.router.navigate('load', {trigger: true});
+      }
+    });
+    this.router.route('login', 'login', function() {
+      self.switchView('login');
+    });
     this.router.route('load', 'load', function() {
       self.switchView('load');
     });
     this.router.route('save', 'save', function() {
       self.switchView('save');
+    });
+    this.router.route('start', 'start', function() {
+      self.switchView('start');
     });
   },
 
@@ -64,6 +77,11 @@ views.Application = Backbone.View.extend({
     this.el.find('.user-status .username').text(app.username);
 
     // now append views
+    this.loginView = new views.Login({
+    });
+    this.loginView.render();
+    $('#main').append(this.loginView.el);
+
     this.loadView = new views.Load({});
     this.loadView.render();
     $('#main').append(this.loadView.el);
@@ -77,7 +95,6 @@ views.Application = Backbone.View.extend({
     
     return this;
   },
-
 
   // Helpers
   // -------

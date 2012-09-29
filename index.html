@@ -23,58 +23,17 @@
   <!-- templates -->
   <script name='start' type='text/html'>
     <div class="view start">
-    <% if (authenticated) { %>
+      <ul id="main-menu" class="nav nav-tabs">
+        <li><a class="grid-selector" href="#grid" data-toggle="tab">Grid</a></li>
+        <li><a href="#transformations" data-toggle="tab">Transformations</a></li>
+      </ul>
 
-
-    <ul id="main-menu" class="nav nav-tabs">
-      <li><a class="grid-selector" href="#grid" data-toggle="tab">Grid</a></li>
-      <li><a href="#transformations" data-toggle="tab">Transformations</a></li>
-    </ul>
-
-    <div class="tab-content">
-      <div class="tab-pane" id="grid"></div>
-      <div class="tab-pane" id="transformations">
-        <div id="editor"></div>
-      </div>
-    </div>
-
-    <% } else { %>
-      <h1 style="text-align: center; margin: 30px;">How It Works</h1>
-      <div class="row instructions">
-        <div class="span3">
-          <div class="well">
-            <h3>1. Login</h3>
-            <p>Login to GitHub so that we can save your work later</p>
-          </div>
-        </div>
-        <div class="span3">
-          <div class="well">
-            <h3>2. Load Some Data</h3>
-            <p>Load data from online sources (e.g. the DataHub, GitHub or CSVs online)</p>
-          </div>
-        </div>
-        <div class="span3">
-          <div class="well">
-            <h3>3. Clean It Up</h2>
-            <p>Write simple javascript or use the built-in functions to clean up the data.</p>
-          </div>
-        </div>
-        <div class="span3">
-          <div class="well">
-            <h3>4. Save the Result</h3>
-            <p>Save the resulting <strong>data and scripts</strong> to GitHub</p>
-          </div>
+      <div class="tab-content">
+        <div class="tab-pane" id="grid"></div>
+        <div class="tab-pane" id="transformations">
+          <div id="editor"></div>
         </div>
       </div>
-
-      <div class="splash">
-        <div class="authorize">
-          <h1>Get Started</h1>
-          <p>Login to GitHub to get started!</p>
-          <a class="button" href="https://github.com/login/oauth/authorize?client_id=<%= oauth_client_id %>&scope=repo, user">Authorize with GitHub</a>
-        </div>
-      </div>
-    <% } %>
     </div>
   </script>
 
@@ -132,11 +91,11 @@
   <script src='src/boot.js'></script>
 
   <script src='src/views/application.js'></script>
+  <script src='src/views/login.js'></script>
   <script src='src/views/start.js'></script>
   <script src='src/views/dataset.js'></script>
   <script src='src/views/load.js'></script>
   <script src='src/views/save.js'></script>
-
 </head>
 <body>
 <div class="transformer-app">
