@@ -25,8 +25,6 @@ window.args = _(window.app).toArray();
         // Start the engines
         window.app.instance = new views.Application({ el: '.transformer-app', model: {} }).render();
 
-        app.instance.start();
-
         // Start responding to routes
         Backbone.history.start();
       });

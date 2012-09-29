@@ -15,12 +15,7 @@ views.Application = Backbone.View.extend({
   _logout: function() {
     logout();
     app.instance.render();
-    if ($('#start').length > 0) {
-      app.instance.start();
-    } else {
-      window.location.reload();
-    }
-    
+    window.location.reload();
     return false;
   },
 
@@ -134,10 +129,6 @@ views.Application = Backbone.View.extend({
 
       self.switchView('start');
     }, this));
-  },
-
-  start: function() {
-    this.switchView('start');
   },
 
   notify: function(type, message) {
