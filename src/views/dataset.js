@@ -8,7 +8,6 @@ views.Dataset = Backbone.View.extend({
   },
 
   _toggleTransform: function(e) {
-    e.preventDefault();
     var viewName = $(e.target).attr('data-view');
     this.el.find('.dataset-menu .views a').removeClass('active');
     this.el.find('.dataset-menu .views a[data-view="' + viewName + '"]').addClass('active');
@@ -35,13 +34,32 @@ views.Dataset = Backbone.View.extend({
   },
 
   render: function() {
-    $(this.el).html(templates.dataset({
+    var rendered = _.template(this.template, {
     	name: this.user + " / " + this.repo
-    }));
-    $('#grid').empty().append(this.grid.el);
-    $('#editor').empty().append(this.editor.el);
+    });
+    this.el.html(rendered);
+    this.el.find('#grid').empty().append(this.grid.el);
+    this.el.find('#editor').empty().append(this.editor.el);
+    this.el.find('.nav-tabs a:last').tab('show');
+    this.el.find('#transformations').show();
     return this;
-  }
+  },
+
+  template: ' \
+    <div class="view start"> \
+      <ul id="main-menu" class="nav nav-tabs"> \
+        <li><a class="grid-selector" href="#grid" data-toggle="tab">Grid</a></li> \
+        <li><a href="#transformations" data-toggle="tab">Transformations</a></li> \
+      </ul> \
+ \
+      <div class="tab-content"> \
+        <div class="tab-pane" id="grid"></div> \
+        <div class="tab-pane" id="transformations"> \
+          <div id="editor"></div> \
+        </div> \
+      </div> \
+    </div> \
+  '
 });
 
 }).apply(this, window.args);

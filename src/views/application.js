@@ -86,13 +86,6 @@ views.Application = Backbone.View.extend({
     this.loadView.render();
     $('#main').append(this.loadView.el);
 
-    this.startView = new views.Start({
-      id: "start",
-      model: _.extend(this.model, { authenticated: !!window.authenticated} )
-    });
-    this.startView.render();
-    $('#main').append(this.startView.el);
-    
     return this;
   },
 
@@ -131,6 +124,7 @@ views.Application = Backbone.View.extend({
         branch: branch 
       });
       ds.render();
+      $('#main').append(ds.el);
 
       var saveView = new views.Save({
         model: dataset
