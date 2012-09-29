@@ -15,6 +15,7 @@ views.Application = Backbone.View.extend({
   _logout: function() {
     logout();
     app.instance.render();
+    this.router.navigate('login');
     window.location.reload();
     return false;
   },
