@@ -1,3 +1,8 @@
+(function(config, models, views, routers, utils, templates) {
+
+// Github stuff
+// -------
+
 // Gimme a Github object! Please.
 function github() {
   return new Github({
@@ -36,7 +41,7 @@ function getRepo(user, repo) {
 // 
 // Load everything that's needed for the app + header
 
-function loadApplication(cb) {
+models.loadApplication = function(cb) {
   if (window.authenticated) {
     $.ajax({
       type: "GET",
@@ -68,7 +73,7 @@ function loadApplication(cb) {
 // Authentication
 // -------
 
-function authenticate() {
+models.authenticate = function() {
   if ($.cookie("oauth-token")) return window.authenticated = true;
 
   var match = window.location.href.match(/\?code=([a-z0-9]*)/);
@@ -89,7 +94,7 @@ function authenticate() {
   }
 }
 
-function logout() {
+models.logout = function() {
   window.authenticated = false;
   $.cookie("oauth-token", null);
 }
@@ -97,7 +102,7 @@ function logout() {
 // Load Dataset
 // -------
 
-function loadDataset(user, repo, branch, cb) {
+models.loadDataset = function(user, repo, branch, cb) {
   var repo = getRepo(user, repo);
 
   repo.read(branch, 'data/data.csv', function(err, raw_csv) {
@@ -110,10 +115,12 @@ function loadDataset(user, repo, branch, cb) {
 // Save Dataset
 // -------
 
-function saveDataset(user, repo, branch, data, commitMessage, cb) {
+models.saveDataset = function(user, repo, branch, data, commitMessage, cb) {
   var repo = getRepo(user, repo);
 
   repo.write(branch, 'data/data.csv', data, commitMessage, function(err) {
     cb(err);
   });
 }
+
+}).apply(this, window.args);

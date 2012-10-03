@@ -20,8 +20,8 @@ window.args = _(window.app).toArray();
 (function(config, models, views, routers, utils, templates) {
   $(function() {
 
-    if (authenticate()) {
-      loadApplication(function(err, data) {
+    if (models.authenticate()) {
+      models.loadApplication(function(err, data) {
         // Start the engines
         window.app.instance = new views.Application({ el: '.transformer-app', model: {} }).render();
 

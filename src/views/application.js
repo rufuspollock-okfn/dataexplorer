@@ -13,7 +13,7 @@ views.Application = Backbone.View.extend({
   },
 
   _logout: function() {
-    logout();
+    models.logout();
     app.instance.render();
     this.router.navigate('login');
     window.location.reload();
@@ -108,7 +108,7 @@ views.Application = Backbone.View.extend({
     //this.loading('Loading dataset ...');
     $('#main-menu a.grid-selector').tab('show');
 
-    loadDataset(user, repo, branch, _.bind(function (err, dataset) {
+    models.loadDataset(user, repo, branch, _.bind(function (err, dataset) {
       this.loaded();
       if (err) return this.notify('error', 'The requested resource could not be found.');
 
