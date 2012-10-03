@@ -63,6 +63,7 @@ views.Application = Backbone.View.extend({
 
   // Should be rendered just once
   render: function () {
+    var self = this;
     var loginUrl = 'https://github.com/login/oauth/authorize?client_id=' + config.oauth_client_id + '&scope=repo, user&redirect_uri=' + window.location.href;
     this.el.find('.user-status login a').attr('href', loginUrl);
     if (!window.authenticated) {
@@ -81,6 +82,10 @@ views.Application = Backbone.View.extend({
     this.loadView = new views.Load({});
     this.loadView.render();
     $('#main').append(this.loadView.el);
+
+    this.loadView.bind('load', function(project) {
+      self.dataset(project);
+    });
 
     return this;
   },
@@ -103,10 +108,14 @@ views.Application = Backbone.View.extend({
     // No-op ;-)
   },
 
-  dataset: function(user, repo, branch) {
+  dataset: function(project) {
     var self = this;
     //this.loading('Loading dataset ...');
     $('#main-menu a.grid-selector').tab('show');
+
+    user =  project.get('url').split("/")[3];
+    repo = project.get('url').split("/")[4];
+    branch = project.get('url').split("/")[6];
 
     models.loadDataset(user, repo, branch, _.bind(function (err, dataset) {
       this.loaded();

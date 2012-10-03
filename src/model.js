@@ -1,5 +1,15 @@
 (function(config, models, views, routers, utils, templates) {
 
+models.Project = Backbone.Model.extend({
+  // data_source_url
+  // data_source_type = github | gist | ckan | gdocs | ...
+  // (?) data_source_file_type = csv
+
+  // script_url
+
+  // data_dest_url
+});
+
 // Github stuff
 // -------
 

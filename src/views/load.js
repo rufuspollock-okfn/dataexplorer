@@ -7,23 +7,12 @@ views.Load = Backbone.View.extend({
     'click .load-dataset': '_loadDataset'
   },
 
-  _locateDataset: function() {
-    return $("div.control-group input[name=source]").first().val();
-  },
-
-  _datasetDetails: function(url) {
-    return { 
-      user: url.split("/")[3],
-      repo: url.split("/")[4],
-      branch: url.split("/")[6]
-    };
-  },
-
   _loadDataset: function(e) {
-    e.preventDefault();
-    var url = this._locateDataset();
-    var ds = this._datasetDetails(url);
-    app.instance.dataset(ds.user, ds.repo, ds.branch);
+    var url = $("div.control-group input[name=source]").first().val();
+    var project = new models.Project({
+      url: url
+    });
+    this.trigger('load', project);
     return false;
   },
 
