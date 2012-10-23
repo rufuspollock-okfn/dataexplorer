@@ -4,17 +4,30 @@ views.Load = Backbone.View.extend({
   id: 'load',
 
   events: {
-    'click .load-dataset': '_loadDataset'
+    'click .load-dataset': 'onLoadDataset'
   },
 
-  _loadDataset: function(e) {
+  onLoadDataset: function(e) {
+    var self = this;
     e.preventDefault();
     var $form = $(e.target).closest('form');
-    var url = $form.find("input[name=source]").first().val();
-    var project = new models.Project({
-      url: url
+    // var url = $form.find("input[name=source]").first().val();
+    var data = {};
+    _.each($form.serializeArray(), function(item) {
+      data[item.name] = item.value;
     });
-    this.trigger('load', project);
+    // special case for file form
+    var $files = $form.find('input[type="file"]');
+    if ($files.length > 0) {
+      data.file = $files[0].files[0]
+    }
+    var project = new models.Project();
+    project.loadSourceDataset(data, function(err) {
+      if (err) {
+        // this.notify('error', 'The requested resource could not be found.');
+      }
+      self.trigger('load', project);
+    });
     return false;
   },
 
@@ -46,11 +59,12 @@ views.Load = Backbone.View.extend({
         <div class="tab-content"> \
           <div class="tab-pane active" id="gdocs"> \
             <form class="form-horizontal"> \
+              <input type="hidden" name="backend" value="gdocs" /> \
               <fieldset> \
                 <div class="control-group"> \
-                  <label for="source" class="control-label">URL</label> \
+                  <label for="url" class="control-label">URL</label> \
                   <div class="controls"> \
-                    <input type="text" name="source" class="input span6" placeholder="URL to sheet" /> \
+                    <input type="text" name="url" class="input span6" placeholder="URL to sheet" /> \
                     <p class="help-block"> \
                       To load the spreadsheet you must have "published" it (see: File Menu -> Publish to the Web) \
                     </p> \
@@ -64,11 +78,12 @@ views.Load = Backbone.View.extend({
           </div> \
           <div class="tab-pane" id="github"> \
             <form class="form-horizontal"> \
+              <input type="hidden" name="backend" value="github" /> \
               <fieldset> \
                 <div class="control-group"> \
-                  <label for="source" class="control-label">GitHub CSV URL</label> \
+                  <label for="url" class="control-label">GitHub CSV URL</label> \
                   <div class="controls"> \
-                    <input type="text" name="source" class="input span6" placeholder="URL to CSV on GitHub" value="https://github.com/datasets/transformer-test/blob/master/data/data.csv" /> \
+                    <input type="text" name="url" class="input span6" placeholder="URL to CSV on GitHub" value="https://github.com/datasets/transformer-test/blob/master/data/data.csv" /> \
                   </div> \
                 </div> \
               </fieldset> \
@@ -79,22 +94,23 @@ views.Load = Backbone.View.extend({
           </div> \
           <div class="tab-pane" id="csv-disk"> \
             <form class="form-horizontal"> \
+              <input type="hidden" name="backend" value="csv" /> \
               <div class="control-group"> \
                 <label class="control-label">File</label> \
                 <div class="controls"> \
-                  <input type="file" name="source" /> \
+                  <input type="file" name="file" /> \
                 </div> \
               </div> \
               <div class="control-group"> \
                 <label class="control-label">Separator</label> \
                 <div class="controls"> \
-                  <input type="text" name="separator" value="," class="spam1"/> \
+                  <input type="text" name="delimiter" value="," class="spam1"/> \
                 </div> \
               </div> \
               <div class="control-group"> \
                 <label class="control-label">Text delimiter</label> \
                 <div class="controls"> \
-                  <input type="text" name="delimiter" value=\'"\' /> \
+                  <input type="text" name="quotechar" value=\'"\' /> \
                 </div> \
               </div> \
               <div class="control-group"> \

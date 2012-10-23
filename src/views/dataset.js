@@ -23,9 +23,6 @@ views.Dataset = Backbone.View.extend({
 
   initialize: function(options) {
     this.el = $(this.el);
-  	this.user   = options.user;
-  	this.repo   = options.repo;
-  	this.branch = options.branch;
 
 		this.grid = new recline.View.Grid({model: this.model, id: 'dataset'});
 		this.editor = new recline.View.Transform({model: this.model });
@@ -35,7 +32,7 @@ views.Dataset = Backbone.View.extend({
 
   render: function() {
     var rendered = _.template(this.template, {
-    	name: this.user + " / " + this.repo
+    	name: this.model.title 
     });
     this.el.html(rendered);
     this.el.find('#grid').empty().append(this.grid.el);

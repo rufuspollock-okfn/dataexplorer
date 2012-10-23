@@ -8,6 +8,33 @@ models.Project = Backbone.Model.extend({
   // script_url
 
   // data_dest_url
+  loadSourceDataset: function(datasetInfo, cb) {
+    var self = this;
+    this.set({source: datasetInfo});
+    if (datasetInfo.backend == 'github') {
+      self.loadGithubDataset(datasetInfo.url, cb);
+    } else {
+      self.dataset = new recline.Model.Dataset(datasetInfo);
+      self.dataset.fetch().done(function() {
+        cb();
+      });
+    }
+  },
+
+  loadGithubDataset: function(url, cb) {
+    var self = this;
+    user =  project.get('url').split("/")[3];
+    repo = project.get('url').split("/")[4];
+    branch = project.get('url').split("/")[6];
+
+    var repo = getRepo(user, repo);
+
+    repo.read(branch, 'data/data.csv', function(err, raw_csv) {
+      self.dataset = new recline.Model.Dataset({data: raw_csv, backend: 'csv'});
+      self.dataset.fetch();
+      cb(err, dataset);
+    });
+  }
 });
 
 // Github stuff
@@ -107,19 +134,6 @@ models.authenticate = function() {
 models.logout = function() {
   window.authenticated = false;
   $.cookie("oauth-token", null);
-}
-
-// Load Dataset
-// -------
-
-models.loadDataset = function(user, repo, branch, cb) {
-  var repo = getRepo(user, repo);
-
-  repo.read(branch, 'data/data.csv', function(err, raw_csv) {
-    var dataset = new recline.Model.Dataset({data: raw_csv, backend: 'csv'});
-    dataset.fetch();
-    cb(err, dataset);
-  });
 }
 
 // Save Dataset
