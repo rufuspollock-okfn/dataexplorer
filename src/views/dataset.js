@@ -8,17 +8,38 @@ views.Dataset = Backbone.View.extend({
 
   initialize: function(options) {
     this.el = $(this.el);
-
-		this.grid = new recline.View.Grid({model: this.model, id: 'dataset'});
-		this.editor = new recline.View.Transform({model: this.model });
-    this.editor.render();
-		this.model.query();
   },
 
   render: function() {
     this.el.html(this.template);
+    var views = [
+       {
+         id: 'grid',
+         label: 'Grid', 
+         view: new recline.View.SlickGrid({
+           model: this.model
+         })
+       },
+       {
+         id: 'map',
+         label: 'Map',
+         view: new recline.View.Map({
+           model: this.model
+         })
+       }
+    ];
+		this.grid = new recline.View.MultiView({
+      model: this.model,
+      views: views
+    });
+		this.editor = new recline.View.Transform({model: this.model });
+
     this.el.find('#grid').empty().append(this.grid.el);
     this.el.find('#editor').empty().append(this.editor.el);
+    this.editor.render();
+
+		this.model.query();
+
     return this;
   },
 
