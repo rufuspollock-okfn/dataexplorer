@@ -47,10 +47,13 @@ views.Load = Backbone.View.extend({
       <div class="tabbable"> \
         <ul class="nav nav-tabs"> \
           <li class="active"> \
-            <a href="#gdocs" data-toggle="tab">Google Docs Spreadsheet</a> \
+            <a href="#gdocs" data-toggle="tab">Google Spreadsheet</a> \
           </li> \
           <li> \
             <a href="#csv-disk" data-toggle="tab">CSV on disk</a> \
+          </li> \
+          <li> \
+            <a href="#csv-online" data-toggle="tab">CSV Online</a> \
           </li> \
           <li> \
             <a href="#github" data-toggle="tab">GitHub CSV</a> \
@@ -103,6 +106,25 @@ views.Load = Backbone.View.extend({
                   <input type="text" name="encoding" value="UTF-8" /> \
                 </div> \
               </div> \
+              <div class="form-actions"> \
+                <button type="submit" class="btn btn-primary load-dataset">Load</button> \
+              </div> \
+            </form> \
+          </div> \
+          <div class="tab-pane" id="csv-online"> \
+            <form class="form-horizontal"> \
+              <input type="hidden" name="backend" value="csv" /> \
+              <fieldset> \
+                <div class="control-group"> \
+                  <label for="url" class="control-label">URL</label> \
+                  <div class="controls"> \
+                    <input type="text" name="url" class="input span6" placeholder="URL to CSV" /> \
+                    <p class="help-block"> \
+                      The CSV must either be on the same server or on a domain that supports cross domain requests (via CORS) \
+                    </p> \
+                  </div> \
+                </div> \
+              </fieldset> \
               <div class="form-actions"> \
                 <button type="submit" class="btn btn-primary load-dataset">Load</button> \
               </div> \
