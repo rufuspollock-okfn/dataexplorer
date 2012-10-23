@@ -50,10 +50,10 @@ views.Load = Backbone.View.extend({
             <a href="#gdocs" data-toggle="tab">Google Docs Spreadsheet</a> \
           </li> \
           <li> \
-            <a href="#github" data-toggle="tab">GitHub CSV</a> \
+            <a href="#csv-disk" data-toggle="tab">CSV on disk</a> \
           </li> \
           <li> \
-            <a href="#csv-disk" data-toggle="tab">Load from CSV on disk</a> \
+            <a href="#github" data-toggle="tab">GitHub CSV</a> \
           </li> \
         </ul> \
         <div class="tab-content"> \
@@ -68,22 +68,6 @@ views.Load = Backbone.View.extend({
                     <p class="help-block"> \
                       To load the spreadsheet you must have "published" it (see: File Menu -> Publish to the Web) \
                     </p> \
-                  </div> \
-                </div> \
-              </fieldset> \
-              <div class="form-actions"> \
-                <button type="submit" class="btn btn-primary load-dataset">Load</button> \
-              </div> \
-            </form> \
-          </div> \
-          <div class="tab-pane" id="github"> \
-            <form class="form-horizontal"> \
-              <input type="hidden" name="backend" value="github" /> \
-              <fieldset> \
-                <div class="control-group"> \
-                  <label for="url" class="control-label">GitHub CSV URL</label> \
-                  <div class="controls"> \
-                    <input type="text" name="url" class="input span6" placeholder="URL to CSV on GitHub" value="https://github.com/datasets/transformer-test/blob/master/data/data.csv" /> \
                   </div> \
                 </div> \
               </fieldset> \
@@ -119,6 +103,22 @@ views.Load = Backbone.View.extend({
                   <input type="text" name="encoding" value="UTF-8" /> \
                 </div> \
               </div> \
+              <div class="form-actions"> \
+                <button type="submit" class="btn btn-primary load-dataset">Load</button> \
+              </div> \
+            </form> \
+          </div> \
+          <div class="tab-pane" id="github"> \
+            <form class="form-horizontal"> \
+              <input type="hidden" name="backend" value="github" /> \
+              <fieldset> \
+                <div class="control-group"> \
+                  <label for="url" class="control-label">GitHub CSV URL</label> \
+                  <div class="controls"> \
+                    <input type="text" name="url" class="input span6" placeholder="URL to CSV on GitHub" value="https://github.com/datasets/transformer-test/blob/master/data/data.csv" /> \
+                  </div> \
+                </div> \
+              </fieldset> \
               <div class="form-actions"> \
                 <button type="submit" class="btn btn-primary load-dataset">Load</button> \
               </div> \
