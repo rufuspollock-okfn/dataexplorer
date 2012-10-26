@@ -12,7 +12,7 @@ window.app = {
       return memo;
     }, {}),
     state: {'repo': ''},
-    instance: {}
+    instance: null
 };
 
 window.args = _(window.app).toArray();
@@ -20,17 +20,13 @@ window.args = _(window.app).toArray();
 (function(config, models, views, routers, utils, templates) {
   $(function() {
 
-    if (authenticate()) {
-      loadApplication(function(err, data) {
+    if (models.authenticate()) {
+      models.loadApplication(function(err, data) {
         // Start the engines
         window.app.instance = new views.Application({ el: '.transformer-app', model: {} }).render();
 
-        app.instance.start();
-        // Initialize router
-        // window.router = new routers.Application({});
-
-        // // Start responding to routes
-        // Backbone.history.start();
+        // Start responding to routes
+        Backbone.history.start();
       });
     }
   });

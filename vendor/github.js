@@ -1,4 +1,4 @@
-// Github.js 0.6.1
+// Github.js 0.7.0
 // (c) 2012 Michael Aufreiter, Development Seed
 // Github.js is freely distributable under the MIT license.
 // For all details and documentation:
@@ -10,41 +10,42 @@
 
   Github = window.Github = function(options) {
 
-    // Util
+    // HTTP Request Abstraction
     // =======
+    // 
+    // I'm not proud of this and neither should you be if you were responsible for the XMLHttpRequest spec.
 
-    function headers() {
-      var headers = {}
-      if (options.auth === 'oauth' && !options.token) return { Accept: 'application/vnd.github.raw' };
-      if (options.auth === 'basic' && (!options.username || !options.password)) return { Accept: 'application/vnd.github.raw' };
-      return options.auth == 'oauth'
-             ? { Authorization: 'token '+ options.token, Accept: 'application/vnd.github.raw' }
-             : { Authorization : 'Basic ' + Base64.encode(options.username + ':' + options.password), Accept: 'application/vnd.github.raw' }
-    }
+    function _request(method, path, data, cb, raw) {
+      function getURL() {
+        var url = API_URL + path;
+        return url + ((/\?/).test(url) ? "&" : "?") + (new Date()).getTime();
+      }
 
-    function _request(method, path, data, cb) {
-      $.ajax({
-        type: method,
-        url: API_URL + path,
-        data: JSON.stringify(data),
-        dataType: 'json',
-        contentType: 'application/x-www-form-urlencoded',
-        success: function(res) { cb(null, res); },
-        error: function(err) { cb(err); },
-        headers : headers()
-      });
-    }
+      var xhr = new XMLHttpRequest();
+      if (!raw) {xhr.dataType = "json"}
 
-    function _raw_request(method, path, data, cb) {
-      $.ajax({
-        type: method,
-        url: API_URL + path,
-        data: JSON.stringify(data),
-        contentType: 'application/x-www-form-urlencoded',
-        success: function(res) { cb(null, res); },
-        error: function(err) { cb(err); },
-        headers : headers()
-      });
+      xhr.open(method, getURL());
+      xhr.onreadystatechange = function () {
+        if (this.readyState == 4) {
+          if (this.status >= 200 && this.status < 300 || this.status === 304) {
+            cb(null, raw ? this.responseText : this.responseText ? JSON.parse(this.responseText) : true);
+          } else {
+            cb({request: this, error: this.status});
+          }
+        }
+      }
+      xhr.setRequestHeader('Accept','application/vnd.github.raw');
+      xhr.setRequestHeader('Content-Type','application/json');
+      if (
+         (options.auth == 'oauth' && options.token) ||
+         (options.auth == 'basic' && options.username && options.password)
+         ) {
+           xhr.setRequestHeader('Authorization',options.auth == 'oauth'
+             ? 'token '+ options.token
+             : 'Basic ' + Base64.encode(options.username + ':' + options.password)
+           );
+         }
+      data ? xhr.send(JSON.stringify(data)) : xhr.send();
     }
 
     // User API
@@ -66,6 +67,15 @@
         });
       };
 
+      // List authenticated user's gists
+      // -------
+
+      this.gists = function(cb) {
+        _request("GET", "/gists", null, function(err, res) {
+          cb(err,res);
+        });
+      };
+
       // Show user information
       // -------
 
@@ -84,22 +94,21 @@
         });
       };
 
+      // List a user's gists
+      // -------
+
+      this.userGists = function(username, cb) {
+        _request("GET", "/users/"+username+"/gists", null, function(err, res) {
+          cb(err,res);
+        });
+      };
+
       // List organization repositories
       // -------
 
       this.orgRepos = function(orgname, cb) {
         _request("GET", "/orgs/"+orgname+"/repos?type=all&per_page=1000&sort=updated&direction=desc", null, function(err, res) {
           cb(err, res);
-        });
-      };
-
-      // List all user gists
-      // This will return all public gists if user is not authenticated
-      // -------
-
-      this.userGists = function(username,cb) {
-        _request("GET", "/gists", null, function(err, res) {
-          cb(err,res);
         });
       };
     };
@@ -125,7 +134,7 @@
 
       function updateTree(branch, cb) {
         if (branch === currentTree.branch && currentTree.sha) return cb(null, currentTree.sha);
-        that.getRef(branch, function(err, sha) {
+        that.getRef("heads/"+branch, function(err, sha) {
           currentTree.branch = branch;
           currentTree.sha = sha;
           cb(err, sha);
@@ -136,10 +145,32 @@
       // -------
 
       this.getRef = function(ref, cb) {
-        _request("GET", repoPath + "/git/refs/heads/" + ref, null, function(err, res) {
+        _request("GET", repoPath + "/git/refs/" + ref, null, function(err, res) {
           if (err) return cb(err);
           cb(null, res.object.sha);
         });
+      };
+
+      // Create a new reference
+      // --------
+      //
+      // {
+      //   "ref": "refs/heads/my-new-branch-name",
+      //   "sha": "827efc6d56897b048c772eb4087f854f46256132"
+      // }
+
+      this.createRef = function(options, cb) {
+        _request("POST", repoPath + "/git/refs", options, cb);
+      };
+
+      // Delete a reference
+      // --------
+      // 
+      // repo.deleteRef('heads/gh-pages')
+      // repo.deleteRef('tags/v1.0')
+
+      this.deleteRef = function(ref, cb) {
+        _request("DELETE", repoPath + "/git/refs/"+ref, options, cb);
       };
 
       // List all branches of a repository
@@ -156,7 +187,7 @@
       // -------
 
       this.getBlob = function(sha, cb) {
-        _raw_request("GET", repoPath + "/git/blobs/" + sha, null, cb);
+        _request("GET", repoPath + "/git/blobs/" + sha, null, cb, 'raw');
       };
 
       // For a given file path, get the corresponding sha (blob for files, tree for dirs)
@@ -164,7 +195,7 @@
 
       this.getSha = function(branch, path, cb) {
         // Just use head if path is empty
-        if (path === "") return that.getRef(branch, cb);
+        if (path === "") return that.getRef("heads/"+branch, cb);
         that.getTree(branch+"?recursive=true", function(err, tree) {
           var file = _.select(tree, function(file) {
             return file.path === path;
@@ -187,11 +218,14 @@
       // -------
 
       this.postBlob = function(content, cb) {
-        var data = {
-          "content": content,
-          "encoding": "utf-8"
-        };
-        _request("POST", repoPath + "/git/blobs", data, function(err, res) {
+        if (typeof(content) === "string") {
+          content = {
+            "content": content,
+            "encoding": "utf-8"
+          };
+        }
+
+        _request("POST", repoPath + "/git/blobs", content, function(err, res) {
           if (err) return cb(err);
           cb(null, res.sha);
         });
@@ -265,9 +299,28 @@
       // -------
 
       this.show = function(cb) {
-        _request("GET", repoPath, null, function(err, info) {
-          cb(null, info);
-        });
+        _request("GET", repoPath, null, cb);
+      };
+
+      // Get contents
+      // --------
+
+      this.contents = function(path, cb) {
+        _request("GET", repoPath + "/contents", { path: path }, cb);
+      };
+
+      // Fork repository
+      // -------
+
+      this.fork = function(cb) {
+        _request("POST", repoPath + "/forks", null, cb);
+      };
+
+      // Create pull request
+      // --------
+
+      this.createPullRequest = function(options, cb) {
+        _request("POST", repoPath + "/pulls", options, cb);
       };
 
       // Read file at given path
@@ -276,7 +329,9 @@
       this.read = function(branch, path, cb) {
         that.getSha(branch, path, function(err, sha) {
           if (!sha) return cb("not found", null);
-          that.getBlob(sha, cb);
+          that.getBlob(sha, function(err, content) {
+            cb(err, content, sha);
+          });
         });
       };
 
@@ -331,24 +386,17 @@
 
       this.write = function(branch, path, content, message, cb) {
         updateTree(branch, function(err, latestCommit) {
+          if (err) return cb(err);
           that.postBlob(content, function(err, blob) {
-            if(err === null) {
-              that.updateTree(latestCommit, path, blob, function(err, tree) {
-                that.commit(latestCommit, tree, message, function(err, commit) {
-                  that.updateHead(branch, commit, cb);
-                });
+            if (err) return cb(err);
+            that.updateTree(latestCommit, path, blob, function(err, tree) {
+              if (err) return cb(err);
+              that.commit(latestCommit, tree, message, function(err, commit) {
+                if (err) return cb(err);
+                that.updateHead(branch, commit, cb);
               });
-            } else {
-              alert("Error saving: " + (function() { switch(err.status) {
-              case 404:
-                // github returns 404 (not 403) to mask the (non)-existence
-                // of private members of the namespace, when access is denied
-                return "permission denied or repo not found";
-              default:
-                return "unknown error";
-              }})());
-            }
-          })
+            });
+          });
         });
       };
     };
@@ -364,38 +412,12 @@
       // Read the gist
       // --------
 
-      this.show = function(cb) {
-        _request("GET", gistPath, null, function(err,info) {
-          cb(err,info);
+      this.read = function(cb) {
+        _request("GET", gistPath, null, function(err, gist) {
+          cb(err, gist);
         });
       };
 
-      // Star the gist
-      // --------
-
-      this.star = function(cb) {
-        _request("PUT", gistPath+"/star", null, function(err,res) {
-          cb(err,res);
-        });
-      }
-
-      // Check if the Gist is starred
-      // --------
-
-      this.isStarred = function(cb) {
-        _request("GET", gistPath+"/star", null, function(err,res) {
-          cb(err,res);
-        });
-      };
-
-      // Unstar the gist
-      // --------
-
-      this.unstar = function(cb) {
-        _request("DELETE", gistPath+"/star", null, function(err,res) {
-          cb(err,res);
-        });
-      };
 
       // Delete the gist
       // --------
@@ -418,43 +440,11 @@
       // Update a gist with the new stuff
       // --------
 
-      this.edit = function(cb,options) {
+      this.update = function(options, cb) {
         _request("PATCH", gistPath, options, function(err,res) {
           cb(err,res);
         });
       };
-
-      // Update Gist Description
-      // --------
-
-      this.updateDescription = function(cb,description) {
-        that.edit(cb,{description: description});
-      };
-
-      // Rename a file in the gist
-      // --------
-
-      this.renameFile = function(oldName, newName, cb) {
-        var options = {files:{}};
-        options.files[oldName] = newName;
-        that.edit(cb, options);
-      };
-
-      // Delete a file in the gist
-      // --------
-
-      this.deleteFile = function(fileName, cb) {
-        var options = {files:{}};
-        options.files[fileName] = null;
-        that.edit(cb,options);
-      };
-
-      // Update a particular file in the gist
-      this.updateFile = function(filename, contents, cb) {
-        var options = {files:{}};
-        options.files[filename] = {content: contents};
-        that.edit(cb,options);
-      }
     };
 
     // Top Level API

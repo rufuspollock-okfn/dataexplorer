@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset='UTF-8'/>
-  <title>Data Transformer &middot; Transform Data in Pure Javascript</title>
+  <title>Data Explorer &middot; View and Clean Data in the Browser</title>
   <link rel='shortcut icon' href='images/favicon.ico' type='image/x-icon' />
 
   <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
@@ -10,6 +10,14 @@
     <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
   <![endif]-->
   <link rel="stylesheet" href="vendor/recline/vendor/bootstrap/2.0.2/css/bootstrap.css">
+  <link rel="stylesheet" href="vendor/recline/vendor/leaflet/0.4.4/leaflet.css">
+  <!--[if lte IE 8]>
+  <link rel="stylesheet" href="vendor/recline/vendor/leaflet/0.4.4/leaflet.ie.css" />
+  <![endif]-->
+  <link rel="stylesheet" href="vendor/recline/vendor/leaflet.markercluster/MarkerCluster.css">
+  <link rel="stylesheet" href="vendor/recline/vendor/leaflet.markercluster/MarkerCluster.Default.css">
+  
+  <link rel="stylesheet" href="vendor/recline/vendor/slickgrid/2.0.1/slick.grid.css">
 
   <!-- Recline CSS components -->
   <link rel="stylesheet" href="vendor/recline/dist/recline.css">
@@ -21,109 +29,6 @@
   <link rel="stylesheet" href="vendor/recline/vendor/bootstrap/2.0.2/css/bootstrap-responsive.css">
 
   <!-- templates -->
-  <script name='start' type='text/html'>
-    <% if (authenticated) { %>
-
-
-    <ul id="main-menu" class="nav nav-tabs">
-      <li class="active"><a href="#dataset" data-toggle="tab">Dataset</a></li>
-      <li><a class="grid-selector" href="#grid" data-toggle="tab">Grid</a></li>
-      <li><a href="#transformations" data-toggle="tab">Transformations</a></li>
-    </ul>
-
-	<div class="tab-content">
-	  <div class="tab-pane active" id="dataset">
-      <form class="js-load-url form-horizontal" id="load_dataset_form">
-        <fieldset>
-          <legend>Load a CSV or GitHub repo</legend>
-          <div class="control-group">
-            <label for="source" class="control-label">CSV file</label>
-            <div class="controls">
-              <input type="text" name="source" class="input span4" placeholder="URL to CSV sheet" value="https://github.com/datasets/transformer-test/blob/master/data/data.csv" />
-              <p class="help-block"></p>
-            </div>
-          </div>
-        </fieldset>
-        <div class="form-actions">
-          <button type="submit" class="btn btn-primary load-dataset">Load</button>
-          <button class="save-dataset btn">Save</button>
-        </div>
-      </form>
-
-
-	  </div>
-	  <div class="tab-pane" id="grid">
-	  </div>
-	  <div class="tab-pane" id="transformations">
-		<div id="editor">
-		</div>
-
-	  </div>
-	</div>
-
-    <% } else { %>
-      <h1 style="text-align: center; margin: 30px;">How It Works</h1>
-      <div class="row instructions">
-        <div class="span3">
-          <div class="well">
-            <h3>1. Login</h3>
-            <p>Login to GitHub so that we can save your work later</p>
-          </div>
-        </div>
-        <div class="span3">
-          <div class="well">
-            <h3>2. Load Some Data</h3>
-            <p>Load data from online sources (e.g. the DataHub, GitHub or CSVs online)</p>
-          </div>
-        </div>
-        <div class="span3">
-          <div class="well">
-            <h3>3. Clean It Up</h2>
-            <p>Write simple javascript or use the built-in functions to clean up the data.</p>
-          </div>
-        </div>
-        <div class="span3">
-          <div class="well">
-            <h3>4. Save the Result</h3>
-            <p>Save the resulting <strong>data and scripts</strong> to GitHub</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="splash">
-        <div class="authorize">
-          <h1>Get Started</h1>
-          <p>Login to GitHub to get started!</p>
-          <a class="button" href="https://github.com/login/oauth/authorize?client_id=<%= oauth_client_id %>&scope=repo, user">Authorize with GitHub</a>
-        </div>
-      </div>
-    <% } %>
-  </script>
-
-  <script name='dataset' type='text/html'>
-    <div class="dataset">
-      <div class="dataset-menu-wrapper">
-        <div class="dataset-menu">
-          <div class="name"><%= name %></div>
-          <div class="btn-group views" data-toggle="buttons-radio">
-            <a class="toggle-transform btn active" data-view="grid" href="#">Grid</a>
-            <a class="toggle-transform btn" data-view="transform" href="#">Transform</a>
-          </div>
-          <a class="save-dataset btn btn-primary">Save</a>
-        </div>
-      </div>
-
-      <div class="dataset-content">
-       <!-- <div id="grid">
-
-        </div>
-        <div id="editor" style="display: none;">
-
-        </div> -->
-      </div>
-    </div>
-  </script>
-
   <script name='header' type='text/html'>
       <div class='user-status<%= !window.authenticated ? " logged-out" : "" %>'>
       <% if (window.authenticated) { %>
@@ -145,18 +50,24 @@
   <script type="text/javascript" src="vendor/recline/vendor/moment/1.6.2/moment.js"></script>
   <script type="text/javascript" src="vendor/recline/vendor/mustache/0.5.0-dev/mustache.js"></script>
   <script type="text/javascript" src="vendor/recline/vendor/bootstrap/2.0.2/bootstrap.js"></script>
+  <script type="text/javascript" src="vendor/recline/vendor/leaflet/0.4.4/leaflet.js"></script>
+  <script type="text/javascript" src="vendor/recline/vendor/leaflet.markercluster/leaflet.markercluster.js"></script>
+  <script type="text/javascript" src="vendor/recline/vendor/slickgrid/2.0.1/jquery-ui-1.8.16.custom.min.js"></script>
+  <script type="text/javascript" src="vendor/recline/vendor/slickgrid/2.0.1/jquery.event.drag-2.0.min.js"></script>
+  <script type="text/javascript" src="vendor/recline/vendor/slickgrid/2.0.1/slick.grid.min.js"></script>
 
   <script type="text/javascript" src="vendor/recline/dist/recline.js"></script>
 
 
   <!-- Application-specific -->
-  <script src='src/model.js'></script>
   <script src='src/boot.js'></script>
+  <script src='src/model.js'></script>
 
   <script src='src/views/application.js'></script>
-  <script src='src/views/start.js'></script>
+  <script src='src/views/login.js'></script>
   <script src='src/views/dataset.js'></script>
-
+  <script src='src/views/load.js'></script>
+  <script src='src/views/save.js'></script>
 </head>
 <body>
 <div class="transformer-app">
@@ -164,8 +75,12 @@
     <div class="navbar-inner">
       <div class="container">
         <a class="brand" href="#">
-          Data Transformer - a tool for cleaning up data
+          Data Explorer - view and clean data in the browser
         </a>
+        <ul class="nav">
+          <li><a href="#load">Load</a></li>
+          <li><a href="#save">Save</a></li>
+        </ul>
         <ul class="nav pull-right user-status">
           <li class="logged-in"><a class="username"></a></li>
           <li class="logged-in"><a class="logout" href="#" title="sign out"><i class="icon-off icon-white"></i></a></li>
