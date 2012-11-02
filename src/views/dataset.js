@@ -26,6 +26,13 @@ views.Dataset = Backbone.View.extend({
          view: new recline.View.Map({
            model: this.model
          })
+       },
+       {
+         id: 'graph',
+         label: 'Graph',
+         view: new recline.View.Graph({
+           model: this.model
+         })
        }
     ];
 		this.grid = new recline.View.MultiView({
