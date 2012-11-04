@@ -23,16 +23,16 @@ models.Project = Backbone.Model.extend({
 
   loadGithubDataset: function(url, cb) {
     var self = this;
-    user =  project.get('url').split("/")[3];
-    repo = project.get('url').split("/")[4];
-    branch = project.get('url').split("/")[6];
+    user =  url.split("/")[3];
+    repo = url.split("/")[4];
+    branch = url.split("/")[6];
 
     var repo = getRepo(user, repo);
 
     repo.read(branch, 'data/data.csv', function(err, raw_csv) {
       self.dataset = new recline.Model.Dataset({data: raw_csv, backend: 'csv'});
       self.dataset.fetch();
-      cb(err, dataset);
+      cb(err, self.dataset);
     });
   }
 });
