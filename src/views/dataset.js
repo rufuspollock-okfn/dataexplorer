@@ -35,17 +35,24 @@ views.Dataset = Backbone.View.extend({
          })
        }
     ];
+
+    // see below!
+    var width = this.el.find('.multiview-here').width();
+
 		this.grid = new recline.View.MultiView({
+      el: this.el.find('.multiview-here'),
       model: this.model,
       views: views
     });
 		this.editor = new recline.View.Transform({model: this.model });
 
-    this.el.find('#grid').empty().append(this.grid.el);
-    this.el.find('#editor').empty().append(this.editor.el);
+    this.el.find('#editor').append(this.editor.el);
     this.editor.render();
 
 		this.model.query();
+
+    // HACK - for some reason the grid view of multiview is massively wide by default
+    this.el.find('.view.start .recline-data-explorer').width(width);
 
     return this;
   },
@@ -62,7 +69,9 @@ views.Dataset = Backbone.View.extend({
           </li> \
         </ul> \
         <div class="tab-content"> \
-          <div class="tab-pane active" id="grid"></div> \
+          <div class="tab-pane active" id="grid"> \
+            <div class="multiview-here"></div> \
+          </div> \
           <div class="tab-pane" id="transformations"> \
             <div id="editor"></div> \
           </div> \
