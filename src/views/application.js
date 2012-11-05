@@ -110,6 +110,8 @@ views.Application = Backbone.View.extend({
 
   dataset: function(project) {
     var self = this;
+    self.switchView('start');
+
     //this.loading('Loading dataset ...');
     $('#main-menu a.grid-selector').tab('show');
 
@@ -117,16 +119,8 @@ views.Application = Backbone.View.extend({
       model: project.dataset, 
       id: 'dataset'
     });
-    ds.render();
     $('#main').append(ds.el);
-
-    var saveView = new views.Save({
-      model: dataset
-    });
-    saveView.render();
-    $('#main').append(saveView.el);
-
-    self.switchView('start');
+    ds.render();
   },
 
   notify: function(type, message) {
