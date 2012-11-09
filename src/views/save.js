@@ -44,7 +44,7 @@ views.Save = Backbone.View.extend({
   },
 
   saveDataset: function(location) {
-  	var rawCSV = this._serializeCSV(this.model);
+  	var rawCSV = this._serializeCSV(this.project.dataset);
     models.saveDataset(location.user, location.repo, location.branch, rawCSV, "updated file", function() {
       alert("Saved.");
     });
