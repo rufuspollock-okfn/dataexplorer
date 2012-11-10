@@ -45,9 +45,14 @@ views.Save = Backbone.View.extend({
 
   saveDataset: function(location) {
   	var rawCSV = this._serializeCSV(this.project.dataset);
-    models.saveDataset(location.user, location.repo, location.branch, rawCSV, "updated file", function() {
-      alert("Saved.");
-    });
+    models.saveDataset(location.user, location.repo, location.branch, rawCSV, "updated file", function(err) {
+	  alert((function() { 
+		if (!err) return "Saved."
+		switch (err.error) {
+		  case 404: return "Error saving: not logged in or URL not found";
+          default: return "Error saving, HTTP code: " + err;
+		}})());
+	});		   
     return false;
   },
 
