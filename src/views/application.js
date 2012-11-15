@@ -87,6 +87,10 @@ views.Application = Backbone.View.extend({
       self.dataset(project);
     });
 
+    this.saveView = new views.Save({});
+    this.saveView.render();
+    $('#main').append(this.saveView.el);
+
     return this;
   },
 
