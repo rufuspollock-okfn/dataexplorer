@@ -1,8 +1,6 @@
 (function(config, models, views, routers, utils, templates) {
 
 views.Load = Backbone.View.extend({
-  id: 'load',
-
   events: {
     'click .load-dataset': 'onLoadDataset'
   },
