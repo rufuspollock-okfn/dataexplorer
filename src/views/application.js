@@ -8,7 +8,6 @@ views.Application = Backbone.View.extend({
   // ------
 
   events: {
-    'click .toggle-view': 'toggleView',
     'click a.logout': '_logout',
     'click a.login': '_login'
   },
@@ -23,18 +22,6 @@ views.Application = Backbone.View.extend({
     e.preventDefault();
     var url = 'https://github.com/login/oauth/authorize?client_id=' + config.oauth_client_id + '&scope=repo, user';
     window.open(url, 'Data Explorer - Github Login', 'height=400,width=400');
-  },
-
-  toggleView: function (e) {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    var link  = $(e.currentTarget),
-        route = link.attr('href').replace(/^\//, '');
-    
-    $('.toggle-view.active').removeClass('active');
-    link.addClass('active');
-    router.navigate(route, true);
   },
 
   // Initialize
