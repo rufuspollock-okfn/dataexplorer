@@ -87,58 +87,31 @@ function getRepo(user, repo) {
 // 
 // Load everything that's needed for the app + header
 
-models.loadApplication = function(cb) {
-  if (window.authenticated) {
-    $.ajax({
-      type: "GET",
-      url: 'https://api.github.com/user',
-      dataType: 'json',
-      contentType: 'application/x-www-form-urlencoded',
-      headers : { Authorization : 'token ' + $.cookie('oauth-token') },
-      success: function(res) {
-        $.cookie("avatar", res.avatar_url);
-        $.cookie("username", res.login);
-        app.username = res.login;
+models.loadUserInfo = function(cb) {
+  $.ajax({
+    type: "GET",
+    url: 'https://api.github.com/user',
+    dataType: 'json',
+    contentType: 'application/x-www-form-urlencoded',
+    headers : { Authorization : 'token ' + $.cookie('oauth-token') },
+    success: function(res) {
+      $.cookie("avatar", res.avatar_url);
+      $.cookie("username", res.login);
+      app.username = res.login;
 
-        var user = github().getUser();
-        var owners = {};
+      var user = github().getUser();
+      var owners = {};
 
-        cb(null);
-
-      },
-      error: function(err) { 
-        cb('error');
-      }
-    });
-
-  } else {
-    cb(null);
-  }
+      cb(null);
+    },
+    error: function(err) { 
+      cb('error');
+    }
+  });
 }
 
 // Authentication
 // -------
-
-models.authenticate = function() {
-  if ($.cookie("oauth-token")) return window.authenticated = true;
-
-  var match = window.location.href.match(/\?code=([a-z0-9]*)/);
-
-  // Handle Code
-  if (match) {
-    $.getJSON(window.app.config.gatekeeper_url + '/authenticate/'+match[1], function(data) {
-      $.cookie('oauth-token', data.token);
-      window.authenticated = true;
-      // Adjust URL
-      var regex = new RegExp("\\?code="+match[1]);
-
-      window.location.href = window.location.href.replace(regex, '').replace('&state=', '');
-    });
-    return false;
-  } else {
-    return true;  
-  }
-}
 
 models.logout = function() {
   window.authenticated = false;
