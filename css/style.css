@@ -38,8 +38,12 @@ body {
   color: #434C50;
 }
 
-.navbar .nav.user-status .login {
+.user-status li.not-logged-in {
   display: none;
+}
+
+.user-status.logged-out .not-logged-in {
+  display: inherit;
 }
 
 .user-status.logged-out .logged-in {
@@ -67,18 +71,6 @@ body {
   border: 1px solid #C3CCD0;
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0),0 0 10px rgba(0, 0, 0, 0.1);
   border-radius: 3px;
-  }
-
-.view.login .splash h2 {
-  background: url('images/sprite.png') 111px 47px no-repeat;
-  text-indent: -3000px;
-  overflow: hidden;
-  display: block;
-  height: 200px;
-  }
-
-.view.login .splash p {
-  margin-bottom: 20px;	
   }
 
 .authorize {

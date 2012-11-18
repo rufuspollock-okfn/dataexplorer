@@ -8,28 +8,20 @@ views.Application = Backbone.View.extend({
   // ------
 
   events: {
-    'click .toggle-view': 'toggleView',
-    'click a.logout': '_logout'
+    'click a.logout': '_logout',
+    'click a.login': '_login'
   },
 
   _logout: function() {
     models.logout();
-    app.instance.render();
-    this.router.navigate('login');
     window.location.reload();
     return false;
   },
 
-  toggleView: function (e) {
+  _login: function(e) {
     e.preventDefault();
-    e.stopPropagation();
-    
-    var link  = $(e.currentTarget),
-        route = link.attr('href').replace(/^\//, '');
-    
-    $('.toggle-view.active').removeClass('active');
-    link.addClass('active');
-    router.navigate(route, true);
+    var url = 'https://github.com/login/oauth/authorize?client_id=' + config.oauth_client_id + '&scope=repo, user';
+    window.open(url, 'Data Explorer - Github Login', 'height=400,width=400');
   },
 
   // Initialize
@@ -41,14 +33,7 @@ views.Application = Backbone.View.extend({
     _.bindAll(this);
     this.router = new Backbone.Router();
     this.router.route('', 'home', function() {
-      if (!window.authenticated) {
-        self.router.navigate('login', {trigger: true});
-      } else {
-        self.router.navigate('load', {trigger: true});
-      }
-    });
-    this.router.route('login', 'login', function() {
-      self.switchView('login');
+      self.router.navigate('load', {trigger: true});
     });
     this.router.route('load', 'load', function() {
       self.switchView('load');
@@ -66,19 +51,14 @@ views.Application = Backbone.View.extend({
     var self = this;
     var loginUrl = 'https://github.com/login/oauth/authorize?client_id=' + config.oauth_client_id + '&scope=repo, user&redirect_uri=' + window.location.href;
     this.el.find('.user-status login a').attr('href', loginUrl);
-    if (!window.authenticated) {
-      this.el.find('.user-status').addClass('logged-out');
-    } else {
-      this.el.find('.user-status').removeClass('logged-out');
+    // we will override if logged in
+    this.el.find('.user-status').addClass('logged-out');
+
+    if ($.cookie("oauth-token")) {
+      this.finishLogin();
     }
-    this.el.find('.user-status .username').text(app.username);
 
     // now append views
-    this.loginView = new views.Login({
-    });
-    this.loginView.render();
-    $('#main').append(this.loginView.el);
-
     this.loadView = new views.Load({});
     this.loadView.render();
     $('#main').append(this.loadView.el);
@@ -105,13 +85,20 @@ views.Application = Backbone.View.extend({
     this.router.navigate(name);
   },
 
+  finishLogin: function(cb) {
+    var self = this;
+    models.loadUserInfo(function() {
+      self.el.find('.user-status').removeClass('logged-out');
+      self.el.find('.user-status .username').text(app.username);
+      window.authenticated = true;
+      if (cb) {
+        cb();
+      }
+    });
+  },
+
   // Main Views
   // ----------
-
-  static: function() {
-    this.header.render();
-    // No-op ;-)
-  },
 
   dataset: function(project) {
     var self = this;

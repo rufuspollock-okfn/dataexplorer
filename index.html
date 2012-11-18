@@ -28,17 +28,6 @@
 
   <link rel="stylesheet" href="vendor/recline/vendor/bootstrap/2.0.2/css/bootstrap-responsive.css">
 
-  <!-- templates -->
-  <script name='header' type='text/html'>
-      <div class='user-status<%= !window.authenticated ? " logged-out" : "" %>'>
-      <% if (window.authenticated) { %>
-        <%= app.username %> <i class="icon-off"></i><a class="logout" href="#">Logout</a>
-      <% } else { %>
-          <a class="btn" href="https://github.com/login/oauth/authorize?client_id=<%= oauth_client_id %>&scope=repo, user&redirect_uri=<%= window.location.href %>">Sign in using Github</a>
-      <% } %>
-      </div>
-  </script>
-
   <!-- scripts -->
   <script src='vendor/jquery.js'></script>
   <script src='vendor/jquery.cookie.js'></script>
@@ -86,8 +75,8 @@
         <ul class="nav pull-right user-status">
           <li class="logged-in"><a class="username"></a></li>
           <li class="logged-in"><a class="logout" href="#" title="sign out"><i class="icon-off icon-white"></i></a></li>
-          <li class="login">
-            <a class="" href="">Sign in using Github</a>
+          <li class="not-logged-in">
+            <a class="login" href="#">Sign in using Github</a>
           </li>
         </ul>
       </div>
@@ -96,6 +85,36 @@
 
   <div class='container'>
     <div id='main'></div>
+  </div>
+
+  <div class="view about" style="display: none;">
+    <h1 style="text-align: center; margin: 30px;">How It Works</h1>
+    <div class="row instructions">
+      <div class="span3">
+        <div class="well">
+          <h3>1. Login</h3>
+          <p>Login to GitHub so that we can save your work later</p>
+        </div>
+      </div>
+      <div class="span3">
+        <div class="well">
+          <h3>2. Load Some Data</h3>
+          <p>Load data from online sources (e.g. the DataHub, GitHub or CSVs online)</p>
+        </div>
+      </div>
+      <div class="span3">
+        <div class="well">
+          <h3>3. Clean It Up</h2>
+          <p>Write simple javascript or use the built-in functions to clean up the data.</p>
+        </div>
+      </div>
+      <div class="span3">
+        <div class="well">
+          <h3>4. Save the Result</h3>
+          <p>Save the resulting <strong>data and scripts</strong> to GitHub</p>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div id='footer'>
