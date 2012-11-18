@@ -28,17 +28,6 @@
 
   <link rel="stylesheet" href="vendor/recline/vendor/bootstrap/2.0.2/css/bootstrap-responsive.css">
 
-  <!-- templates -->
-  <script name='header' type='text/html'>
-      <div class='user-status<%= !window.authenticated ? " logged-out" : "" %>'>
-      <% if (window.authenticated) { %>
-        <%= app.username %> <i class="icon-off"></i><a class="logout" href="#">Logout</a>
-      <% } else { %>
-          <a class="btn" href="https://github.com/login/oauth/authorize?client_id=<%= oauth_client_id %>&scope=repo, user&redirect_uri=<%= window.location.href %>">Sign in using Github</a>
-      <% } %>
-      </div>
-  </script>
-
   <!-- scripts -->
   <script src='vendor/jquery.js'></script>
   <script src='vendor/jquery.cookie.js'></script>

@@ -108,11 +108,6 @@ views.Application = Backbone.View.extend({
   // Main Views
   // ----------
 
-  static: function() {
-    this.header.render();
-    // No-op ;-)
-  },
-
   dataset: function(project) {
     var self = this;
     self.switchView('start');
