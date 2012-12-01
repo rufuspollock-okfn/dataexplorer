@@ -32,6 +32,19 @@ views.Application = Backbone.View.extend({
     this.el = $(this.el);
     _.bindAll(this);
     this.router = new Backbone.Router();
+
+    // TODO: make this somewhat nicer - e.g. show a loading message etc
+    var state = recline.View.parseQueryString(decodeURIComponent(window.location.search));
+    if (state.backend) {
+      var project = new models.Project();
+      project.loadSourceDataset(state, function(err) {
+        if (err) {
+          // this.notify('error', 'The requested resource could not be found.');
+        }
+        self.dataset(project);
+      });
+    }
+    
     this.router.route('', 'home', function() {
       self.router.navigate('load', {trigger: true});
     });
