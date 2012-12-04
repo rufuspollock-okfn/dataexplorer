@@ -54,8 +54,8 @@ views.Application = Backbone.View.extend({
     this.router.route('save', 'save', function() {
       self.switchView('save');
     });
-    this.router.route('start', 'start', function() {
-      self.switchView('start');
+    this.router.route('dataset', 'dataset', function() {
+      self.switchView('dataset');
     });
   },
 
@@ -115,7 +115,7 @@ views.Application = Backbone.View.extend({
 
   dataset: function(project) {
     var self = this;
-    self.switchView('start');
+    self.switchView('dataset');
 
     //this.loading('Loading dataset ...');
     $('#main-menu a.grid-selector').tab('show');
