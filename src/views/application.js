@@ -32,12 +32,14 @@ views.Application = Backbone.View.extend({
     this.el = $(this.el);
     _.bindAll(this);
     this.router = new Backbone.Router();
+    this.projectList = new models.ProjectList();
+    this.projectList.load();
 
     // TODO: make this somewhat nicer - e.g. show a loading message etc
     var state = recline.View.parseQueryString(decodeURIComponent(window.location.search));
     if (state.backend) {
-      var project = new models.Project();
-      project.loadSourceDataset(state, function(err) {
+      var project = new models.Project({source: state});
+      project.loadSourceDataset(function(err) {
         if (err) {
           // this.notify('error', 'The requested resource could not be found.');
         }
@@ -46,7 +48,10 @@ views.Application = Backbone.View.extend({
     }
     
     this.router.route('', 'home', function() {
-      self.router.navigate('load', {trigger: true});
+      self.router.navigate('projects', {trigger: true});
+    });
+    this.router.route('projects', 'projects', function() {
+      self.switchView('projects');
     });
     this.router.route('load', 'load', function() {
       self.switchView('load');
@@ -54,8 +59,8 @@ views.Application = Backbone.View.extend({
     this.router.route('save', 'save', function() {
       self.switchView('save');
     });
-    this.router.route('start', 'start', function() {
-      self.switchView('start');
+    this.router.route('dataset', 'dataset', function() {
+      self.switchView('dataset');
     });
   },
 
@@ -72,14 +77,18 @@ views.Application = Backbone.View.extend({
     }
 
     // now append views
+    this.projectsView = new views.Projects({
+      collection: this.projectList
+    });
+    this.projectsView.render();
+    $('#main').append(this.projectsView.el);
+    this.projectsView.bind('load', this.onLoadProject);
+
     this.loadView = new views.Load({});
     this.loadView.render();
     $('#main').append(this.loadView.el);
 
-    this.loadView.bind('load', function(project) {
-      self.dataset(project);
-	  self.saveView.project = project;
-    });
+    this.loadView.bind('load', this.onLoadProject);
 
     this.saveView = new views.Save({});
     this.saveView.render();
@@ -110,12 +119,18 @@ views.Application = Backbone.View.extend({
     });
   },
 
+  onLoadProject: function(project) {
+    this.dataset(project);
+    this.saveView.project = project;
+    this.currentProject = project;
+  },
+
   // Main Views
   // ----------
 
   dataset: function(project) {
     var self = this;
-    self.switchView('start');
+    self.switchView('dataset');
 
     //this.loading('Loading dataset ...');
     $('#main-menu a.grid-selector').tab('show');

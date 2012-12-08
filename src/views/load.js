@@ -19,8 +19,8 @@ views.Load = Backbone.View.extend({
     if ($files.length > 0) {
       data.file = $files[0].files[0]
     }
-    var project = new models.Project();
-    project.loadSourceDataset(data, function(err) {
+    var project = new models.Project({source: data});
+    project.loadSourceDataset(function(err) {
       if (err) {
         // this.notify('error', 'The requested resource could not be found.');
       }

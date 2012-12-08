@@ -1,7 +1,7 @@
 (function(config, models, views, routers, utils, templates) {
 
 views.Dataset = Backbone.View.extend({
-  id: 'start',
+  id: 'dataset',
 
   events: {
   },
