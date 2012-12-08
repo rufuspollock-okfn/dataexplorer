@@ -1,6 +1,28 @@
 (function(config, models, views, routers, utils, templates) {
 
 models.Project = Backbone.Model.extend({
+  defaults: function() {
+    return {
+      project_version: 1,
+      created: new Date().toISOString()
+    }
+  },
+
+  initialize: function() {
+    var self = this;
+    if (!this.id) {
+      this.set({id: 'dataexplorer-xyz'});
+    }
+    this.bind('change', this.saveToStorage);
+    this.saveToStorage();
+  },
+
+  saveToStorage: function() {
+    var data = this.toJSON();
+    data.last_modified = new Date().toISOString();
+    localStorage.setItem(this.id, JSON.stringify(data));
+  },
+
   // model
   // {
   //   source: datasetInfo // info needed load a dataset using recline
@@ -13,18 +35,19 @@ models.Project = Backbone.Model.extend({
   // data_source_url
   // data_source_type = github | gist | ckan | gdocs | ...
   // (?) data_source_file_type = csv
-
   // script_url
-
   // data_dest_url
-  loadSourceDataset: function(datasetInfo, cb) {
+
+  // load source dataset info
+  loadSourceDataset: function(cb) {
     var self = this;
-    this.set({source: datasetInfo});
+    var datasetInfo = self.get('source');
     if (datasetInfo.backend == 'github') {
       self.loadGithubDataset(datasetInfo.url, cb);
     } else {
       self.dataset = new recline.Model.Dataset(datasetInfo);
       self.dataset.fetch().done(function() {
+        // TODO: should we set dataset metadata onto project source?
         cb();
       });
     }
@@ -43,6 +66,24 @@ models.Project = Backbone.Model.extend({
       self.dataset.fetch();
       cb(err, self.dataset);
     });
+  }
+});
+
+models.ProjectList = Backbone.Collection.extend({
+  model: models.Project,
+  load: function() {
+    for(key in localStorage) {
+      if (key.indexOf('dataexplorer-') == 0) {
+        var projectInfo = localStorage.getItem(key);
+        try {
+          var data = JSON.parse(projectInfo);
+          var tmp = new models.Project(data);
+          this.add(tmp);
+        } catch(e) {
+          alert('Failed to load project ' + projectInfo);
+        }
+      }
+    }
   }
 });
 
