@@ -39,6 +39,7 @@
         <ul class="nav">
           <li><a href="#projects">My Projects</a></li>
           <li><a href="#save">Export Data</a></li>
+          <li><a href="#about">About</a></li>
         </ul>
         <ul class="nav pull-right user-status">
           <li class="logged-in"><a class="username"></a></li>
@@ -52,38 +53,51 @@
   </div>
 
   <div class='container'>
-    <div id='main'></div>
-  </div>
+    <div id='main'>
 
-  <div class="view about" style="display: none;">
-    <h1 style="text-align: center; margin: 30px;">How It Works</h1>
-    <div class="row instructions">
-      <div class="span3">
-        <div class="well">
-          <h3>1. Login</h3>
-          <p>Login to GitHub so that we can save your work later</p>
+      <div class="view about" style="display: none;">
+        <h1>What it Does</h1>
+        <div class="row instructions">
+          <div class="span3">
+            <div class="well">
+              <h3>Import Data</h3>
+              <p>Load data from <strong>Google Docs, CSVs, DataHub, GitHub</strong> and more</p>
+            </div>
+          </div>
+          <div class="span3">
+            <div class="well">
+              <h3>Explore and Visualize</h2>
+              <p>Explore the data in a <strong>rich tabular interface</strong>, create <strong>graphs and maps</strong></p>
+            </div>
+          </div>
+          <div class="span3">
+            <div class="well">
+              <h3>Clean and Transform</h2>
+              <p>Write <strong>simple javascript</strong> to <strong>clean and transform</strong> the data</p>
+            </div>
+          </div>
+          <div class="span3">
+            <div class="well">
+              <h3>Save the Results</h3>
+              <p>Save the resulting <strong>data and scripts</strong> to GitHub, local disk or elsewhere</p>
+            </div>
+          </div>
         </div>
+        <h2 class="followup">And all of this from the comfort of your browser!</h2>
+        <p class="actions">
+          <a class="btn btn-primary btn-large" href="?url=http://resources.opendatalabs.org/datasets/standard-and-poors-500-shiller/data/data.csv&backend=csv">
+            Check out an example (Shiller's S&P data) &raquo;
+          </a>
+          &mdash;
+          <a class="btn btn-primary btn-large" href="#load">
+            Get started by loading your own data &raquo;
+          </a>
+        </p>
       </div>
-      <div class="span3">
-        <div class="well">
-          <h3>2. Load Some Data</h3>
-          <p>Load data from online sources (e.g. the DataHub, GitHub or CSVs online)</p>
-        </div>
-      </div>
-      <div class="span3">
-        <div class="well">
-          <h3>3. Clean It Up</h2>
-          <p>Write simple javascript or use the built-in functions to clean up the data.</p>
-        </div>
-      </div>
-      <div class="span3">
-        <div class="well">
-          <h3>4. Save the Result</h3>
-          <p>Save the resulting <strong>data and scripts</strong> to GitHub</p>
-        </div>
-      </div>
+    
     </div>
   </div>
+
 
   <div id='footer'>
   </div>

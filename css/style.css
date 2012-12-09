@@ -136,3 +136,35 @@ body {
   height: 500px;
 }
 
+
+/**********************************************************
+  * About page
+  *********************************************************/
+
+.view.about h1 {
+  text-align: center;
+  margin: 30px;
+}
+
+.view.about .instructions .well {
+  padding-bottom: 25px;
+}
+
+.view.about .instructions .well h3 {
+  margin-bottom: 10px;
+}
+
+.view.about .followup {
+  text-align: center;
+  font-style: italic;
+  margin-top: 20px;
+}
+
+.view.about .actions {
+  text-align: center;
+}
+
+.view.about .actions a {
+  width: 200px;
+  margin: 30px;
+}

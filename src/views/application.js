@@ -50,6 +50,9 @@ views.Application = Backbone.View.extend({
     this.router.route('', 'home', function() {
       self.router.navigate('projects', {trigger: true});
     });
+    this.router.route('about', 'about', function() {
+      self.switchView('about');
+    });
     this.router.route('projects', 'projects', function() {
       self.switchView('projects');
     });
