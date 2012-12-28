@@ -136,6 +136,55 @@ body {
   height: 500px;
 }
 
+/**********************************************************
+  * Project List
+  *********************************************************/
+
+.project.summary {
+	padding: 1em 0 0.5em 0.0em;
+	border-bottom: 1px solid #ececec;
+}
+
+.project.summary .title {
+  padding-top: 0.5em;
+  font-weight: bold;
+  font-size: 1.3em;
+}
+
+.project.summary .title a {
+	text-decoration: none;
+}
+
+ul.datasets ul.dataset_formats {
+    float: right;
+    padding: 0 0 3px 0;
+    margin: 0;
+    font-family: monospace;
+}
+ul.datasets ul.dataset_formats li {
+    display: inline;
+    margin: 0;
+    padding: 0 5px 0 5px;
+    border: none;
+    font-weight: normal;
+    font-size: 0.9em;
+    color: #808080;
+    background:#ececec;
+}
+ul.datasets .openness {
+    clear:right;
+    float:right;
+    font-size:0.8em;
+}
+ul.datasets .openness img {
+    vertical-align:top;
+}
+ul.datasets .openness li {
+    margin:0;
+    padding:0;
+    border:none;
+}
+
 
 /**********************************************************
   * About page
