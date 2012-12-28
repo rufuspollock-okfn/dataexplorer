@@ -155,36 +155,46 @@ body {
 	text-decoration: none;
 }
 
-ul.datasets ul.dataset_formats {
-    float: right;
-    padding: 0 0 3px 0;
-    margin: 0;
-    font-family: monospace;
-}
-ul.datasets ul.dataset_formats li {
-    display: inline;
-    margin: 0;
-    padding: 0 5px 0 5px;
-    border: none;
-    font-weight: normal;
-    font-size: 0.9em;
-    color: #808080;
-    background:#ececec;
-}
-ul.datasets .openness {
-    clear:right;
-    float:right;
-    font-size:0.8em;
-}
-ul.datasets .openness img {
-    vertical-align:top;
-}
-ul.datasets .openness li {
-    margin:0;
-    padding:0;
-    border:none;
+/**********************************************************
+  * CodeMirror editable areas
+  *********************************************************/
+
+.CodeMirror {
+  border: 1px solid #ddd;
 }
 
+.codemirror-result {
+  border: 1px solid #ddd;
+  border-top: none;
+  padding: 10px;
+  font-family: monospace;
+}
+
+.CodeMirror .button {
+  font-family: "Helvetica Neue", "Helvetica", san-serif;
+  padding: 5px;
+  cursor: pointer;
+  background-color: #333;
+  color: #fff;
+  position: relative;
+  float: right;
+  font-size: 11px;
+  line-height: 16px;
+  padding: 2px 6px;
+  margin-bottom: -20px;
+  margin-right: 10px;
+  border-radius: 4px;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  z-index: 100;
+  top: 8px; 
+}
+.CodeMirror .button:hover {
+  background-color: #2685ED;
+}
+.CodeMirror .button.clear {
+  margin-right: 102px; 
+}
 
 /**********************************************************
   * About page

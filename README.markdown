@@ -14,3 +14,14 @@ Built on [Recline JS](http://okfnlabs.org/recline/).
 
 Open index.html in your browser!
 
+## License and Credits
+
+Licensed under the MIT license.
+
+All Credits as per Recline. Also all the amazing vendor libraries including:
+
+* Backbone
+* Bootstrap
+* [CodeMirror](http://codemirror.net/)
+* Runnable Codemirror thanks to Irene Ros
+

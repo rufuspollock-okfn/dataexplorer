@@ -125,9 +125,9 @@ views.Application = Backbone.View.extend({
   },
 
   onLoadProject: function(project) {
-    this.dataset(project);
-    this.saveView.project = project;
     this.currentProject = project;
+    this.saveView.project = project;
+    this.dataset(project);
   },
 
   // Main Views
