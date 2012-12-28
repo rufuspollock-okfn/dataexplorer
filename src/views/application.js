@@ -42,8 +42,10 @@ views.Application = Backbone.View.extend({
       project.loadSourceDataset(function(err) {
         if (err) {
           // this.notify('error', 'The requested resource could not be found.');
+        } else {
+          project.save();
+          this.onLoadProject(project);
         }
-        self.dataset(project);
       });
     }
     

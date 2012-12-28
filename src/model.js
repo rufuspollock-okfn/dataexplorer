@@ -22,14 +22,17 @@ models.Project = Backbone.Model.extend({
       }
       this.set({id: _id});
     }
-    this.bind('change', this.saveToStorage);
-    this.saveToStorage();
+    this.bind('change', this.save);
   },
 
   saveToStorage: function() {
     var data = this.toJSON();
     data.last_modified = new Date().toISOString();
     localStorage.setItem(this.id, JSON.stringify(data));
+  },
+
+  save: function() {
+    this.saveToStorage();
   },
 
   // model
