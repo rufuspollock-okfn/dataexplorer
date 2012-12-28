@@ -11,7 +11,16 @@ models.Project = Backbone.Model.extend({
   initialize: function() {
     var self = this;
     if (!this.id) {
-      this.set({id: 'dataexplorer-xyz'});
+      // generate a unique id with guard against duplication
+      // there is some still small risk of a race condition if 2 apps doing this at the same time but we can live with it!
+      var _generateId = function() {
+        return 'dataexplorer-' + parseInt(Math.random() * 1000000)
+      };
+      var _id = _generateId();
+      while(_id in localStorage) {
+        _id = _generateId();
+      }
+      this.set({id: _id});
     }
     this.bind('change', this.saveToStorage);
     this.saveToStorage();
