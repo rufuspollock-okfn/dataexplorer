@@ -1,8 +1,6 @@
 (function(config, models, views, routers, utils, templates) {
 
-views.Dataset = Backbone.View.extend({
-  id: 'dataset',
-
+views.Project = Backbone.View.extend({
   events: {
   },
 
@@ -61,7 +59,7 @@ views.Dataset = Backbone.View.extend({
   },
 
   template: ' \
-    <div class="view start"> \
+    <div class="view project"> \
       <div class="tabbable"> \
         <ul class="nav nav-tabs"> \
           <li class="active"> \
@@ -159,7 +157,6 @@ var codemirrorify = function(codeblock) {
         output = $('<div>', {
           "class" : cmopts.classes.codemirrorresult
         }).appendTo($(wrapper).parent());
-console.log(wrapper);
 
     clearButton.click(function(editor, output){
       return function(event) {

@@ -64,9 +64,8 @@ views.Application = Backbone.View.extend({
     this.router.route('save', 'save', function() {
       self.switchView('save');
     });
-    this.router.route('dataset', 'dataset', function() {
-      self.switchView('dataset');
-    });
+    // project
+    this.router.route('project/:projectId', 'project', this.projectShow);
   },
 
   // Should be rendered just once
@@ -105,11 +104,15 @@ views.Application = Backbone.View.extend({
   // Helpers
   // -------
 
-  switchView: function(name) {
+  switchView: function(name, path) {
     $('body').removeClass().addClass('current-view '+name);
     $('#main .view').hide();
     $('#main .view.' + name).show();
-    this.router.navigate(name);
+    if (path) {
+      this.router.navigate(path);
+    } else {
+      this.router.navigate(name);
+    }
   },
 
   finishLogin: function(cb) {
@@ -125,27 +128,42 @@ views.Application = Backbone.View.extend({
   },
 
   onLoadProject: function(project) {
-    this.currentProject = project;
-    this.saveView.project = project;
-    this.dataset(project);
+    this.projectList.add(project);
+    this.projectShow(project.id);
   },
 
   // Main Views
   // ----------
 
-  dataset: function(project) {
+  projectShow: function(projectId) {
     var self = this;
-    self.switchView('dataset');
+    var project = this.projectList.get(projectId);
+    // housekeeping
+    this.currentProject = project;
+    this.saveView.project = project;
 
     //this.loading('Loading dataset ...');
     $('#main-menu a.grid-selector').tab('show');
 
-    var ds = new views.Dataset({
-      model: project.dataset, 
-      id: 'dataset'
-    });
-    $('#main').append(ds.el);
-    ds.render();
+    // if we not yet have data loaded, load it now ...
+    if (!project.dataset) {
+      project.loadSourceDataset(displayIt)
+    } else {
+      displayIt();
+    }
+
+    function displayIt(err) {
+      if (err) {
+        // this.notify('error', 'The requested resource could not be found.');
+        return;
+      }
+      var ds = new views.Project({
+        model: project.dataset
+      });
+      $('#main').append(ds.el);
+      ds.render();
+      self.switchView('project', 'project/'+ projectId);
+    }
   },
 
   notify: function(type, message) {

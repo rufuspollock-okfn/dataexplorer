@@ -132,7 +132,7 @@ body {
   margin-bottom: 7px;
 }
 
-.view.start #grid .recline-slickgrid {
+.view.project #grid .recline-slickgrid {
   height: 500px;
 }
 
