@@ -1,15 +1,33 @@
 (function(config, models, views, routers, utils, templates) {
 
+// The central object in the Data Explorer
+//
+// model
+// {
+//   source: datasetInfo // info needed load a dataset using recline
+//   // does not exist yet
+//   dest: 
+//   ...
+//   // save to gists
+//   scripts: [ {...}, ... ]
+// }
 models.Project = Backbone.Model.extend({
   defaults: function() {
     return {
-      project_version: 1,
-      created: new Date().toISOString()
+      manifest_version: 1,
+      created: new Date().toISOString(),
+      scripts: [
+        {
+          id: 'main.js',
+          content: 'log("hello world")'
+        }
+      ]
     }
   },
 
   initialize: function() {
     var self = this;
+    this.scripts = new Backbone.Collection();
     if (!this.id) {
       // generate a unique id with guard against duplication
       // there is some still small risk of a race condition if 2 apps doing this at the same time but we can live with it!
@@ -22,6 +40,10 @@ models.Project = Backbone.Model.extend({
       }
       this.set({id: _id});
     }
+    this.scripts.reset(_.map(
+      this.get('scripts'),
+      function(scriptData) { return new models.Script(scriptData) }
+    ));
     this.bind('change', this.save);
   },
 
@@ -32,23 +54,9 @@ models.Project = Backbone.Model.extend({
   },
 
   save: function() {
+    this.set({scripts: this.scripts.toJSON()}, {silent: true});
     this.saveToStorage();
   },
-
-  // model
-  // {
-  //   source: datasetInfo // info needed load a dataset using recline
-  //   // does not exist yet
-  //   dest: 
-  //   ...
-  //   // save to gist
-  //   transformScript: 
-  // }
-  // data_source_url
-  // data_source_type = github | gist | ckan | gdocs | ...
-  // (?) data_source_file_type = csv
-  // script_url
-  // data_dest_url
 
   // load source dataset info
   loadSourceDataset: function(cb) {
@@ -95,6 +103,17 @@ models.ProjectList = Backbone.Collection.extend({
           alert('Failed to load project ' + projectInfo);
         }
       }
+    }
+  }
+});
+
+models.Script = Backbone.Model.extend({
+  defaults: function() {
+    return {
+      created: new Date().toISOString(),
+      last_modified: new Date().toISOString(),
+      language: 'javascript',
+      content: ''
     }
   }
 });
