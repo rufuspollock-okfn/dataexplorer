@@ -7,10 +7,6 @@ body {
   margin-left: 0;
 }
 
-.recline-grid-container {
-  height: 550px;
-}
-
 .page-home .row.instructions .span4 .well {
   height: 100px;
 }
@@ -102,37 +98,10 @@ body {
   .authorize a.button:hover { background: #3d4548; }
 
 /**********************************************************
-  * Dataset
+  * Project 
   *********************************************************/
 
-.dataset {
-  margin-top: -5px;
-}
-
-.dataset-menu-wrapper {
-	background: #eee;
-}
-.dataset-menu {
-	line-height: 40px;
-	margin: 0 auto;
-	padding: 10px;
-	overflow: auto;
-}
-
-.dataset-menu > div {
-	float: left;
-	margin-right: 30px;
-}
-
-.dataset-menu .views {
-  margin-top: 5px;
-}
-
-.dataset-menu .save-dataset {
-  margin-bottom: 7px;
-}
-
-.view.project #grid .recline-slickgrid {
+.view.project .recline-slickgrid {
   height: 500px;
 }
 
