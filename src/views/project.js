@@ -53,7 +53,7 @@ views.Project = Backbone.View.extend({
 		this.model.query();
 
     // HACK - for some reason the grid view of multiview is massively wide by default
-    this.el.find('.view.start .recline-data-explorer').width(width);
+    this.el.find('.view.project .recline-data-explorer').width(width);
 
     return this;
   },
