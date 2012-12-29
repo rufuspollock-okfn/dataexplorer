@@ -101,8 +101,21 @@ body {
   * Project 
   *********************************************************/
 
+.view.project .menu {
+  margin-top: -5px;
+  margin-bottom: 5px;
+  height: 30px;
+}
+
+.view.project .rhs {
+  float: right;
+}
+
 .view.project .recline-slickgrid {
   height: 500px;
+}
+
+.view.project .script-editor {
 }
 
 /**********************************************************

@@ -1,7 +1,20 @@
 (function(config, models, views, routers, utils, templates) {
 
 views.Project = Backbone.View.extend({
+  template: ' \
+    <div class="view project"> \
+      <div class="menu"> \
+        &nbsp; \
+        <div class="btn-group rhs" data-toggle="buttons-checkbox"> \
+          <a href="#" data-action="script-editor" class="btn">Script Editor</a> \
+        </div> \
+      </div> \
+      <div class="script-editor"></div> \
+      <div class="multiview-here"></div> \
+    </div> \
+  ',
   events: {
+    'click .menu a': '_onMenuClick'
   },
 
   initialize: function(options) {
@@ -40,15 +53,20 @@ views.Project = Backbone.View.extend({
 		this.grid = new recline.View.MultiView({
       el: this.el.find('.multiview-here'),
       model: this.model,
-      views: views
+      views: views,
+      sidebarViews: []
     });
 		this.editor = new recline.View.Transform({model: this.model });
 
-    this.el.find('#editor').append(this.editor.el);
+    this.el.find('.script-editor').append(this.editor.el);
     this.editor.render();
+
     // enable codemirror
     var $textarea = $('textarea.expression-preview-code')[0];
     codemirrorify($textarea);
+
+    // now hide this element for the moment
+    this.editor.el.parent().hide();
 
 		this.model.query();
 
@@ -58,28 +76,11 @@ views.Project = Backbone.View.extend({
     return this;
   },
 
-  template: ' \
-    <div class="view project"> \
-      <div class="tabbable"> \
-        <ul class="nav nav-tabs"> \
-          <li class="active"> \
-            <a href="#grid" data-toggle="tab" class="grid-selector">Grid</a> \
-            </li> \
-          <li> \
-            <a href="#transformations" data-toggle="tab">Transformations</a> \
-          </li> \
-        </ul> \
-        <div class="tab-content"> \
-          <div class="tab-pane active" id="grid"> \
-            <div class="multiview-here"></div> \
-          </div> \
-          <div class="tab-pane" id="transformations"> \
-            <div id="editor"></div> \
-          </div> \
-        </div> \
-      </div> \
-    </div> \
-  '
+  _onMenuClick: function(e) {
+    e.preventDefault();
+    var action = $(e.target).attr('data-action');
+    this.el.find('.' + action).toggle('slow');
+  }
 });
 
 
