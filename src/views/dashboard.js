@@ -12,7 +12,7 @@ views.Dashboard = Backbone.View.extend({
       <hr /> \
       {{#projects}} \
       <div class="project summary"> \
-        <h3 class="title"><a href="#{{id}}" class="js-load-project">{{showTitle}}</a></h3> \
+        <h3 class="title"><a href="#project/{{id}}" class="js-load-project">{{showTitle}}</a></h3> \
         Last modified: {{last_modified_nice}} \
         <br /> \
         Data source: {{source.url}} \
@@ -38,20 +38,6 @@ views.Dashboard = Backbone.View.extend({
       projects: projects
     });
     this.$el.html(tmp);
-  },
-
-  events: {
-    'click a.js-load-project': 'loadProject'
-  },
-
-  loadProject: function(e) {
-    var self = this;
-    e.preventDefault();
-    var projectId = $(e.target).attr('href').slice(1);
-    var project = this.collection.get(projectId);
-    project.loadSourceDataset(function(err) {
-      self.trigger('load', project);
-    });
   }
 });
 
