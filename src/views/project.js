@@ -23,26 +23,26 @@ views.Project = Backbone.View.extend({
 
   render: function() {
     this.el.html(this.template);
-    var views = [
+    var reclineviews = [
        {
          id: 'grid',
          label: 'Grid', 
          view: new recline.View.SlickGrid({
-           model: this.model
+           model: this.model.dataset
          })
        },
        {
          id: 'map',
          label: 'Map',
          view: new recline.View.Map({
-           model: this.model
+           model: this.model.dataset
          })
        },
        {
          id: 'graph',
          label: 'Graph',
          view: new recline.View.Graph({
-           model: this.model
+           model: this.model.dataset
          })
        }
     ];
@@ -52,23 +52,21 @@ views.Project = Backbone.View.extend({
 
 		this.grid = new recline.View.MultiView({
       el: this.el.find('.multiview-here'),
-      model: this.model,
-      views: views,
+      model: this.model.dataset,
+      views: reclineviews,
       sidebarViews: []
     });
-		this.editor = new recline.View.Transform({model: this.model });
+		this.editor = new views.ScriptEditor({
+      model: this.model.scripts.get('main.js')
+    });
 
     this.el.find('.script-editor').append(this.editor.el);
     this.editor.render();
 
-    // enable codemirror
-    var $textarea = $('textarea.expression-preview-code')[0];
-    codemirrorify($textarea);
-
     // now hide this element for the moment
     this.editor.el.parent().hide();
 
-		this.model.query();
+		this.model.dataset.query();
 
     // HACK - for some reason the grid view of multiview is massively wide by default
     this.el.find('.view.project .recline-data-explorer').width(width);
@@ -80,6 +78,26 @@ views.Project = Backbone.View.extend({
     e.preventDefault();
     var action = $(e.target).attr('data-action');
     this.el.find('.' + action).toggle('slow');
+  }
+});
+
+views.ScriptEditor = Backbone.View.extend({
+  template: ' \
+    <textarea class="content"></textarea> \
+  ',
+  events: {
+  },
+
+  initialize: function(options) {
+    this.el = $(this.el);
+  },
+
+  render: function() {
+    this.el.html(this.template);
+    var $textarea = this.el.find('textarea');
+    $textarea.val(this.model.get('content'));
+    // enable codemirror
+    codemirrorify($textarea);
   }
 });
 

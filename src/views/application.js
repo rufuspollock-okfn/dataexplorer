@@ -158,7 +158,7 @@ views.Application = Backbone.View.extend({
         return;
       }
       var ds = new views.Project({
-        model: project.dataset
+        model: project
       });
       $('#main').append(ds.el);
       ds.render();
