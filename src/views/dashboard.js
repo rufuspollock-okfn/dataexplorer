@@ -1,8 +1,8 @@
 (function(config, models, views, routers, utils, templates) {
 
-views.Projects = Backbone.View.extend({
+views.Dashboard = Backbone.View.extend({
   template: ' \
-    <div class="view projects"> \
+    <div class="view dashboard"> \
       <div class="page-header"> \
       <h2>Existing Projects ({{total}})</h2> \
   </div> \
@@ -31,7 +31,6 @@ views.Projects = Backbone.View.extend({
     var projects = _.map(this.collection.toJSON(), function(project) {
       project.last_modified_nice = new Date(project.last_modified).toString();
       project.showTitle = project.title || project.source.url;
-      console.log(project.showTitle);
       return project;
     });
     var tmp = Mustache.render(this.template, {

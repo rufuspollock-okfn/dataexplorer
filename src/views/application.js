@@ -50,13 +50,13 @@ views.Application = Backbone.View.extend({
     }
     
     this.router.route('', 'home', function() {
-      self.router.navigate('projects', {trigger: true});
+      self.router.navigate('dashboard', {trigger: true});
     });
     this.router.route('about', 'about', function() {
       self.switchView('about');
     });
-    this.router.route('projects', 'projects', function() {
-      self.switchView('projects');
+    this.router.route('dashboard', 'dashboard', function() {
+      self.switchView('dashboard');
     });
     this.router.route('load', 'load', function() {
       self.switchView('load');
@@ -82,12 +82,12 @@ views.Application = Backbone.View.extend({
     }
 
     // now append views
-    this.projectsView = new views.Projects({
+    this.dashboardView = new views.Dashboard({
       collection: this.projectList
     });
-    this.projectsView.render();
-    $('#main').append(this.projectsView.el);
-    this.projectsView.bind('load', this.onLoadProject);
+    this.dashboardView.render();
+    $('#main').append(this.dashboardView.el);
+    this.dashboardView.bind('load', this.onLoadProject);
 
     this.loadView = new views.Load({});
     this.loadView.render();
