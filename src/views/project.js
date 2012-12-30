@@ -81,11 +81,22 @@ views.Project = Backbone.View.extend({
   }
 });
 
+
+// The runnable CodeMirror work is largely based on Irene Ros' great deck.js +
+// codemirror work (MIT licensed!). Thanks Irene!
+// https://github.com/iros/deck.js-codemirror/blob/1.0.0rc/deck.codemirror.js
 views.ScriptEditor = Backbone.View.extend({
   template: ' \
-    <textarea class="content"></textarea> \
+    <div class="script-editor-widget"> \
+      <div class="button runsandbox">Run in Sandbox</div> \
+      <div class="button clear">Clear Output</div> \
+      <div class="output"></div> \
+      <textarea class="content"></textarea> \
+    </div> \
   ',
   events: {
+    'click .button.clear': '_onClear',
+    'click .button.runsandbox': '_onRunSandboxed'
   },
 
   initialize: function(options) {
@@ -94,107 +105,36 @@ views.ScriptEditor = Backbone.View.extend({
 
   render: function() {
     this.el.html(this.template);
-    var $textarea = this.el.find('textarea');
+    var $textarea = this.el.find('textarea.content');
     $textarea.val(this.model.get('content'));
     // enable codemirror
-    codemirrorify($textarea);
-  }
-});
-
-
-// Direct copy (with a few tweaks) of Irene Ros' great deck.js + codemirror work
-// https://github.com/iros/deck.js-codemirror/blob/1.0.0rc/deck.codemirror.js
-
-var cmopts = {
-  classes: {
-    codemirror: 'deck-codemirror',
-    codemirrorresult: 'codemirror-result'
-  },
-  
-  selectors: {
-    codemirroritem: '.code',
+    var options = {
+      lineNumbers : true,
+      theme : "default",
+      mode : "javascript",
+      theme : "default",
+      indentUnit : 2,
+      indentWithTabs : false,
+      tabMode: "shift",
+      runnable : true
+    };
+    this.editor = CodeMirror.fromTextArea($textarea[0], options);
+    this.$output = $('.output');
   },
 
-  data : {
-    codemirrorified: 'codemirrorified'
+  _onClear: function(e) {
+    this.$output.html('');
   },
-  codemirror : {
-    lineNumbers : true,
-    theme : "default",
-    mode : "javascript",
-    theme : "default",
-    indentUnit : 2,
-    indentWithTabs : false,
-    tabMode: "shift",
-    runnable : true
-  }
-};
 
-// a helper private function that can be used to "codemirror" a codeblock (textarea element) 
-var codemirrorify = function(codeblock) {
-  // initialize defaults.
-  var codeblock = $(codeblock),
-      editor    = null,
-      options   = $.extend(cmopts.codemirror,
-        {
-          mode : !!codeblock.attr('mode') ? codeblock.attr('mode') : cmopts.codemirror.mode,
-          theme : !!codeblock.attr('theme') ? codeblock.attr('theme') : cmopts.codemirror.theme,
-          onFocus : function(e) {
-            inEditor = true;
-          },
-          onBlur : function(e) {
-            inEditor = false;
-          }
-        }
-      );
-
-  // if this is a textarea just use the codemirror shorthand.
-  if (codeblock.get(0).nodeName.toUpperCase() === "TEXTAREA") {
-    editor = CodeMirror.fromTextArea(codeblock[0], options);
-  } else {
-    // else codemirror the element's content and attach to element parent. 
-    var parent  = codeblock.parent();
-    codeblock.hide();
-    editor      = CodeMirror(parent[0], 
-      $.extend(options, {
-        value : codeblock.html()
-      })
-    );
-  }
-
-  if (cmopts.codemirror.runnable || codeblock.attr("runnable")) {
-    // make the code runnable
-    var wrapper = editor.getWrapperElement(),
-        button  = $('<div>', {
-          "class" : "button",
-          text : "Run in Sandbox"
-        }).prependTo(wrapper),
-        clearButton  = $('<div>', {
-          "class" : "button clear",
-          text : "Clear Output"
-        }).prependTo(wrapper),
-        output = $('<div>', {
-          "class" : cmopts.classes.codemirrorresult
-        }).appendTo($(wrapper).parent());
-
-    clearButton.click(function(editor, output){
-      return function(event) {
-        output.html('');
-      };
-    }(editor, output));
-
-    // TODO: make this *much* cleaner ...
-    // var globals = $(codeblock).attr("globals");
+  _onRunSandboxed: function(e) {
+    // globals is a hash { 'name-in-context': variable }
     var globals = '_';
-    button.click(function() {
-      return runCodeMirrorCodeSandboxed(editor, output, globals)
-    });
-  }
-}
+    this._runCodeMirrorCodeSandboxed(this.editor, this.$output, globals);
+  },
 
-// editor = codemirror editor
-// output = output area
-function runCodeMirrorCodeSandboxed(editor, output, globals) {
+  // editor = codemirror editor
+  // output = output area
+  _runCodeMirrorCodeSandboxed: function(editor, output, globals) {
   return function(event) {
 
     // save the default logging behavior.
@@ -207,8 +147,6 @@ function runCodeMirrorCodeSandboxed(editor, output, globals) {
     var iframe = $("<iframe>")
       .css("display", "none")
       .appendTo($(document).find('body'));
-
-    // Overwrite the default log behavior to pipe to an output element.
 
     // Overwrite the default log behavior to pipe to an output element.
     console.log = function() {
@@ -234,6 +172,7 @@ function runCodeMirrorCodeSandboxed(editor, output, globals) {
       "parent.sandbox=MSIE?this:{eval:function(s){return eval(s)}}<\/script>";
 
     if (globals) {
+      for(
       var exposeGlobals = globals.split(",");
 
       $.each(exposeGlobals, function(prop, val) {
@@ -259,8 +198,8 @@ function runCodeMirrorCodeSandboxed(editor, output, globals) {
     
     // set the old logging behavior back.
     console.log = real_console_log;
-  }(editor, output);
-};
-
+  }();
+}
+});
 
 }).apply(this, window.args);

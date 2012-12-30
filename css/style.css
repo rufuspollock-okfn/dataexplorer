@@ -141,18 +141,28 @@ body {
   * CodeMirror editable areas
   *********************************************************/
 
-.CodeMirror {
-  border: 1px solid #ddd;
+.script-editor-widget {
+  margin-bottom: 5px;
 }
 
-.codemirror-result {
+.script-editor-widget .CodeMirror {
   border: 1px solid #ddd;
-  border-top: none;
-  padding: 10px;
+  margin-right: 302px;
+  height: 250px;
+}
+
+.script-editor-widget .output {
+  border: 1px solid #ddd;
+  border-left: none;
+  padding-left: 5px;
   font-family: monospace;
+  float: right;
+  width: 300px;
+  height: 250px;
+  background-color: #eee;
 }
 
-.CodeMirror .button {
+.script-editor-widget .button {
   font-family: "Helvetica Neue", "Helvetica", san-serif;
   padding: 5px;
   cursor: pointer;
@@ -170,12 +180,13 @@ body {
   -webkit-border-radius: 4px;
   z-index: 100;
   top: 8px; 
+  margin-right: 320px;
 }
-.CodeMirror .button:hover {
+.script-editor-widget .button:hover {
   background-color: #2685ED;
 }
-.CodeMirror .button.clear {
-  margin-right: 102px; 
+.script-editor-widget .button.clear {
+  top: 35px; 
 }
 
 /**********************************************************
