@@ -41,9 +41,10 @@ models.Project = Backbone.Model.extend({
       this.set({id: _id});
     }
     this.scripts.reset(_.map(
-      this.get('scripts'),
+      self.get('scripts'),
       function(scriptData) { return new models.Script(scriptData) }
     ));
+    this.scripts.bind('change', function() {self.save()});
     this.bind('change', this.save);
   },
 

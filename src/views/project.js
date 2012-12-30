@@ -127,6 +127,8 @@ views.ScriptEditor = Backbone.View.extend({
   },
 
   _onRunSandboxed: function(e) {
+    // save the script ...
+    this.model.set({content: this.editor.getValue()});
     // globals is a hash { 'name-in-context': variable }
     var globals = '_';
     this._runCodeMirrorCodeSandboxed(this.editor, this.$output, globals);
