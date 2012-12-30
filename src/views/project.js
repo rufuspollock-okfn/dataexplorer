@@ -172,7 +172,6 @@ views.ScriptEditor = Backbone.View.extend({
       "parent.sandbox=MSIE?this:{eval:function(s){return eval(s)}}<\/script>";
 
     if (globals) {
-      for(
       var exposeGlobals = globals.split(",");
 
       $.each(exposeGlobals, function(prop, val) {
