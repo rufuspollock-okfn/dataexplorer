@@ -59,6 +59,8 @@ views.Project = Backbone.View.extend({
 		this.editor = new views.ScriptEditor({
       model: this.model.scripts.get('main.js')
     });
+    // TODO: hmmm, this is not that elegant ...
+    this.editor.dataset = this.model.dataset;
 
     this.el.find('.script-editor').append(this.editor.el);
     this.editor.render();
@@ -137,7 +139,13 @@ views.ScriptEditor = Backbone.View.extend({
         function(e) { self._handleWorkerCommunication(e) },
         false);
     var codeToRun = this.editor.getValue();
-    worker.postMessage({src: codeToRun}); // Send data to our worker.
+    worker.postMessage({
+      src: codeToRun,
+      dataset: {
+        records: this.dataset._store.data,
+        fields: this.dataset._store.fields
+      }
+    });
   },
 
   _handleWorkerCommunication: function(e) {

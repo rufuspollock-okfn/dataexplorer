@@ -152,10 +152,12 @@ body {
 }
 
 .script-editor-widget .output {
+  overflow: auto;
   border: 1px solid #ddd;
   border-left: none;
   padding-left: 5px;
   font-family: monospace;
+  font-size: 80%;
   float: right;
   width: 300px;
   height: 250px;

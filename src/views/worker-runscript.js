@@ -1,14 +1,32 @@
+// jQuery is referenced (but not used) by recline.dataset
+var jQuery = null;
 importScripts('../../vendor/underscore.js');
+importScripts('../../vendor/backbone.js');
+importScripts('../../vendor/recline/dist/recline.dataset.js');
+
+// Convert all arguments to Strings (Objects will be JSONified).
+var print = function() {
+  var items = [];
+  for (var i = 0; i < arguments.length; i++) {
+    var value = arguments[i];
+    try {
+      items.push(typeof(value) == 'object' ? JSON.stringify(value) : String(value));
+    } catch(e) {}
+  }
+  var msg = items.join(" ");
+  self.postMessage({msg: 'print', data: msg})
+};
 
 self.onmessage = runScript;
 
 function runScript(ev) {
   var inputId = ev.data.id,
     src = ev.data.src;
-
-  var print = function(d) {
-    self.postMessage({inputId: inputId, msg: 'print', data: d.toString()})
-  };
+    dataset = new recline.Backend.Memory.Store(
+      ev.data.dataset.records,
+      ev.data.dataset.fields
+      )
+    ;
 
   try {
     self.postMessage({inputId: inputId, msg: 'eval::start'})
@@ -27,6 +45,7 @@ function runScript(ev) {
   }
   catch (error) {
     self.postMessage({inputId: inputId, msg: 'error', data: error.toString()})
+    // console.log(error);
   } finally {
     self.postMessage({inputId: inputId, msg: 'eval::end'})
   }
