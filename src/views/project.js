@@ -101,6 +101,8 @@ views.ScriptEditor = Backbone.View.extend({
 
   initialize: function(options) {
     this.el = $(this.el);
+    this.editor = null;
+    this.$output = null;
   },
 
   render: function() {
@@ -127,80 +129,36 @@ views.ScriptEditor = Backbone.View.extend({
   },
 
   _onRunSandboxed: function(e) {
+    var self = this;
     // save the script ...
     this.model.set({content: this.editor.getValue()});
-    // globals is a hash { 'name-in-context': variable }
-    var globals = '_';
-    this._runCodeMirrorCodeSandboxed(this.editor, this.$output, globals);
+    var worker = new Worker('src/views/worker-runscript.js');
+    worker.addEventListener('message',
+        function(e) { self._handleWorkerCommunication(e) },
+        false);
+    var codeToRun = this.editor.getValue();
+    worker.postMessage({src: codeToRun}); // Send data to our worker.
   },
 
-  // editor = codemirror editor
-  // output = output area
-  _runCodeMirrorCodeSandboxed: function(editor, output, globals) {
-  return function(event) {
-
-    // save the default logging behavior.
-    var real_console_log = console.log;
-    
-    // save the default logging behavior.
-    // Following Dean Edward's fantastic sandbox code:
-    // http://dean.edwards.name/weblog/2006/11/sandbox/+evaluating+js+in+an+iframe
-    // create an iframe sandbox for this element.
-    var iframe = $("<iframe>")
-      .css("display", "none")
-      .appendTo($(document).find('body'));
-
-    // Overwrite the default log behavior to pipe to an output element.
-    console.log = function() {
-      var messages = [];
-      // Convert all arguments to Strings (Objects will be JSONified).
-      for (var i = 0; i < arguments.length; i++) {
-        var value = arguments[i];
-        try {
-          messages.push(typeof(value) == 'object' ? JSON.stringify(value) : String(value));
-        } catch(e) {}
-      }
-      var msg = messages.join(" ");
-      if (output.html() !== "") {
-        output.append("<br />" + msg);
-      } else {
-        output.html(msg);
-      }
-    };
-
-    var sandBoxMarkup = "<script>"+
-      "var MSIE/*@cc_on =1@*/;"+ // sniff
-      "console={ log: parent.console.log };" +
-      "parent.sandbox=MSIE?this:{eval:function(s){return eval(s)}}<\/script>";
-
-    if (globals) {
-      var exposeGlobals = globals.split(",");
-
-      $.each(exposeGlobals, function(prop, val) {
-        val = $.trim(val);
-        iframe[0].contentWindow[val] = window[val];
-      });
-      // define the dataset variable in the iframe ...
-      iframe[0].contentWindow['dataset'] = window.app.instance.currentProject.dataset._store;
+  _handleWorkerCommunication: function(e) {
+    var self = this;
+    if (e.data.msg == 'print') {
+      this._writeToOutput(e.data.data);
+    } else if (e.data.msg == 'error') {
+      this._writeToOutput(e.data.data, 'error');
     }
+    // console.log('Worker said: ', e.data);
+  },
 
-    // write a script into the <iframe> and create the sandbox
-    frames[frames.length - 1].document.write(sandBoxMarkup);
-
-    var combinedSource = "";
-    
-    combinedSource += editor.getValue();
-    
-    // eval in the sandbox.
-    sandbox.eval(combinedSource);
-
-    // get rid of the frame. New Frame for every context.
-    iframe.remove();
-    
-    // set the old logging behavior back.
-    console.log = real_console_log;
-  }();
-}
+  _writeToOutput: function(msg, type) {
+    // make it a bit safer ...
+    msg = msg.replace('<', '&lt;').replace('>', '&gt;');
+    if (type === 'error') {
+      msg = '<span class="error"><strong>Error: </strong>' + msg + '</span>';
+    }
+    msg += '<br />';
+    this.$output.append(msg);
+  }
 });
 
 }).apply(this, window.args);

@@ -162,6 +162,11 @@ body {
   background-color: #eee;
 }
 
+.script-editor-widget .output .error {
+  color: red;
+  font-style: italic;
+}
+
 .script-editor-widget .button {
   font-family: "Helvetica Neue", "Helvetica", san-serif;
   padding: 5px;
