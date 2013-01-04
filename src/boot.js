@@ -18,7 +18,7 @@ window.app = {
 window.args = _(window.app).toArray();
 
 (function(config, models, views, routers, utils, templates) {
-  $(function() {
+  $(window).load(function() {
 
     // check for special case where this window is being used for doing the login
     var match = window.location.href.match(/\?code=([a-z0-9]*)/);

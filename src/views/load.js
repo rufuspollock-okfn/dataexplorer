@@ -23,8 +23,10 @@ views.Load = Backbone.View.extend({
     project.loadSourceDataset(function(err) {
       if (err) {
         // this.notify('error', 'The requested resource could not be found.');
+      } else {
+        project.save();
+        self.trigger('load', project);
       }
-      self.trigger('load', project);
     });
     return false;
   },

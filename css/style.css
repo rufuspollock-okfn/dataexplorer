@@ -7,10 +7,6 @@ body {
   margin-left: 0;
 }
 
-.recline-grid-container {
-  height: 550px;
-}
-
 .page-home .row.instructions .span4 .well {
   height: 100px;
 }
@@ -102,40 +98,103 @@ body {
   .authorize a.button:hover { background: #3d4548; }
 
 /**********************************************************
-  * Dataset
+  * Project 
   *********************************************************/
 
-.dataset {
+.view.project .menu {
   margin-top: -5px;
+  margin-bottom: 5px;
+  height: 30px;
 }
 
-.dataset-menu-wrapper {
-	background: #eee;
-}
-.dataset-menu {
-	line-height: 40px;
-	margin: 0 auto;
-	padding: 10px;
-	overflow: auto;
+.view.project .rhs {
+  float: right;
 }
 
-.dataset-menu > div {
-	float: left;
-	margin-right: 30px;
-}
-
-.dataset-menu .views {
-  margin-top: 5px;
-}
-
-.dataset-menu .save-dataset {
-  margin-bottom: 7px;
-}
-
-.view.start #grid .recline-slickgrid {
+.view.project .recline-slickgrid {
   height: 500px;
 }
 
+.view.project .script-editor {
+}
+
+/**********************************************************
+  * Project List
+  *********************************************************/
+
+.project.summary {
+	padding: 1em 0 0.5em 0.0em;
+	border-bottom: 1px solid #ececec;
+}
+
+.project.summary .title {
+  padding-top: 0.5em;
+  font-weight: bold;
+  font-size: 1.3em;
+}
+
+.project.summary .title a {
+	text-decoration: none;
+}
+
+/**********************************************************
+  * CodeMirror editable areas
+  *********************************************************/
+
+.script-editor-widget {
+  margin-bottom: 5px;
+}
+
+.script-editor-widget .CodeMirror {
+  border: 1px solid #ddd;
+  margin-right: 302px;
+  height: 250px;
+}
+
+.script-editor-widget .output {
+  overflow: auto;
+  border: 1px solid #ddd;
+  border-left: none;
+  padding-left: 5px;
+  font-family: monospace;
+  font-size: 80%;
+  float: right;
+  width: 300px;
+  height: 250px;
+  background-color: #eee;
+}
+
+.script-editor-widget .output .error {
+  color: red;
+  font-style: italic;
+}
+
+.script-editor-widget .button {
+  font-family: "Helvetica Neue", "Helvetica", san-serif;
+  padding: 5px;
+  cursor: pointer;
+  background-color: #333;
+  color: #fff;
+  position: relative;
+  float: right;
+  font-size: 11px;
+  line-height: 16px;
+  padding: 2px 6px;
+  margin-bottom: -20px;
+  margin-right: 10px;
+  border-radius: 4px;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  z-index: 100;
+  top: 8px; 
+  margin-right: 320px;
+}
+.script-editor-widget .button:hover {
+  background-color: #2685ED;
+}
+.script-editor-widget .button.clear {
+  top: 35px; 
+}
 
 /**********************************************************
   * About page
