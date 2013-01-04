@@ -17,6 +17,10 @@ var print = function() {
   self.postMessage({msg: 'print', data: msg})
 };
 
+var saveDataset = function(dataset) {
+  self.postMessage({msg: 'saveDataset', fields: dataset.fields, records: dataset.records });
+};
+
 self.onmessage = runScript;
 
 function runScript(ev) {

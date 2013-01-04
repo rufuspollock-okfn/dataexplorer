@@ -90,7 +90,7 @@ views.Project = Backbone.View.extend({
 views.ScriptEditor = Backbone.View.extend({
   template: ' \
     <div class="script-editor-widget"> \
-      <div class="button runsandbox">Run in Sandbox</div> \
+      <div class="button runsandbox">Run the Code</div> \
       <div class="button clear">Clear Output</div> \
       <div class="output"></div> \
       <textarea class="content"></textarea> \
@@ -154,6 +154,11 @@ views.ScriptEditor = Backbone.View.extend({
       this._writeToOutput(e.data.data);
     } else if (e.data.msg == 'error') {
       this._writeToOutput(e.data.data, 'error');
+    } else if (e.data.msg == 'saveDataset') {
+      this.dataset._store.records = e.data.records;
+      this.dataset._store.fields = e.data.fields;
+      this.dataset.fields.reset(this.dataset._store.fields);
+      this.dataset.query({size: this.dataset._store.records.length});
     }
     // console.log('Worker said: ', e.data);
   },
