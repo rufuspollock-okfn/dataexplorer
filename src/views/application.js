@@ -21,7 +21,7 @@ views.Application = Backbone.View.extend({
   _login: function(e) {
     e.preventDefault();
     var url = 'https://github.com/login/oauth/authorize?client_id=' + config.oauth_client_id + '&scope=repo, user';
-    window.open(url, 'Data Explorer - Github Login', 'height=400,width=400');
+    window.open(url, 'Data Explorer - Github Login', 'height=750,width=1000');
   },
 
   // Initialize
