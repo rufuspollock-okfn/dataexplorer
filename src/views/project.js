@@ -142,7 +142,7 @@ views.ScriptEditor = Backbone.View.extend({
     worker.postMessage({
       src: codeToRun,
       dataset: {
-        records: this.dataset._store.data,
+        records: this.dataset._store.records,
         fields: this.dataset._store.fields
       }
     });
