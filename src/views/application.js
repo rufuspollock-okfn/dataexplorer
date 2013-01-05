@@ -20,7 +20,7 @@ views.Application = Backbone.View.extend({
 
   _login: function(e) {
     e.preventDefault();
-    var url = 'https://github.com/login/oauth/authorize?client_id=' + config.oauth_client_id + '&scope=repo, user';
+    var url = 'https://github.com/login/oauth/authorize?client_id=' + config.oauth_client_id + '&scope=repo, user, gist';
     window.open(url, 'Data Explorer - Github Login', 'height=750,width=1000');
   },
 
@@ -44,7 +44,7 @@ views.Application = Backbone.View.extend({
           // this.notify('error', 'The requested resource could not be found.');
         } else {
           project.save();
-          this.onLoadProject(project);
+          self.onLoadProject(project);
         }
       });
     }
@@ -65,7 +65,7 @@ views.Application = Backbone.View.extend({
       self.switchView('save');
     });
     // project
-    this.router.route('project/:projectId', 'project', this.projectShow);
+    this.router.route(':username/:projectId', 'project', this.projectShow);
   },
 
   // Should be rendered just once
@@ -77,6 +77,8 @@ views.Application = Backbone.View.extend({
     this.el.find('.user-status').addClass('logged-out');
 
     if ($.cookie("oauth-token")) {
+      // set the username immediately to avoid race conditions between this and project loading (where we use the username)
+      self.username = $.cookie('username');
       this.finishLogin();
     }
 
@@ -120,6 +122,8 @@ views.Application = Backbone.View.extend({
     models.loadUserInfo(function() {
       self.el.find('.user-status').removeClass('logged-out');
       self.el.find('.user-status .username').text(app.username);
+      self.username = app.username;
+      self.authenticated = true;
       window.authenticated = true;
       if (cb) {
         cb();
@@ -129,30 +133,52 @@ views.Application = Backbone.View.extend({
 
   onLoadProject: function(project) {
     this.projectList.add(project);
-    this.projectShow(project.id);
+    this.projectShow('project', project.id);
   },
 
   // Main Views
   // ----------
 
-  projectShow: function(projectId) {
-    var self = this;
-    var project = this.projectList.get(projectId);
-    // housekeeping
-    this.currentProject = project;
-    this.saveView.project = project;
-
-    //this.loading('Loading dataset ...');
-    $('#main-menu a.grid-selector').tab('show');
-
-    // if we not yet have data loaded, load it now ...
-    if (!project.dataset) {
-      project.loadSourceDataset(displayIt)
+  _loadProject: function(username, projectId, cb) {
+    if (username == 'project') {
+      var project = this.projectList.get(projectId);
+      checkDatasetLoaded(project);
     } else {
-      displayIt();
+      var gist = models.github().getGist(projectId);
+      gist.read(function(err, gist) {
+        var project = new models.Project(JSON.parse(gist.files['datapackage.json'].content));
+        checkDatasetLoaded(project)
+      });
     }
 
-    function displayIt(err) {
+    function checkDatasetLoaded(project) {
+      // if we not yet have data loaded, load it now ...
+      if (!project.dataset) {
+        project.loadSourceDataset(function(err) { cb(err, project) });
+      } else {
+        cb(null, project);
+      }
+    }
+  },
+
+  projectShow: function(username, projectId) {
+    var self = this;
+    self.switchView('project', username + '/' + projectId);
+    this._loadProject(username, projectId, displayIt);
+    function displayIt(err, project) {
+      // housekeeping
+      self.currentProject = project;
+      self.saveView.project = project;
+
+      // if this project does in fact have remote backing let's set the username so it is sharable
+      // we only want to do this where this is a "local" project url (i.e. one using local id stuff)
+      if (username === 'project' && self.username && project.get('gist_id')) {
+        self.router.navigate(
+          self.username + '/' + project.get('gist_id'),
+          {replace: true}
+          );
+      }
+
       if (err) {
         // this.notify('error', 'The requested resource could not be found.');
         return;
@@ -160,9 +186,11 @@ views.Application = Backbone.View.extend({
       var ds = new views.Project({
         model: project
       });
+      // let's remove all previous instances of this view ...
+      // TODO: probably should do this to the Backbone view element
+      $('#main .view.project').remove();
       $('#main').append(ds.el);
       ds.render();
-      self.switchView('project', 'project/'+ projectId);
     }
   },
 

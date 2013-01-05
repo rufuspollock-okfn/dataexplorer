@@ -80,7 +80,9 @@
       // -------
 
       this.show = function(username, cb) {
-        _request("GET", "/users/"+username, null, function(err, res) {
+        var command = username ? "/users/"+username : "/user";
+
+        _request("GET", command, null, function(err, res) {
           cb(err, res);
         });
       };
@@ -435,6 +437,21 @@
         });
       };
 
+      // Create the gist
+      // --------
+      // {
+      //  "description": "the description for this gist",
+      //    "public": true,
+      //    "files": {
+      //      "file1.txt": {
+      //        "content": "String file contents"
+      //      }
+      //    }
+      // }
+      
+      this.create = function(options, cb){
+        _request("POST","/gists", options, cb);
+      };
 
       // Delete the gist
       // --------

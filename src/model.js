@@ -19,7 +19,7 @@ models.Project = Backbone.Model.extend({
       scripts: [
         {
           id: 'main.js',
-          content: 'log("hello world")'
+          content: 'print("hello world")'
         }
       ]
     }
@@ -49,14 +49,61 @@ models.Project = Backbone.Model.extend({
   },
 
   saveToStorage: function() {
-    var data = this.toJSON();
+    var data = this._toDataPackage();
     data.last_modified = new Date().toISOString();
     localStorage.setItem(this.id, JSON.stringify(data));
   },
 
+  _toDataPackage: function() {
+    var data = this.toJSON();
+    data.scripts = this.scripts.toJSON();
+    data.datasets = [];
+    return data;
+  },
+
+  saveToGist: function() {
+    var self = this;
+    var gh = models.github();
+    var gistJSON = {
+      description: this.get('description'),
+      files: {
+        'datapackage.json': {
+          'content': JSON.stringify(this._toDataPackage(), null, 2)
+        }
+      }
+    };
+    if (this.get('gist_id')) {
+      var gist = gh.getGist(this.get('gist_id'));
+      gist.update(gistJSON, function(err, gist) {
+        if (err) {
+          alert('Failed to save project to gist');
+          console.log(err);
+        } else {
+          console.log('Saved to gist successfully');
+        }
+      });
+    } else {
+      gistJSON.public = true;
+      var gist = gh.getGist();
+      gist.create(gistJSON, function(err, gist) {
+        if (err) {
+          alert('Initial save of project to gist failed');
+          console.log(err);
+        } else {
+          // we do not want to trigger an immediate resave to the gist
+          self.set({gist_id: gist.id, gist_url: gist.url}, {silent: true});
+          self.saveToStorage();
+        }
+      });
+    }
+  },
+
   save: function() {
-    this.set({scripts: this.scripts.toJSON()}, {silent: true});
     this.saveToStorage();
+    // TODO: do not want to save *all* the time so should probably check and only save every 5m or something
+    if (window.authenticated) {
+      this.saveToGist();
+    }
   },
 
   // load source dataset info
@@ -123,7 +170,7 @@ models.Script = Backbone.Model.extend({
 // -------
 
 // Gimme a Github object! Please.
-function github() {
+models.github = function() {
   return new Github({
     token: $.cookie('oauth-token'),
     username: $.cookie('username'),
@@ -148,7 +195,7 @@ function getRepo(user, repo) {
   currentRepo = {
     user: user,
     repo: repo,
-    instance: github().getRepo(user, repo)
+    instance: models.github().getRepo(user, repo)
   };
 
   return currentRepo.instance;
@@ -172,7 +219,7 @@ models.loadUserInfo = function(cb) {
       $.cookie("username", res.login);
       app.username = res.login;
 
-      var user = github().getUser();
+      var user = models.github().getUser();
       var owners = {};
 
       cb(null);
