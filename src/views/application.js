@@ -77,6 +77,8 @@ views.Application = Backbone.View.extend({
     this.el.find('.user-status').addClass('logged-out');
 
     if ($.cookie("oauth-token")) {
+      // set the username immediately to avoid race conditions between this and project loading (where we use the username)
+      self.username = $.cookie('username');
       this.finishLogin();
     }
 
@@ -120,6 +122,8 @@ views.Application = Backbone.View.extend({
     models.loadUserInfo(function() {
       self.el.find('.user-status').removeClass('logged-out');
       self.el.find('.user-status .username').text(app.username);
+      self.username = app.username;
+      self.authenticated = true;
       window.authenticated = true;
       if (cb) {
         cb();
@@ -166,6 +170,15 @@ views.Application = Backbone.View.extend({
       self.currentProject = project;
       self.saveView.project = project;
 
+      // if this project does in fact have remote backing let's set the username so it is sharable
+      // we only want to do this where this is a "local" project url (i.e. one using local id stuff)
+      if (username === 'project' && self.username && project.get('gist_id')) {
+        self.router.navigate(
+          self.username + '/' + project.get('gist_id'),
+          {replace: true}
+          );
+      }
+
       if (err) {
         // this.notify('error', 'The requested resource could not be found.');
         return;
@@ -173,6 +186,9 @@ views.Application = Backbone.View.extend({
       var ds = new views.Project({
         model: project
       });
+      // let's remove all previous instances of this view ...
+      // TODO: probably should do this to the Backbone view element
+      $('#main .view.project').remove();
       $('#main').append(ds.el);
       ds.render();
     }
