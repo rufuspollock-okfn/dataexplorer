@@ -133,7 +133,7 @@ views.Application = Backbone.View.extend({
 
   onLoadProject: function(project) {
     this.projectList.add(project);
-    this.projectShow(project.id);
+    this.projectShow('project', project.id);
   },
 
   // Main Views
