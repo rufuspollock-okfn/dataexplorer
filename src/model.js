@@ -49,10 +49,16 @@ models.Project = Backbone.Model.extend({
   },
 
   saveToStorage: function() {
-    var data = this.toJSON();
-    data.scripts = this.scripts.toJSON();
+    var data = this._toDataPackage();
     data.last_modified = new Date().toISOString();
     localStorage.setItem(this.id, JSON.stringify(data));
+  },
+
+  _toDataPackage: function() {
+    var data = this.toJSON();
+    data.scripts = this.scripts.toJSON();
+    data.datasets = [];
+    return data;
   },
 
   saveToGist: function() {
@@ -62,12 +68,7 @@ models.Project = Backbone.Model.extend({
       description: this.get('description'),
       files: {
         'datapackage.json': {
-          'content': JSON.stringify({
-            metadata: this.toJSON(),
-            files: [],
-            scripts: this.scripts.toJSON()
-            },
-          null, 2)
+          'content': JSON.stringify(this._toDataPackage(), null, 2)
         }
       }
     };

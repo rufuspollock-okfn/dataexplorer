@@ -65,7 +65,7 @@ views.Application = Backbone.View.extend({
       self.switchView('save');
     });
     // project
-    this.router.route('project/:projectId', 'project', this.projectShow);
+    this.router.route(':username/:projectId', 'project', this.projectShow);
   },
 
   // Should be rendered just once
@@ -135,24 +135,37 @@ views.Application = Backbone.View.extend({
   // Main Views
   // ----------
 
-  projectShow: function(projectId) {
-    var self = this;
-    var project = this.projectList.get(projectId);
-    // housekeeping
-    this.currentProject = project;
-    this.saveView.project = project;
-
-    //this.loading('Loading dataset ...');
-    $('#main-menu a.grid-selector').tab('show');
-
-    // if we not yet have data loaded, load it now ...
-    if (!project.dataset) {
-      project.loadSourceDataset(displayIt)
+  _loadProject: function(username, projectId, cb) {
+    if (username == 'project') {
+      var project = this.projectList.get(projectId);
+      checkDatasetLoaded(project);
     } else {
-      displayIt();
+      var gist = models.github().getGist(projectId);
+      gist.read(function(err, gist) {
+        var project = new models.Project(JSON.parse(gist.files['datapackage.json'].content));
+        checkDatasetLoaded(project)
+      });
     }
 
-    function displayIt(err) {
+    function checkDatasetLoaded(project) {
+      // if we not yet have data loaded, load it now ...
+      if (!project.dataset) {
+        project.loadSourceDataset(function(err) { cb(err, project) });
+      } else {
+        cb(null, project);
+      }
+    }
+  },
+
+  projectShow: function(username, projectId) {
+    var self = this;
+    self.switchView('project', username + '/' + projectId);
+    this._loadProject(username, projectId, displayIt);
+    function displayIt(err, project) {
+      // housekeeping
+      self.currentProject = project;
+      self.saveView.project = project;
+
       if (err) {
         // this.notify('error', 'The requested resource could not be found.');
         return;
@@ -162,7 +175,6 @@ views.Application = Backbone.View.extend({
       });
       $('#main').append(ds.el);
       ds.render();
-      self.switchView('project', 'project/'+ projectId);
     }
   },
 
