@@ -22,30 +22,16 @@ my.Project = Backbone.View.extend({
   },
 
   render: function() {
+    var self = this;
     this.el.html(this.template);
-    var reclineviews = [
-       {
-         id: 'grid',
-         label: 'Grid', 
-         view: new recline.View.SlickGrid({
-           model: this.model.datasets.at(0)
-         })
-       },
-       {
-         id: 'map',
-         label: 'Map',
-         view: new recline.View.Map({
-           model: this.model.datasets.at(0)
-         })
-       },
-       {
-         id: 'graph',
-         label: 'Graph',
-         view: new recline.View.Graph({
-           model: this.model.datasets.at(0)
-         })
-       }
-    ];
+
+    var reclineviews = _.map(this.model.get('views'), function(viewInfo) {
+      var out = _.clone(viewInfo);
+      out.view = new recline.View[viewInfo.type]({
+        model: self.model.datasets.at(0)
+      });
+      return out;
+    });
 
     // see below!
     var width = this.el.find('.multiview-here').width();
@@ -68,7 +54,7 @@ my.Project = Backbone.View.extend({
     // now hide this element for the moment
     this.editor.el.parent().hide();
 
-		this.model.datasets.at(0).query();
+    this.model.datasets.at(0).query();
 
     // HACK - for some reason the grid view of multiview is massively wide by default
     this.el.find('.view.project .recline-data-explorer').width(width);
@@ -84,9 +70,6 @@ my.Project = Backbone.View.extend({
 });
 
 
-// The runnable CodeMirror work is largely based on Irene Ros' great deck.js +
-// codemirror work (MIT licensed!). Thanks Irene!
-// https://github.com/iros/deck.js-codemirror/blob/1.0.0rc/deck.codemirror.js
 my.ScriptEditor = Backbone.View.extend({
   template: ' \
     <div class="script-editor-widget"> \

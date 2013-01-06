@@ -25,7 +25,25 @@ my.Project = Backbone.Model.extend({
           content: 'print("hello world")'
         }
       ],
-      datasets: []
+      datasets: [],
+      views: [
+        {
+          id: 'grid',
+          label: 'Grid',
+          // must be in recline.View namespace for the present
+          type: 'SlickGrid'
+        },
+        {
+          id: 'graph',
+          label: 'Graph',
+          type: 'Graph'
+        },
+        {
+          id: 'map',
+          label: 'Map',
+          type: 'Map'
+        }
+      ]
     }
   },
 
@@ -116,14 +134,17 @@ my.Project = Backbone.Model.extend({
   // load source dataset info
   loadSourceDataset: function(cb) {
     var self = this;
-    var datasetInfo = self.get('source');
+    var datasetInfo = self.datasets.at(0).toJSON();
     if (datasetInfo.backend == 'github') {
-      self.loadGithubDataset(datasetInfo.url, cb);
+      self.loadGithubDataset(datasetInfo.url, function(err, whocares) {
+        self.datasets.at(0).fetch().done(function() {
+          cb(null, self);
+        });
+      });
     } else {
-      self.dataset = new recline.Model.Dataset(datasetInfo);
-      self.dataset.fetch().done(function() {
+      self.datasets.at(0).fetch().done(function() {
         // TODO: should we set dataset metadata onto project source?
-        cb();
+        cb(null, self);
       });
     }
   },
@@ -137,8 +158,8 @@ my.Project = Backbone.Model.extend({
     var repo = getRepo(user, repo);
 
     repo.read(branch, 'data/data.csv', function(err, raw_csv) {
-      self.dataset = new recline.Model.Dataset({data: raw_csv, backend: 'csv'});
-      self.dataset.fetch();
+      // TODO: need to do this properly ...
+      self.datasets.reset([new recline.Model.Dataset({data: raw_csv, backend: 'csv'})]);
       cb(err, self.dataset);
     });
   }

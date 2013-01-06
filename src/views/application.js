@@ -150,7 +150,7 @@ my.Application = Backbone.View.extend({
 
     function checkDatasetLoaded(project) {
       // if we not yet have data loaded, load it now ...
-      if (!project.datasets.at(0) || !project.datasets.at(0)._store) {
+      if (project.datasets.at(0).recordCount === null) {
         project.loadSourceDataset(function(err) { cb(err, project) });
       } else {
         cb(null, project);
