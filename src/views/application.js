@@ -41,15 +41,9 @@ my.Application = Backbone.View.extend({
     // TODO: make this somewhat nicer - e.g. show a loading message etc
     var state = recline.View.parseQueryString(decodeURIComponent(window.location.search));
     if (state.backend) {
-      var project = new DataExplorer.Model.Project({source: state});
-      project.loadSourceDataset(function(err) {
-        if (err) {
-          // this.notify('error', 'The requested resource could not be found.');
-        } else {
-          project.save();
-          self.onLoadProject(project);
-        }
-      });
+      var project = new DataExplorer.Model.Project({datasets: [state]});
+      project.save();
+      self.onLoadProject(project);
     }
     
     this.router.route('', 'home', function() {
@@ -156,7 +150,7 @@ my.Application = Backbone.View.extend({
 
     function checkDatasetLoaded(project) {
       // if we not yet have data loaded, load it now ...
-      if (!project.dataset) {
+      if (!project.datasets.at(0) || !project.datasets.at(0)._store) {
         project.loadSourceDataset(function(err) { cb(err, project) });
       } else {
         cb(null, project);

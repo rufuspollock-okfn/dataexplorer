@@ -28,21 +28,21 @@ my.Project = Backbone.View.extend({
          id: 'grid',
          label: 'Grid', 
          view: new recline.View.SlickGrid({
-           model: this.model.dataset
+           model: this.model.datasets.at(0)
          })
        },
        {
          id: 'map',
          label: 'Map',
          view: new recline.View.Map({
-           model: this.model.dataset
+           model: this.model.datasets.at(0)
          })
        },
        {
          id: 'graph',
          label: 'Graph',
          view: new recline.View.Graph({
-           model: this.model.dataset
+           model: this.model.datasets.at(0)
          })
        }
     ];
@@ -52,15 +52,15 @@ my.Project = Backbone.View.extend({
 
 		this.grid = new recline.View.MultiView({
       el: this.el.find('.multiview-here'),
-      model: this.model.dataset,
+      model: this.model.datasets.at(0),
       views: reclineviews,
       sidebarViews: []
     });
-		this.editor = new views.ScriptEditor({
+		this.editor = new DataExplorer.View.ScriptEditor({
       model: this.model.scripts.get('main.js')
     });
     // TODO: hmmm, this is not that elegant ...
-    this.editor.dataset = this.model.dataset;
+    this.editor.dataset = this.model.datasets.at(0);
 
     this.el.find('.script-editor').append(this.editor.el);
     this.editor.render();
@@ -68,7 +68,7 @@ my.Project = Backbone.View.extend({
     // now hide this element for the moment
     this.editor.el.parent().hide();
 
-		this.model.dataset.query();
+		this.model.datasets.at(0).query();
 
     // HACK - for some reason the grid view of multiview is massively wide by default
     this.el.find('.view.project .recline-data-explorer').width(width);
