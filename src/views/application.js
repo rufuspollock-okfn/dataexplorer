@@ -63,6 +63,7 @@ my.Application = Backbone.View.extend({
     });
     // project
     this.router.route(':username/:projectId', 'project', this.projectShow);
+    this.router.route(':username/:projectId/view/:viewId', 'projectWithView', this.projectShow);
   },
 
   // Should be rendered just once

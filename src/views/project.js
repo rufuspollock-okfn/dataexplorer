@@ -129,6 +129,15 @@ my.Project = Backbone.View.extend({
         if (view.view.show) {
           view.view.show();
         }
+        // update the url / route to show just this view
+        // HACK
+        var current = Backbone.history.fragment;
+        var newpath = current.split('/view')[0] + '/view/' + pageName;
+        if (current.indexOf('/view')!= -1) {
+          DataExplorer.app.instance.router.navigate(newpath);
+        } else {
+          DataExplorer.app.instance.router.navigate(newpath, {replace: true});
+        }
       } else {
         view.view.el.hide();
         if (view.view.elSidebar) {
@@ -216,7 +225,6 @@ my.ScriptEditor = Backbone.View.extend({
       this.dataset.fields.reset(this.dataset._store.fields);
       this.dataset.query({size: this.dataset._store.records.length});
     }
-    // console.log('Worker said: ', e.data);
   },
 
   _writeToOutput: function(msg, type) {
