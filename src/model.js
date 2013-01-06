@@ -1,4 +1,7 @@
-(function(config, models, views, routers, utils, templates) {
+this.DataExplorer = this.DataExplorer || {};
+this.DataExplorer.Model = this.DataExplorer.Model || {};
+
+(function(my) {
 
 // The central object in the Data Explorer
 //
@@ -11,7 +14,7 @@
 //   // save to gists
 //   scripts: [ {...}, ... ]
 // }
-models.Project = Backbone.Model.extend({
+my.Project = Backbone.Model.extend({
   defaults: function() {
     return {
       manifest_version: 1,
@@ -42,7 +45,7 @@ models.Project = Backbone.Model.extend({
     }
     this.scripts.reset(_.map(
       self.get('scripts'),
-      function(scriptData) { return new models.Script(scriptData) }
+      function(scriptData) { return new my.Script(scriptData) }
     ));
     this.scripts.bind('change', function() {self.save()});
     this.bind('change', this.save);
@@ -63,7 +66,7 @@ models.Project = Backbone.Model.extend({
 
   saveToGist: function() {
     var self = this;
-    var gh = models.github();
+    var gh = my.github();
     var gistJSON = {
       description: this.get('description'),
       files: {
@@ -137,15 +140,15 @@ models.Project = Backbone.Model.extend({
   }
 });
 
-models.ProjectList = Backbone.Collection.extend({
-  model: models.Project,
+my.ProjectList = Backbone.Collection.extend({
+  model: my.Project,
   load: function() {
     for(key in localStorage) {
       if (key.indexOf('dataexplorer-') == 0) {
         var projectInfo = localStorage.getItem(key);
         try {
           var data = JSON.parse(projectInfo);
-          var tmp = new models.Project(data);
+          var tmp = new my.Project(data);
           this.add(tmp);
         } catch(e) {
           alert('Failed to load project ' + projectInfo);
@@ -155,7 +158,7 @@ models.ProjectList = Backbone.Collection.extend({
   }
 });
 
-models.Script = Backbone.Model.extend({
+my.Script = Backbone.Model.extend({
   defaults: function() {
     return {
       created: new Date().toISOString(),
@@ -170,7 +173,7 @@ models.Script = Backbone.Model.extend({
 // -------
 
 // Gimme a Github object! Please.
-models.github = function() {
+my.github = function() {
   return new Github({
     token: $.cookie('oauth-token'),
     username: $.cookie('username'),
@@ -195,7 +198,7 @@ function getRepo(user, repo) {
   currentRepo = {
     user: user,
     repo: repo,
-    instance: models.github().getRepo(user, repo)
+    instance: my.github().getRepo(user, repo)
   };
 
   return currentRepo.instance;
@@ -207,7 +210,7 @@ function getRepo(user, repo) {
 // 
 // Load everything that's needed for the app + header
 
-models.loadUserInfo = function(cb) {
+my.loadUserInfo = function(cb) {
   $.ajax({
     type: "GET",
     url: 'https://api.github.com/user',
@@ -217,9 +220,9 @@ models.loadUserInfo = function(cb) {
     success: function(res) {
       $.cookie("avatar", res.avatar_url);
       $.cookie("username", res.login);
-      app.username = res.login;
+      // app.username = res.login;
 
-      var user = models.github().getUser();
+      var user = my.github().getUser();
       var owners = {};
 
       cb(null);
@@ -233,7 +236,7 @@ models.loadUserInfo = function(cb) {
 // Authentication
 // -------
 
-models.logout = function() {
+my.logout = function() {
   window.authenticated = false;
   $.cookie("oauth-token", null);
 }
@@ -241,7 +244,7 @@ models.logout = function() {
 // Save Dataset
 // -------
 
-models.saveDataset = function(user, repo, branch, data, commitMessage, cb) {
+my.saveDataset = function(user, repo, branch, data, commitMessage, cb) {
   var repo = getRepo(user, repo);
 
   repo.write(branch, 'data/data.csv', data, commitMessage, function(err) {
@@ -249,4 +252,4 @@ models.saveDataset = function(user, repo, branch, data, commitMessage, cb) {
   });
 }
 
-}).apply(this, window.args);
+}(this.DataExplorer.Model));

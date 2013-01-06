@@ -13,7 +13,7 @@ views.Application = Backbone.View.extend({
   },
 
   _logout: function() {
-    models.logout();
+    DataExplorer.Model.logout();
     window.location.reload();
     return false;
   },
@@ -32,13 +32,13 @@ views.Application = Backbone.View.extend({
     this.el = $(this.el);
     _.bindAll(this);
     this.router = new Backbone.Router();
-    this.projectList = new models.ProjectList();
+    this.projectList = new DataExplorer.Model.ProjectList();
     this.projectList.load();
 
     // TODO: make this somewhat nicer - e.g. show a loading message etc
     var state = recline.View.parseQueryString(decodeURIComponent(window.location.search));
     if (state.backend) {
-      var project = new models.Project({source: state});
+      var project = new DataExplorer.Model.Project({source: state});
       project.loadSourceDataset(function(err) {
         if (err) {
           // this.notify('error', 'The requested resource could not be found.');
@@ -119,10 +119,10 @@ views.Application = Backbone.View.extend({
 
   finishLogin: function(cb) {
     var self = this;
-    models.loadUserInfo(function() {
+    DataExplorer.Model.loadUserInfo(function() {
       self.el.find('.user-status').removeClass('logged-out');
-      self.el.find('.user-status .username').text(app.username);
-      self.username = app.username;
+      self.el.find('.user-status .username').text(DataExplorer.app.username);
+      self.username = DataExplorer.app.username;
       self.authenticated = true;
       window.authenticated = true;
       if (cb) {
@@ -144,9 +144,9 @@ views.Application = Backbone.View.extend({
       var project = this.projectList.get(projectId);
       checkDatasetLoaded(project);
     } else {
-      var gist = models.github().getGist(projectId);
+      var gist = DataExplorer.Model.github().getGist(projectId);
       gist.read(function(err, gist) {
-        var project = new models.Project(JSON.parse(gist.files['datapackage.json'].content));
+        var project = new DataExplorer.Model.Project(JSON.parse(gist.files['datapackage.json'].content));
         checkDatasetLoaded(project)
       });
     }
