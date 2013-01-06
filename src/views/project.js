@@ -3,29 +3,46 @@
 my.Project = Backbone.View.extend({
   template: ' \
     <div class="view project"> \
-      <div class="menu"> \
-        &nbsp; \
-        <div class="btn-group rhs" data-toggle="buttons-checkbox"> \
-          <a href="#" data-action="script-editor" class="btn">Script Editor</a> \
+      <div class="header"> \
+        <div class="navigation"> \
+          <div class="btn-group" data-toggle="buttons-radio"> \
+          {{#views}} \
+          <a href="#{{id}}" data-view="{{id}}" class="btn">{{label}}</a> \
+          {{/views}} \
+          </div> \
         </div> \
+        <div class="recline-results-info"> \
+          <span class="doc-count">{{recordCount}}</span> records\
+        </div> \
+        <div class="menu-right"> \
+          <div class="btn-group" data-toggle="buttons-checkbox"> \
+            <a href="#" data-action="script-editor" class="btn">Script Editor</a> \
+          </div> \
+        </div> \
+        <div class="query-editor-here" style="display:inline;"></div> \
       </div> \
       <div class="script-editor"></div> \
+      <div class="data-view-sidebar"></div> \
+      <div class="data-view-container"></div> \
       <div class="multiview-here"></div> \
     </div> \
   ',
   events: {
-    'click .menu a': '_onMenuClick'
+    'click .menu-right a': '_onMenuClick',
+    'click .navigation a': '_onSwitchView'
   },
 
   initialize: function(options) {
     this.el = $(this.el);
+    this.state = {};
   },
 
   render: function() {
     var self = this;
-    this.el.html(this.template);
+    var tmpl = Mustache.render(this.template, this.model.toJSON());
+    this.el.html(tmpl);
 
-    var reclineviews = _.map(this.model.get('views'), function(viewInfo) {
+    this.views = _.map(this.model.get('views'), function(viewInfo) {
       var out = _.clone(viewInfo);
       out.view = new recline.View[viewInfo.type]({
         model: self.model.datasets.at(0)
@@ -33,15 +50,32 @@ my.Project = Backbone.View.extend({
       return out;
     });
 
+    // now create and append other views
+    var $dataViewContainer = this.el.find('.data-view-container');
+    var $dataSidebar = this.el.find('.data-view-sidebar');
+
+    // the main views
+    _.each(this.views, function(view, pageName) {
+      view.view.render();
+      $dataViewContainer.append(view.view.el);
+      if (view.view.elSidebar) {
+        $dataSidebar.append(view.view.elSidebar);
+      }
+    });
+
+    var pager = new recline.View.Pager({
+      model: this.model.datasets.at(0).queryState
+    });
+    this.el.find('.recline-results-info').after(pager.el);
+
+    var queryEditor = new recline.View.QueryEditor({
+      model: this.model.datasets.at(0).queryState
+    });
+    this.el.find('.query-editor-here').append(queryEditor.el);
+
     // see below!
     var width = this.el.find('.multiview-here').width();
 
-		this.grid = new recline.View.MultiView({
-      el: this.el.find('.multiview-here'),
-      model: this.model.datasets.at(0),
-      views: reclineviews,
-      sidebarViews: []
-    });
 		this.editor = new DataExplorer.View.ScriptEditor({
       model: this.model.scripts.get('main.js')
     });
@@ -59,6 +93,13 @@ my.Project = Backbone.View.extend({
     // HACK - for some reason the grid view of multiview is massively wide by default
     this.el.find('.view.project .recline-data-explorer').width(width);
 
+    // set the current view
+    if (this.state.currentView) {
+      this._updateNav(this.state.currentView);
+    } else {
+      this._updateNav(this.views[0].id);
+    }
+
     return this;
   },
 
@@ -66,7 +107,39 @@ my.Project = Backbone.View.extend({
     e.preventDefault();
     var action = $(e.target).attr('data-action');
     this.el.find('.' + action).toggle('slow');
-  }
+  },
+
+  _onSwitchView: function(e) {
+    e.preventDefault();
+    var viewName = $(e.target).attr('data-view');
+    this._updateNav(viewName);
+  },
+
+  _updateNav: function(pageName) {
+    this.el.find('.navigation a').removeClass('active');
+    var $el = this.el.find('.navigation a[data-view="' + pageName + '"]');
+    $el.addClass('active');
+    // show the specific page
+    _.each(this.views, function(view, idx) {
+      if (view.id === pageName) {
+        view.view.el.show();
+        if (view.view.elSidebar) {
+          view.view.elSidebar.show();
+        }
+        if (view.view.show) {
+          view.view.show();
+        }
+      } else {
+        view.view.el.hide();
+        if (view.view.elSidebar) {
+          view.view.elSidebar.hide();
+        }
+        if (view.view.hide) {
+          view.view.hide();
+        }
+      }
+    });
+  },
 });
 
 
