@@ -1,8 +1,11 @@
-(function(config, models, views, routers, utils, templates) {
+this.DataExplorer = this.DataExplorer || {};
+this.DataExplorer.View = this.DataExplorer.View || {};
+
+(function(my) {
 
 // This is the top-level piece of UI.
 
-views.Application = Backbone.View.extend({
+my.Application = Backbone.View.extend({
 
   // Events
   // ------
@@ -20,7 +23,7 @@ views.Application = Backbone.View.extend({
 
   _login: function(e) {
     e.preventDefault();
-    var url = 'https://github.com/login/oauth/authorize?client_id=' + config.oauth_client_id + '&scope=repo, user, gist';
+    var url = 'https://github.com/login/oauth/authorize?client_id=' + DataExplorer.app.config.oauth_client_id + '&scope=repo, user, gist';
     window.open(url, 'Data Explorer - Github Login', 'height=750,width=1000');
   },
 
@@ -71,7 +74,7 @@ views.Application = Backbone.View.extend({
   // Should be rendered just once
   render: function () {
     var self = this;
-    var loginUrl = 'https://github.com/login/oauth/authorize?client_id=' + config.oauth_client_id + '&scope=repo, user&redirect_uri=' + window.location.href;
+    var loginUrl = 'https://github.com/login/oauth/authorize?client_id=' + DataExplorer.app.config.oauth_client_id + '&scope=repo, user&redirect_uri=' + window.location.href;
     this.el.find('.user-status login a').attr('href', loginUrl);
     // we will override if logged in
     this.el.find('.user-status').addClass('logged-out');
@@ -83,20 +86,20 @@ views.Application = Backbone.View.extend({
     }
 
     // now append views
-    this.dashboardView = new views.Dashboard({
+    this.dashboardView = new DataExplorer.View.Dashboard({
       collection: this.projectList
     });
     this.dashboardView.render();
     $('#main').append(this.dashboardView.el);
     this.dashboardView.bind('load', this.onLoadProject);
 
-    this.loadView = new views.Load({});
+    this.loadView = new DataExplorer.View.Load({});
     this.loadView.render();
     $('#main').append(this.loadView.el);
 
     this.loadView.bind('load', this.onLoadProject);
 
-    this.saveView = new views.Save({});
+    this.saveView = new DataExplorer.View.Save({});
     this.saveView.render();
     $('#main').append(this.saveView.el);
 
@@ -183,7 +186,7 @@ views.Application = Backbone.View.extend({
         // this.notify('error', 'The requested resource could not be found.');
         return;
       }
-      var ds = new views.Project({
+      var ds = new DataExplorer.View.Project({
         model: project
       });
       // let's remove all previous instances of this view ...
@@ -195,7 +198,7 @@ views.Application = Backbone.View.extend({
   },
 
   notify: function(type, message) {
-    $('#main').append(new views.Notification(type, message).render().el);
+    $('#main').append(new DataExplorer.View.Notification(type, message).render().el);
   },
 
   loading: function(msg) {
@@ -208,4 +211,4 @@ views.Application = Backbone.View.extend({
 
 });
 
-}).apply(this, window.args);
+}(this.DataExplorer.View));

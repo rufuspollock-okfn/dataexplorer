@@ -1,6 +1,6 @@
-(function(config, models, views, routers, utils, templates) {
+(function(my) {
 
-views.Dashboard = Backbone.View.extend({
+my.Dashboard = Backbone.View.extend({
   template: ' \
     <div class="view dashboard"> \
       <div class="page-header"> \
@@ -42,4 +42,4 @@ views.Dashboard = Backbone.View.extend({
   }
 });
 
-}).apply(this, window.args);
+}(this.DataExplorer.View));

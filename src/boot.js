@@ -32,7 +32,7 @@ window.args = _(this.DataExplorer.app).toArray();
     // Check whether we are logged in and boot the app
 
     // Start the engines
-    DataExplorer.app.instance = new views.Application({ el: '.transformer-app', model: {} }).render();
+    DataExplorer.app.instance = new DataExplorer.View.Application({ el: '.transformer-app', model: {} }).render();
 
     // listen for login success in login window
     window.addEventListener("message", function(evt) {

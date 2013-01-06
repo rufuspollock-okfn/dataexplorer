@@ -1,6 +1,6 @@
-(function(config, models, views, routers, utils, templates) {
+(function(my) {
 
-views.Project = Backbone.View.extend({
+my.Project = Backbone.View.extend({
   template: ' \
     <div class="view project"> \
       <div class="menu"> \
@@ -87,7 +87,7 @@ views.Project = Backbone.View.extend({
 // The runnable CodeMirror work is largely based on Irene Ros' great deck.js +
 // codemirror work (MIT licensed!). Thanks Irene!
 // https://github.com/iros/deck.js-codemirror/blob/1.0.0rc/deck.codemirror.js
-views.ScriptEditor = Backbone.View.extend({
+my.ScriptEditor = Backbone.View.extend({
   template: ' \
     <div class="script-editor-widget"> \
       <div class="button runsandbox">Run the Code</div> \
@@ -174,4 +174,4 @@ views.ScriptEditor = Backbone.View.extend({
   }
 });
 
-}).apply(this, window.args);
+}(this.DataExplorer.View));

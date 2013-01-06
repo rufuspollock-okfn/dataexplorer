@@ -1,6 +1,6 @@
-(function(config, models, views, routers, utils, templates) {
+(function(my) {
 
-views.Save = Backbone.View.extend({
+my.Save = Backbone.View.extend({
   id: 'save',
 
   events: {
@@ -45,7 +45,7 @@ views.Save = Backbone.View.extend({
 
   saveDataset: function(location) {
   	var rawCSV = this._serializeCSV(this.project.dataset);
-    models.saveDataset(location.user, location.repo, location.branch, rawCSV, "updated file", function(err) {
+    DataExplorer.Model.saveDataset(location.user, location.repo, location.branch, rawCSV, "updated file", function(err) {
 	  alert((function() { 
 		if (!err) return "Saved."
 		switch (err.error) {
@@ -87,4 +87,4 @@ views.Save = Backbone.View.extend({
   '
 });
 
-}).apply(this, window.args);
+}(this.DataExplorer.View));
