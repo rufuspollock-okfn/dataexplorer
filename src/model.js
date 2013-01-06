@@ -24,13 +24,15 @@ my.Project = Backbone.Model.extend({
           id: 'main.js',
           content: 'print("hello world")'
         }
-      ]
+      ],
+      datasets: []
     }
   },
 
   initialize: function() {
     var self = this;
     this.scripts = new Backbone.Collection();
+    this.datasets = new Backbone.Collection();
     if (!this.id) {
       // generate a unique id with guard against duplication
       // there is some still small risk of a race condition if 2 apps doing this at the same time but we can live with it!
@@ -46,6 +48,10 @@ my.Project = Backbone.Model.extend({
     this.scripts.reset(_.map(
       self.get('scripts'),
       function(scriptData) { return new my.Script(scriptData) }
+    ));
+    this.datasets.reset(_.map(
+      self.get('datasets'),
+      function(datasetData) { return new recline.Model.Dataset(datasetData) }
     ));
     this.scripts.bind('change', function() {self.save()});
     this.bind('change', this.save);
