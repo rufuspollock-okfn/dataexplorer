@@ -15,7 +15,7 @@ my.Dashboard = Backbone.View.extend({
         <h3 class="title"><a href="#project/{{id}}" class="js-load-project">{{showTitle}}</a></h3> \
         Last modified: {{last_modified_nice}} \
         <br /> \
-        Data source: {{source.url}} \
+        Data source: {{datasets.0.url}} \
       </div> \
       {{/projects}} \
     </div> \
@@ -31,7 +31,7 @@ my.Dashboard = Backbone.View.extend({
   render: function() {
     var projects = _.map(this.collection.toJSON(), function(project) {
       project.last_modified_nice = new Date(project.last_modified).toString();
-      project.showTitle = project.title || project.source.url;
+      project.showTitle = project.title || 'No title';
       return project;
     });
     var tmp = Mustache.render(this.template, {

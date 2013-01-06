@@ -53,21 +53,19 @@ my.Project = Backbone.Model.extend({
       self.get('datasets'),
       function(datasetData) { return new recline.Model.Dataset(datasetData) }
     ));
-    this.scripts.bind('change', function() {self.save()});
+    this.scripts.bind('change', function() {
+      self.set({scripts: self.scripts.toJSON()});
+    });
+    this.datasets.bind('change', function() {
+      self.set({datasets: self.datasets.toJSON()});
+    });
     this.bind('change', this.save);
   },
 
   saveToStorage: function() {
-    var data = this._toDataPackage();
+    var data = this.toJSON();
     data.last_modified = new Date().toISOString();
     localStorage.setItem(this.id, JSON.stringify(data));
-  },
-
-  _toDataPackage: function() {
-    var data = this.toJSON();
-    data.scripts = this.scripts.toJSON();
-    data.datasets = [];
-    return data;
   },
 
   saveToGist: function() {
@@ -77,7 +75,7 @@ my.Project = Backbone.Model.extend({
       description: this.get('description'),
       files: {
         'datapackage.json': {
-          'content': JSON.stringify(this._toDataPackage(), null, 2)
+          'content': JSON.stringify(this.toJSON(), null, 2)
         }
       }
     };
@@ -226,7 +224,7 @@ my.loadUserInfo = function(cb) {
     success: function(res) {
       $.cookie("avatar", res.avatar_url);
       $.cookie("username", res.login);
-      // app.username = res.login;
+      DataExplorer.app.username = res.login;
 
       var user = my.github().getUser();
       var owners = {};
