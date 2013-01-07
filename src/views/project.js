@@ -34,7 +34,7 @@ my.Project = Backbone.View.extend({
 
   initialize: function(options) {
     this.el = $(this.el);
-    this.state = {};
+    this.state = _.extend({}, options.state);
   },
 
   render: function() {

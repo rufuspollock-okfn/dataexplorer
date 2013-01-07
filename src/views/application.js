@@ -159,9 +159,12 @@ my.Application = Backbone.View.extend({
     }
   },
 
-  projectShow: function(username, projectId) {
+  projectShow: function(username, projectId, viewId) {
     var self = this;
     self.switchView('project', username + '/' + projectId);
+    var projectViewState = {
+      currentView: viewId
+    };
     this._loadProject(username, projectId, displayIt);
     function displayIt(err, project) {
       // housekeeping
@@ -182,7 +185,8 @@ my.Application = Backbone.View.extend({
         return;
       }
       var ds = new DataExplorer.View.Project({
-        model: project
+        model: project,
+        state: projectViewState
       });
       // let's remove all previous instances of this view ...
       // TODO: probably should do this to the Backbone view element
