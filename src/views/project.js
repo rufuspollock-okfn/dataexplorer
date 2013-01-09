@@ -42,25 +42,40 @@ my.Project = Backbone.View.extend({
     var tmpl = Mustache.render(this.template, this.model.toJSON());
     this.el.html(tmpl);
 
-    this.views = _.map(this.model.get('views'), function(viewInfo) {
-      var out = _.clone(viewInfo);
-      out.view = new recline.View[viewInfo.type]({
-        model: self.model.datasets.at(0)
-      });
-      return out;
-    });
-
-    // now create and append other views
     var $dataViewContainer = this.el.find('.data-view-container');
     var $dataSidebar = this.el.find('.data-view-sidebar');
 
-    // the main views
-    _.each(this.views, function(view, pageName) {
-      view.view.render();
-      $dataViewContainer.append(view.view.el);
-      if (view.view.elSidebar) {
-        $dataSidebar.append(view.view.elSidebar);
+    // create the Views (graphs, maps etc)
+    this.views = _.map(this.model.get('views'), function(viewInfo) {
+      var out = _.clone(viewInfo);
+      out.view = new recline.View[viewInfo.type]({
+        model: self.model.datasets.at(0),
+        state: viewInfo.state
+      });
+
+      // render and insert into DOM
+      out.view.render();
+      $dataViewContainer.append(out.view.el);
+      if (out.view.elSidebar) {
+        $dataSidebar.append(out.view.elSidebar);
       }
+
+      // now bind state changes so they get saved ...
+      out.view.state.bind('change', function() {
+        var curr = self.model.get('views');
+        // update the view info on the model corresponding to the one being changed
+        _.each(curr, function(viewModel) {
+          if (viewModel.id == out.id) {
+            viewModel.state = out.view.state.toJSON()
+          }
+        });
+        self.model.set('views', curr);
+        // change is not being triggered for some reason ...
+        self.model.trigger('change');
+        self.model.trigger('change:views');
+      });
+
+      return out;
     });
 
     var pager = new recline.View.Pager({
