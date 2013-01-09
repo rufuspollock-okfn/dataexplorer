@@ -33,8 +33,13 @@ my.Project = Backbone.View.extend({
   },
 
   initialize: function(options) {
+    var self = this;
     this.el = $(this.el);
     this.state = _.extend({}, options.state);
+
+    this.model.datasets.at(0).bind('query:done', function() {
+      self.el.find('.doc-count').text(self.model.datasets.at(0).recordCount || 'Unknown');
+    });
   },
 
   render: function() {
@@ -103,7 +108,7 @@ my.Project = Backbone.View.extend({
     // now hide this element for the moment
     this.editor.el.parent().hide();
 
-    this.model.datasets.at(0).query();
+    this.model.datasets.at(0).query({size: this.model.datasets.at(0).recordCount});
 
     // HACK - for some reason the grid view of multiview is massively wide by default
     this.el.find('.view.project .recline-data-explorer').width(width);
