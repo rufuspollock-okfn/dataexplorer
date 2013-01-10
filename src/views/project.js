@@ -35,10 +35,25 @@ my.Project = Backbone.View.extend({
   initialize: function(options) {
     var self = this;
     this.el = $(this.el);
-    this.state = _.extend({}, options.state);
+    this.state = _.extend({currentView: 'grid'}, options.state);
 
     this.model.datasets.at(0).bind('query:done', function() {
       self.el.find('.doc-count').text(self.model.datasets.at(0).recordCount || 'Unknown');
+    });
+
+    // update view queryState on the current view
+    this.model.datasets.at(0).bind('query:done', function() {
+      var curr = self.model.get('views');
+      _.each(curr, function(viewModel, idx) {
+        if (viewModel.id == self.state.currentView) {
+          viewModel.queryState = self.model.datasets.at(0).queryState.toJSON()
+          curr[idx] = viewModel;
+        }
+      });
+      self.model.set('views', curr);
+      // change is not being triggered for some reason ...
+      self.model.trigger('change');
+      self.model.trigger('change:views');
     });
   },
 
@@ -108,17 +123,11 @@ my.Project = Backbone.View.extend({
     // now hide this element for the moment
     this.editor.el.parent().hide();
 
-    this.model.datasets.at(0).query({size: this.model.datasets.at(0).recordCount});
-
     // HACK - for some reason the grid view of multiview is massively wide by default
     this.el.find('.view.project .recline-data-explorer').width(width);
 
     // set the current view
-    if (this.state.currentView) {
-      this._updateNav(this.state.currentView);
-    } else {
-      this._updateNav(this.views[0].id);
-    }
+    this._updateNav(this.state.currentView);
 
     return this;
   },
@@ -136,6 +145,13 @@ my.Project = Backbone.View.extend({
   },
 
   _updateNav: function(pageName) {
+    this.state.currentView = pageName;
+    var view = _.filter(this.model.get('views'), function(view) {return (view.id === pageName) })[0];
+    if (view.queryState) {
+      this.model.datasets.at(0).query(view.queryState);
+    } else {
+      this.model.datasets.at(0).query({size: this.model.datasets.at(0).recordCount});
+    }
     this.el.find('.navigation a').removeClass('active');
     var $el = this.el.find('.navigation a[data-view="' + pageName + '"]');
     $el.addClass('active');
