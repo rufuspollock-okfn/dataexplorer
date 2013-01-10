@@ -1,8 +1,11 @@
-(function(config, models, views, routers, utils, templates) {
+this.DataExplorer = this.DataExplorer || {};
+this.DataExplorer.View = this.DataExplorer.View || {};
+
+(function(my) {
 
 // This is the top-level piece of UI.
 
-views.Application = Backbone.View.extend({
+my.Application = Backbone.View.extend({
 
   // Events
   // ------
@@ -13,14 +16,14 @@ views.Application = Backbone.View.extend({
   },
 
   _logout: function() {
-    models.logout();
+    DataExplorer.Model.logout();
     window.location.reload();
     return false;
   },
 
   _login: function(e) {
     e.preventDefault();
-    var url = 'https://github.com/login/oauth/authorize?client_id=' + config.oauth_client_id + '&scope=repo, user, gist';
+    var url = 'https://github.com/login/oauth/authorize?client_id=' + DataExplorer.app.config.oauth_client_id + '&scope=repo, user, gist';
     window.open(url, 'Data Explorer - Github Login', 'height=750,width=1000');
   },
 
@@ -32,21 +35,15 @@ views.Application = Backbone.View.extend({
     this.el = $(this.el);
     _.bindAll(this);
     this.router = new Backbone.Router();
-    this.projectList = new models.ProjectList();
+    this.projectList = new DataExplorer.Model.ProjectList();
     this.projectList.load();
 
     // TODO: make this somewhat nicer - e.g. show a loading message etc
     var state = recline.View.parseQueryString(decodeURIComponent(window.location.search));
     if (state.backend) {
-      var project = new models.Project({source: state});
-      project.loadSourceDataset(function(err) {
-        if (err) {
-          // this.notify('error', 'The requested resource could not be found.');
-        } else {
-          project.save();
-          self.onLoadProject(project);
-        }
-      });
+      var project = new DataExplorer.Model.Project({datasets: [state]});
+      project.save();
+      self.onLoadProject(project);
     }
     
     this.router.route('', 'home', function() {
@@ -66,12 +63,13 @@ views.Application = Backbone.View.extend({
     });
     // project
     this.router.route(':username/:projectId', 'project', this.projectShow);
+    this.router.route(':username/:projectId/view/:viewId', 'projectWithView', this.projectShow);
   },
 
   // Should be rendered just once
   render: function () {
     var self = this;
-    var loginUrl = 'https://github.com/login/oauth/authorize?client_id=' + config.oauth_client_id + '&scope=repo, user&redirect_uri=' + window.location.href;
+    var loginUrl = 'https://github.com/login/oauth/authorize?client_id=' + DataExplorer.app.config.oauth_client_id + '&scope=repo, user&redirect_uri=' + window.location.href;
     this.el.find('.user-status login a').attr('href', loginUrl);
     // we will override if logged in
     this.el.find('.user-status').addClass('logged-out');
@@ -83,20 +81,20 @@ views.Application = Backbone.View.extend({
     }
 
     // now append views
-    this.dashboardView = new views.Dashboard({
+    this.dashboardView = new DataExplorer.View.Dashboard({
       collection: this.projectList
     });
     this.dashboardView.render();
     $('#main').append(this.dashboardView.el);
     this.dashboardView.bind('load', this.onLoadProject);
 
-    this.loadView = new views.Load({});
+    this.loadView = new DataExplorer.View.Load({});
     this.loadView.render();
     $('#main').append(this.loadView.el);
 
     this.loadView.bind('load', this.onLoadProject);
 
-    this.saveView = new views.Save({});
+    this.saveView = new DataExplorer.View.Save({});
     this.saveView.render();
     $('#main').append(this.saveView.el);
 
@@ -119,10 +117,10 @@ views.Application = Backbone.View.extend({
 
   finishLogin: function(cb) {
     var self = this;
-    models.loadUserInfo(function() {
+    DataExplorer.Model.loadUserInfo(function() {
       self.el.find('.user-status').removeClass('logged-out');
-      self.el.find('.user-status .username').text(app.username);
-      self.username = app.username;
+      self.el.find('.user-status .username').text(DataExplorer.app.username);
+      self.username = DataExplorer.app.username;
       self.authenticated = true;
       window.authenticated = true;
       if (cb) {
@@ -144,16 +142,16 @@ views.Application = Backbone.View.extend({
       var project = this.projectList.get(projectId);
       checkDatasetLoaded(project);
     } else {
-      var gist = models.github().getGist(projectId);
+      var gist = DataExplorer.Model.github().getGist(projectId);
       gist.read(function(err, gist) {
-        var project = new models.Project(JSON.parse(gist.files['datapackage.json'].content));
+        var project = new DataExplorer.Model.Project(JSON.parse(gist.files['datapackage.json'].content));
         checkDatasetLoaded(project)
       });
     }
 
     function checkDatasetLoaded(project) {
       // if we not yet have data loaded, load it now ...
-      if (!project.dataset) {
+      if (project.datasets.at(0).recordCount === null) {
         project.loadSourceDataset(function(err) { cb(err, project) });
       } else {
         cb(null, project);
@@ -161,9 +159,12 @@ views.Application = Backbone.View.extend({
     }
   },
 
-  projectShow: function(username, projectId) {
+  projectShow: function(username, projectId, viewId) {
     var self = this;
     self.switchView('project', username + '/' + projectId);
+    var projectViewState = {
+      currentView: viewId
+    };
     this._loadProject(username, projectId, displayIt);
     function displayIt(err, project) {
       // housekeeping
@@ -183,8 +184,9 @@ views.Application = Backbone.View.extend({
         // this.notify('error', 'The requested resource could not be found.');
         return;
       }
-      var ds = new views.Project({
-        model: project
+      var ds = new DataExplorer.View.Project({
+        model: project,
+        state: projectViewState
       });
       // let's remove all previous instances of this view ...
       // TODO: probably should do this to the Backbone view element
@@ -195,7 +197,7 @@ views.Application = Backbone.View.extend({
   },
 
   notify: function(type, message) {
-    $('#main').append(new views.Notification(type, message).render().el);
+    $('#main').append(new DataExplorer.View.Notification(type, message).render().el);
   },
 
   loading: function(msg) {
@@ -208,4 +210,4 @@ views.Application = Backbone.View.extend({
 
 });
 
-}).apply(this, window.args);
+}(this.DataExplorer.View));

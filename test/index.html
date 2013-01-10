@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>DataExplorer Tests</title>
+  <link rel="stylesheet" href="qunit/qunit-1.10.0.css">
+</head>
+<body>
+  <div id="qunit"></div>
+  <div class="fixtures"></div>
+  <script src="../vendor/jquery.js"></script>
+  <script src="../vendor/jquery.cookie.js"></script>
+  <script src="../vendor/underscore.js"></script>
+  <script src="../vendor/backbone.js"></script>
+  <script src="../vendor/github.js"></script>
+  <script type="text/javascript" src="../vendor/codemirror/3.0/codemirror.js"></script>
+  <script type="text/javascript" src="../vendor/codemirror/3.0/mode/javascript/javascript.js"></script>
+
+  <script type="text/javascript" src="../vendor/recline/vendor/moment/1.6.2/moment.js"></script>
+  <script type="text/javascript" src="../vendor/recline/vendor/mustache/0.5.0-dev/mustache.js"></script>
+  <script type="text/javascript" src="../vendor/recline/vendor/bootstrap/2.0.2/bootstrap.js"></script>
+  <script type="text/javascript" src="../vendor/recline/vendor/leaflet/0.4.4/leaflet.js"></script>
+  <script type="text/javascript" src="../vendor/recline/vendor/leaflet.markercluster/leaflet.markercluster.js"></script>
+  <script type="text/javascript" src="../vendor/recline/vendor/slickgrid/2.0.1/jquery-ui-1.8.16.custom.min.js"></script>
+  <script type="text/javascript" src="../vendor/recline/vendor/slickgrid/2.0.1/jquery.event.drag-2.0.min.js"></script>
+  <script type="text/javascript" src="../vendor/recline/vendor/slickgrid/2.0.1/slick.grid.min.js"></script>
+  <script type="text/javascript" src="../vendor/recline/vendor/flotr2/flotr2.js"></script>
+  <script type="text/javascript" src="../vendor/recline/vendor/underscore.deferred/0.4.0/underscore.deferred.js"></script>
+
+  <script type="text/javascript" src="../vendor/recline/dist/recline.js"></script>
+
+  <!-- must be after flotr2 or we get 'bean undefined' error -->
+  <script src="qunit/qunit-1.10.0.js"></script>
+
+  <script src="../src/model.js"></script>
+  <script src="../src/views/load.js"></script>
+  <script src="../src/views/project.js"></script>
+
+  <script src="model.test.js"></script>
+  <script src="views/load.test.js"></script>
+  <script src="views/project.test.js"></script>
+</body>
+</html>

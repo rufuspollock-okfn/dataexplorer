@@ -116,22 +116,107 @@ body {
   * Project 
   *********************************************************/
 
-.view.project .menu {
-  margin-top: -5px;
-  margin-bottom: 5px;
-  height: 30px;
-}
-
-.view.project .rhs {
-  float: right;
-}
-
 .view.project .recline-slickgrid {
   height: 500px;
 }
 
-.view.project .script-editor {
+.view.project .header {
+  margin-top: -5px;
+  margin-bottom: 5px;
+  height: 35px;
 }
+
+.view.project .data-view-container {
+  display: block;
+  margin-right: 225px;
+}
+
+.view.project .data-view-sidebar {
+  float: right;
+  margin-left: 8px;
+  width: 220px;
+}
+
+.view.project .header .navigation {
+  margin-bottom: 8px;
+  float: left;
+}
+
+.view.project .header .navigation,
+.view.project .header .pagination,
+.view.project .header .pagination form
+{
+  display: inline;
+}
+
+.view.project .header .menu-right {
+  float: right;
+  margin-left: 5px;
+  padding-left: 5px;
+  border-left: solid 2px #ddd;
+}
+
+.header .recline-results-info {
+  line-height: 28px;
+  margin-left: 20px;
+  float: left;
+}
+
+/**********************************************************
+  * Query Editor
+  *********************************************************/
+
+.header .recline-query-editor {
+  float: right;
+  height: 30px;
+}
+
+.header .input-prepend {
+  margin-bottom: auto;
+}
+
+.header .add-on {
+  float: left;
+}
+
+/* needed for Chrome but not FF */
+.header .add-on {
+  margin-left: -27px;
+}
+
+/* needed for FF but not chrome */
+.header .input-prepend {
+  vertical-align: top;
+}
+
+.header .recline-query-editor form button {
+  vertical-align: top;
+}
+
+/**********************************************************
+  * Pager
+  *********************************************************/
+
+.header .recline-pager {
+  float: left;
+  margin: auto;
+  display: block;
+  margin-left: 20px;
+}
+
+.header .recline-pager .pagination input {
+  width: 30px;
+  height: 18px;
+  padding: 2px 4px;
+  margin: 0;
+  margin-top: -4px;
+}
+
+.header .recline-pager .pagination a {
+  line-height: 26px;
+  padding: 0 6px;
+}
+
 
 /**********************************************************
   * Project List

@@ -1,4 +1,5 @@
-window.app = {
+this.DataExplorer = this.DataExplorer || {};
+this.DataExplorer.app = {
     config: {
       gatekeeper_url: 'http://transformer-datahub-gatekeeper.herokuapp.com/',
       oauth_client_id: 'de55312927208bfe772e'
@@ -15,7 +16,7 @@ window.app = {
     instance: null
 };
 
-window.args = _(window.app).toArray();
+window.args = _(this.DataExplorer.app).toArray();
 
 (function(config, models, views, routers, utils, templates) {
   $(window).load(function() {
@@ -31,7 +32,7 @@ window.args = _(window.app).toArray();
     // Check whether we are logged in and boot the app
 
     // Start the engines
-    window.app.instance = new views.Application({ el: '.transformer-app', model: {} }).render();
+    DataExplorer.app.instance = new DataExplorer.View.Application({ el: '.transformer-app', model: {} }).render();
 
     // listen for login success in login window
     window.addEventListener("message", function(evt) {

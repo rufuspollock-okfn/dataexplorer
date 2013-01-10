@@ -1,4 +1,7 @@
-(function(config, models, views, routers, utils, templates) {
+this.DataExplorer = this.DataExplorer || {};
+this.DataExplorer.Model = this.DataExplorer.Model || {};
+
+(function(my) {
 
 // The central object in the Data Explorer
 //
@@ -11,7 +14,7 @@
 //   // save to gists
 //   scripts: [ {...}, ... ]
 // }
-models.Project = Backbone.Model.extend({
+my.Project = Backbone.Model.extend({
   defaults: function() {
     return {
       manifest_version: 1,
@@ -21,6 +24,25 @@ models.Project = Backbone.Model.extend({
           id: 'main.js',
           content: 'print("hello world")'
         }
+      ],
+      datasets: [],
+      views: [
+        {
+          id: 'grid',
+          label: 'Grid',
+          // must be in recline.View namespace for the present
+          type: 'SlickGrid'
+        },
+        {
+          id: 'graph',
+          label: 'Graph',
+          type: 'Graph'
+        },
+        {
+          id: 'map',
+          label: 'Map',
+          type: 'Map'
+        }
       ]
     }
   },
@@ -28,6 +50,7 @@ models.Project = Backbone.Model.extend({
   initialize: function() {
     var self = this;
     this.scripts = new Backbone.Collection();
+    this.datasets = new Backbone.Collection();
     if (!this.id) {
       // generate a unique id with guard against duplication
       // there is some still small risk of a race condition if 2 apps doing this at the same time but we can live with it!
@@ -42,33 +65,35 @@ models.Project = Backbone.Model.extend({
     }
     this.scripts.reset(_.map(
       self.get('scripts'),
-      function(scriptData) { return new models.Script(scriptData) }
+      function(scriptData) { return new my.Script(scriptData) }
     ));
-    this.scripts.bind('change', function() {self.save()});
+    this.datasets.reset(_.map(
+      self.get('datasets'),
+      function(datasetData) { return new recline.Model.Dataset(datasetData) }
+    ));
+    this.scripts.bind('change', function() {
+      self.set({scripts: self.scripts.toJSON()});
+    });
+    this.datasets.bind('change', function() {
+      self.set({datasets: self.datasets.toJSON()});
+    });
     this.bind('change', this.save);
   },
 
   saveToStorage: function() {
-    var data = this._toDataPackage();
+    var data = this.toJSON();
     data.last_modified = new Date().toISOString();
     localStorage.setItem(this.id, JSON.stringify(data));
   },
 
-  _toDataPackage: function() {
-    var data = this.toJSON();
-    data.scripts = this.scripts.toJSON();
-    data.datasets = [];
-    return data;
-  },
-
   saveToGist: function() {
     var self = this;
-    var gh = models.github();
+    var gh = my.github();
     var gistJSON = {
       description: this.get('description'),
       files: {
         'datapackage.json': {
-          'content': JSON.stringify(this._toDataPackage(), null, 2)
+          'content': JSON.stringify(this.toJSON(), null, 2)
         }
       }
     };
@@ -83,7 +108,7 @@ models.Project = Backbone.Model.extend({
         }
       });
     } else {
-      gistJSON.public = true;
+      gistJSON.public = false;
       var gist = gh.getGist();
       gist.create(gistJSON, function(err, gist) {
         if (err) {
@@ -109,14 +134,17 @@ models.Project = Backbone.Model.extend({
   // load source dataset info
   loadSourceDataset: function(cb) {
     var self = this;
-    var datasetInfo = self.get('source');
+    var datasetInfo = self.datasets.at(0).toJSON();
     if (datasetInfo.backend == 'github') {
-      self.loadGithubDataset(datasetInfo.url, cb);
+      self.loadGithubDataset(datasetInfo.url, function(err, whocares) {
+        self.datasets.at(0).fetch().done(function() {
+          cb(null, self);
+        });
+      });
     } else {
-      self.dataset = new recline.Model.Dataset(datasetInfo);
-      self.dataset.fetch().done(function() {
+      self.datasets.at(0).fetch().done(function() {
         // TODO: should we set dataset metadata onto project source?
-        cb();
+        cb(null, self);
       });
     }
   },
@@ -130,22 +158,22 @@ models.Project = Backbone.Model.extend({
     var repo = getRepo(user, repo);
 
     repo.read(branch, 'data/data.csv', function(err, raw_csv) {
-      self.dataset = new recline.Model.Dataset({data: raw_csv, backend: 'csv'});
-      self.dataset.fetch();
+      // TODO: need to do this properly ...
+      self.datasets.reset([new recline.Model.Dataset({data: raw_csv, backend: 'csv'})]);
       cb(err, self.dataset);
     });
   }
 });
 
-models.ProjectList = Backbone.Collection.extend({
-  model: models.Project,
+my.ProjectList = Backbone.Collection.extend({
+  model: my.Project,
   load: function() {
     for(key in localStorage) {
       if (key.indexOf('dataexplorer-') == 0) {
         var projectInfo = localStorage.getItem(key);
         try {
           var data = JSON.parse(projectInfo);
-          var tmp = new models.Project(data);
+          var tmp = new my.Project(data);
           this.add(tmp);
         } catch(e) {
           alert('Failed to load project ' + projectInfo);
@@ -155,7 +183,7 @@ models.ProjectList = Backbone.Collection.extend({
   }
 });
 
-models.Script = Backbone.Model.extend({
+my.Script = Backbone.Model.extend({
   defaults: function() {
     return {
       created: new Date().toISOString(),
@@ -170,7 +198,7 @@ models.Script = Backbone.Model.extend({
 // -------
 
 // Gimme a Github object! Please.
-models.github = function() {
+my.github = function() {
   return new Github({
     token: $.cookie('oauth-token'),
     username: $.cookie('username'),
@@ -195,7 +223,7 @@ function getRepo(user, repo) {
   currentRepo = {
     user: user,
     repo: repo,
-    instance: models.github().getRepo(user, repo)
+    instance: my.github().getRepo(user, repo)
   };
 
   return currentRepo.instance;
@@ -207,7 +235,7 @@ function getRepo(user, repo) {
 // 
 // Load everything that's needed for the app + header
 
-models.loadUserInfo = function(cb) {
+my.loadUserInfo = function(cb) {
   $.ajax({
     type: "GET",
     url: 'https://api.github.com/user',
@@ -217,9 +245,9 @@ models.loadUserInfo = function(cb) {
     success: function(res) {
       $.cookie("avatar", res.avatar_url);
       $.cookie("username", res.login);
-      app.username = res.login;
+      DataExplorer.app.username = res.login;
 
-      var user = models.github().getUser();
+      var user = my.github().getUser();
       var owners = {};
 
       cb(null);
@@ -233,7 +261,7 @@ models.loadUserInfo = function(cb) {
 // Authentication
 // -------
 
-models.logout = function() {
+my.logout = function() {
   window.authenticated = false;
   $.cookie("oauth-token", null);
 }
@@ -241,7 +269,7 @@ models.logout = function() {
 // Save Dataset
 // -------
 
-models.saveDataset = function(user, repo, branch, data, commitMessage, cb) {
+my.saveDataset = function(user, repo, branch, data, commitMessage, cb) {
   var repo = getRepo(user, repo);
 
   repo.write(branch, 'data/data.csv', data, commitMessage, function(err) {
@@ -249,4 +277,4 @@ models.saveDataset = function(user, repo, branch, data, commitMessage, cb) {
   });
 }
 
-}).apply(this, window.args);
+}(this.DataExplorer.Model));

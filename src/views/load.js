@@ -1,6 +1,9 @@
-(function(config, models, views, routers, utils, templates) {
+this.DataExplorer = this.DataExplorer || {};
+this.DataExplorer.View = this.DataExplorer.View || {};
 
-views.Load = Backbone.View.extend({
+(function(my) {
+
+my.Load = Backbone.View.extend({
   events: {
     'click .load-dataset': 'onLoadDataset'
   },
@@ -19,15 +22,9 @@ views.Load = Backbone.View.extend({
     if ($files.length > 0) {
       data.file = $files[0].files[0]
     }
-    var project = new models.Project({source: data});
-    project.loadSourceDataset(function(err) {
-      if (err) {
-        // this.notify('error', 'The requested resource could not be found.');
-      } else {
-        project.save();
-        self.trigger('load', project);
-      }
-    });
+    this.project = new DataExplorer.Model.Project({datasets: [data]});
+    this.project.save();
+    self.trigger('load', this.project);
     return false;
   },
 
@@ -141,4 +138,4 @@ views.Load = Backbone.View.extend({
   '
 });
 
-}).apply(this, window.args);
+}(this.DataExplorer.View));

@@ -1,66 +1,121 @@
-(function(config, models, views, routers, utils, templates) {
+(function(my) {
 
-views.Project = Backbone.View.extend({
+my.Project = Backbone.View.extend({
   template: ' \
     <div class="view project"> \
-      <div class="menu"> \
-        &nbsp; \
-        <div class="btn-group rhs" data-toggle="buttons-checkbox"> \
-          <a href="#" data-action="script-editor" class="btn">Script Editor</a> \
+      <div class="header"> \
+        <div class="navigation"> \
+          <div class="btn-group" data-toggle="buttons-radio"> \
+          {{#views}} \
+          <a href="#{{id}}" data-view="{{id}}" class="btn">{{label}}</a> \
+          {{/views}} \
+          </div> \
         </div> \
+        <div class="recline-results-info"> \
+          <span class="doc-count">{{recordCount}}</span> records\
+        </div> \
+        <div class="menu-right"> \
+          <div class="btn-group" data-toggle="buttons-checkbox"> \
+            <a href="#" data-action="script-editor" class="btn">Script Editor</a> \
+          </div> \
+        </div> \
+        <div class="query-editor-here" style="display:inline;"></div> \
       </div> \
       <div class="script-editor"></div> \
+      <div class="data-view-sidebar"></div> \
+      <div class="data-view-container"></div> \
       <div class="multiview-here"></div> \
     </div> \
   ',
   events: {
-    'click .menu a': '_onMenuClick'
+    'click .menu-right a': '_onMenuClick',
+    'click .navigation a': '_onSwitchView'
   },
 
   initialize: function(options) {
+    var self = this;
     this.el = $(this.el);
+    this.state = _.extend({currentView: 'grid'}, options.state);
+
+    this.model.datasets.at(0).bind('query:done', function() {
+      self.el.find('.doc-count').text(self.model.datasets.at(0).recordCount || 'Unknown');
+    });
+
+    // update view queryState on the current view
+    this.model.datasets.at(0).bind('query:done', function() {
+      var curr = self.model.get('views');
+      _.each(curr, function(viewModel, idx) {
+        if (viewModel.id == self.state.currentView) {
+          viewModel.queryState = self.model.datasets.at(0).queryState.toJSON()
+          curr[idx] = viewModel;
+        }
+      });
+      self.model.set('views', curr);
+      // change is not being triggered for some reason ...
+      self.model.trigger('change');
+      self.model.trigger('change:views');
+    });
   },
 
   render: function() {
-    this.el.html(this.template);
-    var reclineviews = [
-       {
-         id: 'grid',
-         label: 'Grid', 
-         view: new recline.View.SlickGrid({
-           model: this.model.dataset
-         })
-       },
-       {
-         id: 'map',
-         label: 'Map',
-         view: new recline.View.Map({
-           model: this.model.dataset
-         })
-       },
-       {
-         id: 'graph',
-         label: 'Graph',
-         view: new recline.View.Graph({
-           model: this.model.dataset
-         })
-       }
-    ];
+    var self = this;
+    var tmpl = Mustache.render(this.template, this.model.toJSON());
+    this.el.html(tmpl);
+
+    var $dataViewContainer = this.el.find('.data-view-container');
+    var $dataSidebar = this.el.find('.data-view-sidebar');
+
+    // create the Views (graphs, maps etc)
+    this.views = _.map(this.model.get('views'), function(viewInfo) {
+      var out = _.clone(viewInfo);
+      out.view = new recline.View[viewInfo.type]({
+        model: self.model.datasets.at(0),
+        state: viewInfo.state
+      });
+
+      // render and insert into DOM
+      out.view.render();
+      $dataViewContainer.append(out.view.el);
+      if (out.view.elSidebar) {
+        $dataSidebar.append(out.view.elSidebar);
+      }
+
+      // now bind state changes so they get saved ...
+      out.view.state.bind('change', function() {
+        var curr = self.model.get('views');
+        // update the view info on the model corresponding to the one being changed
+        _.each(curr, function(viewModel) {
+          if (viewModel.id == out.id) {
+            viewModel.state = out.view.state.toJSON()
+          }
+        });
+        self.model.set('views', curr);
+        // change is not being triggered for some reason ...
+        self.model.trigger('change');
+        self.model.trigger('change:views');
+      });
+
+      return out;
+    });
+
+    var pager = new recline.View.Pager({
+      model: this.model.datasets.at(0).queryState
+    });
+    this.el.find('.recline-results-info').after(pager.el);
+
+    var queryEditor = new recline.View.QueryEditor({
+      model: this.model.datasets.at(0).queryState
+    });
+    this.el.find('.query-editor-here').append(queryEditor.el);
 
     // see below!
     var width = this.el.find('.multiview-here').width();
 
-		this.grid = new recline.View.MultiView({
-      el: this.el.find('.multiview-here'),
-      model: this.model.dataset,
-      views: reclineviews,
-      sidebarViews: []
-    });
-		this.editor = new views.ScriptEditor({
+		this.editor = new DataExplorer.View.ScriptEditor({
       model: this.model.scripts.get('main.js')
     });
     // TODO: hmmm, this is not that elegant ...
-    this.editor.dataset = this.model.dataset;
+    this.editor.dataset = this.model.datasets.at(0);
 
     this.el.find('.script-editor').append(this.editor.el);
     this.editor.render();
@@ -68,10 +123,11 @@ views.Project = Backbone.View.extend({
     // now hide this element for the moment
     this.editor.el.parent().hide();
 
-		this.model.dataset.query();
-
     // HACK - for some reason the grid view of multiview is massively wide by default
     this.el.find('.view.project .recline-data-explorer').width(width);
+
+    // set the current view
+    this._updateNav(this.state.currentView);
 
     return this;
   },
@@ -80,14 +136,59 @@ views.Project = Backbone.View.extend({
     e.preventDefault();
     var action = $(e.target).attr('data-action');
     this.el.find('.' + action).toggle('slow');
-  }
+  },
+
+  _onSwitchView: function(e) {
+    e.preventDefault();
+    var viewName = $(e.target).attr('data-view');
+    this._updateNav(viewName);
+  },
+
+  _updateNav: function(pageName) {
+    this.state.currentView = pageName;
+    var view = _.filter(this.model.get('views'), function(view) {return (view.id === pageName) })[0];
+    if (view.queryState) {
+      this.model.datasets.at(0).query(view.queryState);
+    } else {
+      this.model.datasets.at(0).query({size: this.model.datasets.at(0).recordCount});
+    }
+    this.el.find('.navigation a').removeClass('active');
+    var $el = this.el.find('.navigation a[data-view="' + pageName + '"]');
+    $el.addClass('active');
+    // show the specific page
+    _.each(this.views, function(view, idx) {
+      if (view.id === pageName) {
+        view.view.el.show();
+        if (view.view.elSidebar) {
+          view.view.elSidebar.show();
+        }
+        if (view.view.show) {
+          view.view.show();
+        }
+        // update the url / route to show just this view
+        // HACK
+        var current = Backbone.history.fragment;
+        var newpath = current.split('/view')[0] + '/view/' + pageName;
+        if (current.indexOf('/view')!= -1) {
+          DataExplorer.app.instance.router.navigate(newpath);
+        } else {
+          DataExplorer.app.instance.router.navigate(newpath, {replace: true});
+        }
+      } else {
+        view.view.el.hide();
+        if (view.view.elSidebar) {
+          view.view.elSidebar.hide();
+        }
+        if (view.view.hide) {
+          view.view.hide();
+        }
+      }
+    });
+  },
 });
 
 
-// The runnable CodeMirror work is largely based on Irene Ros' great deck.js +
-// codemirror work (MIT licensed!). Thanks Irene!
-// https://github.com/iros/deck.js-codemirror/blob/1.0.0rc/deck.codemirror.js
-views.ScriptEditor = Backbone.View.extend({
+my.ScriptEditor = Backbone.View.extend({
   template: ' \
     <div class="script-editor-widget"> \
       <div class="button runsandbox">Run the Code</div> \
@@ -160,7 +261,6 @@ views.ScriptEditor = Backbone.View.extend({
       this.dataset.fields.reset(this.dataset._store.fields);
       this.dataset.query({size: this.dataset._store.records.length});
     }
-    // console.log('Worker said: ', e.data);
   },
 
   _writeToOutput: function(msg, type) {
@@ -174,4 +274,4 @@ views.ScriptEditor = Backbone.View.extend({
   }
 });
 
-}).apply(this, window.args);
+}(this.DataExplorer.View));
