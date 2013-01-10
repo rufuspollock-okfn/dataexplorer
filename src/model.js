@@ -108,7 +108,7 @@ my.Project = Backbone.Model.extend({
         }
       });
     } else {
-      gistJSON.public = true;
+      gistJSON.public = false;
       var gist = gh.getGist();
       gist.create(gistJSON, function(err, gist) {
         if (err) {
