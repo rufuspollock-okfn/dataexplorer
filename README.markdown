@@ -22,6 +22,8 @@ All Credits as per Recline. Also all the amazing vendor libraries including:
 
 * Backbone
 * Bootstrap
+* Leaflet
+* Flot and Flotr2
 * [CodeMirror](http://codemirror.net/)
 * Runnable Codemirror thanks to Irene Ros
 
