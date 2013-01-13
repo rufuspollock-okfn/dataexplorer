@@ -5,7 +5,9 @@ this.DataExplorer.View = this.DataExplorer.View || {};
 
 my.Load = Backbone.View.extend({
   events: {
-    'click .load-dataset': 'onLoadDataset'
+    'click .load-dataset': 'onLoadDataset',
+    'submit form': 'onLoadDataset',
+    'click .search-gdocs': '_onSearchGdocs'
   },
 
   onLoadDataset: function(e) {
@@ -37,6 +39,28 @@ my.Load = Backbone.View.extend({
     this.$el.html(rendered);
     return this;
   },
+
+  _onSearchGdocs: function(e) {
+    var self = this;
+    e.preventDefault();
+    // Create and render a Picker object for searching images.
+    var picker = new google.picker.PickerBuilder()
+      .disableFeature(google.picker.Feature.MULTISELECT_ENABLED)
+      .addView(google.picker.ViewId.SPREADSHEETS )
+      .setCallback(pickerCallback)
+      .build();
+    picker.setVisible(true);
+
+    function pickerCallback(data) {
+      var url = 'nothing';
+      if (data[google.picker.Response.ACTION] == google.picker.Action.PICKED) {
+        var doc = data[google.picker.Response.DOCUMENTS][0];
+        url = doc[google.picker.Document.URL];
+        self.$el.find('#gdocs input[name="url"]').val(url);
+        self.$el.find('#gdocs form').submit();
+      }
+    }
+  },
   
   template: ' \
     <div class="view load"> \
@@ -45,22 +69,17 @@ my.Load = Backbone.View.extend({
       </div> \
       <div id="gdocs"> \
         <h3>Google Spreadsheet</h3> \
-        <form class="form-horizontal"> \
+        <div class="alert alert-warning"> \
+          <strong>Note:</strong> To load a spreadsheet it must have been <strong>"published"</strong> (to do this go to: File Menu -> Publish to the Web) \
+        </div> \
+        <p><a href="#" class="search-gdocs btn btn-primary">Select Spreadsheet in Google Docs &raquo;<br />(Opens file picker)</a></p> \
+        <h4>Or paste the url directly</h4> \
+        <form class="form"> \
           <input type="hidden" name="backend" value="gdocs" /> \
           <fieldset> \
-            <div class="control-group"> \
-              <label for="url" class="control-label">URL</label> \
-              <div class="controls"> \
-                <input type="text" name="url" class="input span6" placeholder="URL to sheet" /> \
-                <p class="help-block"> \
-                  To load the spreadsheet you must have "published" it (see: File Menu -> Publish to the Web) \
-                </p> \
-              </div> \
-            </div> \
-          </fieldset> \
-          <div class="form-actions"> \
+            <input type="text" name="url" class="input span6" placeholder="URL to sheet" /> \
             <button type="submit" class="btn btn-primary load-dataset">Load</button> \
-          </div> \
+          </fieldset> \
         </form> \
       </div> \
       <div id="csv-disk"> \
