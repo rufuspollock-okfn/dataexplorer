@@ -37,7 +37,7 @@ window.args = _(this.DataExplorer.app).toArray();
     // listen for login success in login window
     window.addEventListener("message", function(evt) {
         $.cookie('oauth-token', evt.data);
-        window.app.instance.finishLogin();
+        DataExplorer.app.instance.finishLogin();
       }
       , false
     );
@@ -60,7 +60,7 @@ window.args = _(this.DataExplorer.app).toArray();
     $('.navbar').hide();
     $('#main').html(html);
     // complete the login process
-    $.getJSON(window.app.config.gatekeeper_url + '/authenticate/'+match[1], function(data) {
+    $.getJSON(DataExplorer.app.config.gatekeeper_url + '/authenticate/'+match[1], function(data) {
       window.opener.postMessage(data.token, window.location)
       window.close();
     });
