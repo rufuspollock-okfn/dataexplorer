@@ -26,7 +26,7 @@ body {
 
 .navbar-inner {
   background: #e0e7eb;
-  padding-top: 5px;
+  padding-top: 2px;
 }
 
 .navbar-inner .brand {
@@ -38,6 +38,7 @@ body {
   border-right: 1px solid #f5f7f8;
   margin-top: -5px;
   height: 45px;
+  width: 1px;
 }
 
 .navbar .nav > li > a {
