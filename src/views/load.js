@@ -7,7 +7,8 @@ my.Load = Backbone.View.extend({
   events: {
     'click .load-dataset': 'onLoadDataset',
     'submit form': 'onLoadDataset',
-    'click .search-gdocs': '_onSearchGdocs'
+    'click .search-gdocs': '_onSearchGdocs',
+    'click .tab-import .nav a': '_onImportTabClick'
   },
 
   onLoadDataset: function(e) {
@@ -40,6 +41,11 @@ my.Load = Backbone.View.extend({
     return this;
   },
 
+  _onImportTabClick: function(e) {
+    e.preventDefault();
+    $(e.target).tab('show');
+  },
+
   _onSearchGdocs: function(e) {
     var self = this;
     e.preventDefault();
@@ -64,96 +70,101 @@ my.Load = Backbone.View.extend({
   
   template: ' \
     <div class="view load"> \
-      <div class="page-header"> \
-        <h1>Load Data</h1> \
-      </div> \
-      <div id="gdocs"> \
-        <h3>Google Spreadsheet</h3> \
-        <div class="alert alert-warning"> \
-          <strong>Note:</strong> To load a spreadsheet it must have been <strong>"published"</strong> (to do this go to: File Menu -> Publish to the Web) \
-        </div> \
-        <p><a href="#" class="search-gdocs btn btn-primary">Select Spreadsheet in Google Docs &raquo;<br />(Opens file picker)</a></p> \
-        <h4>Or paste the url directly</h4> \
-        <form class="form"> \
-          <input type="hidden" name="backend" value="gdocs" /> \
-          <fieldset> \
-            <input type="text" name="url" class="input span6" placeholder="URL to sheet" /> \
-            <button type="submit" class="btn btn-primary load-dataset">Load</button> \
-          </fieldset> \
-        </form> \
-      </div> \
-      <div id="csv-disk"> \
-        <h3>CSV on Disk</h3> \
-        <form class="form-horizontal"> \
-          <input type="hidden" name="backend" value="csv" /> \
-          <div class="control-group"> \
-            <label class="control-label">File</label> \
-            <div class="controls"> \
-              <input type="file" name="file" /> \
+      <p><strong>Create a project by importing data</strong></p> \
+      <hr /> \
+      <div class="tabbable tabs-left tab-import"> \
+        <ul class="nav nav-tabs"> \
+          <li class="active"><a href="#gdocs">Google Docs Spreadsheet</a></li>  \
+          <li><a href="#csv-disk">This computer</a></li>  \
+          <li><a href="#csv-online">CSV online</a></li>  \
+          <li><a href="#github">Github (JSON or CSV)</a></li>  \
+        </ul> \
+        <div class="tab-content"> \
+          <div id="gdocs" class="tab-pane active"> \
+            <div class="alert alert-warning"> \
+              <strong>Note:</strong> To load a spreadsheet it must have been <strong>"published"</strong> (to do this go to: File Menu -> Publish to the Web) \
             </div> \
+            <p><a href="#" class="search-gdocs btn btn-primary">Select Spreadsheet in Google Docs &raquo;<br />(Opens file picker)</a></p> \
+            <p><strong>Or paste the url directly</strong></p> \
+            <form class="form"> \
+              <input type="hidden" name="backend" value="gdocs" /> \
+              <fieldset> \
+                <input type="text" name="url" class="input span6" placeholder="URL to sheet" /> \
+                <br /> \
+                <button type="submit" class="btn btn-success load-dataset">Load</button> \
+              </fieldset> \
+            </form> \
           </div> \
-          <div class="control-group"> \
-            <label class="control-label">Separator</label> \
-            <div class="controls"> \
-              <input type="text" name="delimiter" value="," class="spam1"/> \
-            </div> \
-          </div> \
-          <div class="control-group"> \
-            <label class="control-label">Text delimiter</label> \
-            <div class="controls"> \
-              <input type="text" name="quotechar" value=\'"\' /> \
-            </div> \
-          </div> \
-          <div class="control-group"> \
-            <label class="control-label">Encoding</label> \
-            <div class="controls"> \
-              <input type="text" name="encoding" value="UTF-8" /> \
-            </div> \
-          </div> \
-          <div class="form-actions"> \
-            <button type="submit" class="btn btn-primary load-dataset">Load</button> \
-          </div> \
-        </form> \
-      </div> \
-      <div id="csv-online"> \
-        <h3>CSV Online</h3> \
-        <form class="form-horizontal"> \
-          <input type="hidden" name="backend" value="csv" /> \
-          <fieldset> \
-            <div class="control-group"> \
-              <label for="url" class="control-label">URL</label> \
-              <div class="controls"> \
-                <input type="text" name="url" class="input span6" placeholder="URL to CSV" /> \
-                <p class="help-block"> \
-                  The CSV must either be on the same server or on a domain that supports cross domain requests (via CORS) \
-                </p> \
+          <div id="csv-disk" class="tab-pane fade"> \
+            <form class="form-horizontal"> \
+              <input type="hidden" name="backend" value="csv" /> \
+              <div class="control-group"> \
+                <label class="control-label">File</label> \
+                <div class="controls"> \
+                  <input type="file" name="file" /> \
+                </div> \
               </div> \
-            </div> \
-          </fieldset> \
-          <div class="form-actions"> \
-            <button type="submit" class="btn btn-primary load-dataset">Load</button> \
-          </div> \
-        </form> \
-      </div> \
-      <div id="github"> \
-        <h3>GitHub CSV</h3> \
-        <form class="form-horizontal"> \
-          <input type="hidden" name="backend" value="github" /> \
-          <fieldset> \
-            <div class="control-group"> \
-              <label for="url" class="control-label">URL</label> \
-              <div class="controls"> \
-                <input type="text" name="url" class="input span6" placeholder="URL to CSV on GitHub" value="https://github.com/datasets/transformer-test/blob/master/data/data.csv" /> \
+              <div class="control-group"> \
+                <label class="control-label">Separator</label> \
+                <div class="controls"> \
+                  <input type="text" name="delimiter" value="," class="spam1"/> \
+                </div> \
               </div> \
-            </div> \
-          </fieldset> \
-          <div class="form-actions"> \
-            <button type="submit" class="btn btn-primary load-dataset">Load</button> \
+              <div class="control-group"> \
+                <label class="control-label">Text delimiter</label> \
+                <div class="controls"> \
+                  <input type="text" name="quotechar" value=\'"\' /> \
+                </div> \
+              </div> \
+              <div class="control-group"> \
+                <label class="control-label">Encoding</label> \
+                <div class="controls"> \
+                  <input type="text" name="encoding" value="UTF-8" /> \
+                </div> \
+              </div> \
+              <div class="form-actions"> \
+                <button type="submit" class="btn btn-primary load-dataset">Load</button> \
+              </div> \
+            </form> \
           </div> \
-        </form> \
-      </div> \
+          <div id="csv-online" class="tab-pane fade"> \
+            <form class="form-horizontal"> \
+              <input type="hidden" name="backend" value="csv" /> \
+              <fieldset> \
+                <div class="control-group"> \
+                  <label for="url" class="control-label">URL</label> \
+                  <div class="controls"> \
+                    <input type="text" name="url" class="input span6" placeholder="URL to CSV" /> \
+                    <p class="help-block"> \
+                      The CSV must either be on the same server or on a domain that supports cross domain requests (via CORS) \
+                    </p> \
+                  </div> \
+                </div> \
+              </fieldset> \
+              <div class="form-actions"> \
+                <button type="submit" class="btn btn-primary load-dataset">Load</button> \
+              </div> \
+            </form> \
+          </div> \
+          <div id="github" class="tab-pane fade"> \
+            <form class="form-horizontal"> \
+              <input type="hidden" name="backend" value="github" /> \
+              <fieldset> \
+                <div class="control-group"> \
+                  <label for="url" class="control-label">URL</label> \
+                  <div class="controls"> \
+                    <input type="text" name="url" class="input span6" placeholder="URL to CSV on GitHub" value="https://github.com/datasets/transformer-test/blob/master/data/data.csv" /> \
+                  </div> \
+                </div> \
+              </fieldset> \
+              <div class="form-actions"> \
+                <button type="submit" class="btn btn-primary load-dataset">Load</button> \
+              </div> \
+            </form> \
+          </div> \
+        </div><!-- /tab-content -->  \
+      </div><!-- /tabbable -->  \
     </div> \
-  </div> \
   '
 });
 
