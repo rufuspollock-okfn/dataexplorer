@@ -36,8 +36,13 @@ window.args = _(this.DataExplorer.app).toArray();
 
     // listen for login success in login window
     window.addEventListener("message", function(evt) {
-        $.cookie('oauth-token', evt.data);
-        DataExplorer.app.instance.finishLogin();
+        // have to be careful, google file picker (for example) also
+        // trigger this method so we have to check the message is really
+        // from handleGithubLogin function (see below)
+        if (evt.data.token) {
+          $.cookie('oauth-token', evt.data.token);
+          DataExplorer.app.instance.finishLogin();
+        }
       }
       , false
     );
@@ -61,7 +66,7 @@ window.args = _(this.DataExplorer.app).toArray();
     $('#main').html(html);
     // complete the login process
     $.getJSON(DataExplorer.app.config.gatekeeper_url + '/authenticate/'+match[1], function(data) {
-      window.opener.postMessage(data.token, window.location)
+      window.opener.postMessage({token: data.token}, window.location)
       window.close();
     });
   }
