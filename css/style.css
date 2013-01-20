@@ -1,5 +1,12 @@
+@import url(http://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700);
+
 body {
   padding-top: 60px;
+  font-size: 12px;
+}
+
+h1, h2, h3, h4, h5, h6, body, p, input, button, select, textarea {
+	font-family: 'PT Sans', Helvetica, Arial, sans-serif;
 }
 
 /* we do not have a LH sidebar */
@@ -27,6 +34,7 @@ body {
 .navbar-inner {
   background: #e0e7eb;
   padding-top: 0px;
+  font-size: 14px;
 }
 
 .navbar-inner .brand {
