@@ -9,7 +9,8 @@
   <!--[if lt IE 9]>
     <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
   <![endif]-->
-  <link rel="stylesheet" href="vendor/recline/vendor/bootstrap/2.0.2/css/bootstrap.css">
+  <link href="vendor/bootstrap/2.2.2/bootstrap-combined.min.css" rel="stylesheet">
+
   <link rel="stylesheet" href="vendor/recline/vendor/leaflet/0.4.4/leaflet.css">
   <!--[if lte IE 8]>
   <link rel="stylesheet" href="vendor/recline/vendor/leaflet/0.4.4/leaflet.ie.css" />
@@ -25,8 +26,6 @@
 
   <!-- Custom CSS for the Transformer Online App -->
   <link rel="stylesheet" href="css/style.css">
-
-  <link rel="stylesheet" href="vendor/recline/vendor/bootstrap/2.0.2/css/bootstrap-responsive.css">
 </head>
 <body>
 <div class="transformer-app">
@@ -34,13 +33,14 @@
     <div class="navbar-inner">
       <div class="container">
         <a class="brand" href="#">
-          Data Explorer - view and clean data in the browser
+          Data Explorer - view, clean &amp; share data in the browser
         </a>
         <ul class="nav">
           <li class="divider-vertical"></li>
           <li><a href="#dashboard">Dashboard</a></li>
           <li class="divider-vertical"></li>
-          <li><a href="#save">Export Data</a></li>
+          <li><a href="#load">New Project</a></li>
+          <li class="divider-vertical"></li>
         </ul>
         <ul class="nav pull-right user-status">
           <li><a href="#about">About</a></li>
@@ -114,10 +114,10 @@
   <script src='vendor/github.js'></script>
   <script type="text/javascript" src="vendor/codemirror/3.0/codemirror.js"></script>
   <script type="text/javascript" src="vendor/codemirror/3.0/mode/javascript/javascript.js"></script>
+  <script src="vendor/bootstrap/2.2.2/bootstrap.min.js"></script>
 
   <script type="text/javascript" src="vendor/recline/vendor/moment/1.6.2/moment.js"></script>
   <script type="text/javascript" src="vendor/recline/vendor/mustache/0.5.0-dev/mustache.js"></script>
-  <script type="text/javascript" src="vendor/recline/vendor/bootstrap/2.0.2/bootstrap.js"></script>
   <script type="text/javascript" src="vendor/recline/vendor/leaflet/0.4.4/leaflet.js"></script>
   <script type="text/javascript" src="vendor/recline/vendor/leaflet.markercluster/leaflet.markercluster.js"></script>
   <script type="text/javascript" src="vendor/recline/vendor/slickgrid/2.0.1/jquery-ui-1.8.16.custom.min.js"></script>
@@ -127,6 +127,12 @@
   <script type="text/javascript" src="vendor/recline/vendor/underscore.deferred/0.4.0/underscore.deferred.js"></script>
 
   <script type="text/javascript" src="vendor/recline/dist/recline.js"></script>
+
+  <script src="http://www.google.com/jsapi"></script>
+  <script type="text/javascript">
+    // setup gdocs file picker
+    google.load('picker', '1');
+  </script>
 
   <!-- Application-specific -->
   <script src='src/boot.js'></script>

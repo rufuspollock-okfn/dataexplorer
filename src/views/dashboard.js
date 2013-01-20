@@ -15,7 +15,7 @@ my.Dashboard = Backbone.View.extend({
         <h3 class="title"><a href="#project/{{id}}" class="js-load-project">{{showTitle}}</a></h3> \
         Last modified: {{last_modified_nice}} \
         <br /> \
-        Data source: {{datasets.0.url}} \
+        Data source: {{datasource}} \
       </div> \
       {{/projects}} \
     </div> \
@@ -31,8 +31,13 @@ my.Dashboard = Backbone.View.extend({
   render: function() {
     var projects = _.map(this.collection.toJSON(), function(project) {
       project.last_modified_nice = new Date(project.last_modified).toString();
-      project.showTitle = project.title || 'No title';
+      project.showTitle = project.name || 'No name';
+      project.datasource = project.datasets[0].file ? project.datasets[0].filename : project.datasets[0].url;
       return project;
+    });
+    // sort by last modified (most recent first)
+    projects.sort(function(a, b) {
+      return a.last_modified < b.last_modified ?  1 : -1;
     });
     var tmp = Mustache.render(this.template, {
       total: projects.length,
