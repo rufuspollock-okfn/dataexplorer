@@ -16,16 +16,36 @@ my.Load = Backbone.View.extend({
     e.preventDefault();
     var $form = $(e.target).closest('form');
     // var url = $form.find("input[name=source]").first().val();
-    var data = {};
+    var data = {
+    };
     _.each($form.serializeArray(), function(item) {
       data[item.name] = item.value;
     });
+    // try to set name
+    if (data.url) {
+      if (data.backend != 'gdocs') {
+        data.name = data.url.split('/')
+          .pop()
+          .split('.')[0]
+      }
+    }
     // special case for file form
     var $files = $form.find('input[type="file"]');
     if ($files.length > 0) {
-      data.file = $files[0].files[0]
+      data.file = $files[0].files[0];
+      // TODO: size, type, lastModified etc - https://developer.mozilla.org/en-US/docs/DOM/File
+      data.name = data.file.name.split('.')[0];
     }
-    this.project = new DataExplorer.Model.Project({datasets: [data]});
+    // TODO: gdocs spreadsheet (could get this from picker but prefer to wait
+    // for preview code when we can do this properly)
+    var projectName = 'No name';
+    if (data.name) {
+      projectName = data.name.replace('_', ' ').replace('-', ' ');
+    }
+    this.project = new DataExplorer.Model.Project({
+      name: projectName,
+      datasets: [data]
+    });
     this.project.save();
     self.trigger('load', this.project);
     return false;
