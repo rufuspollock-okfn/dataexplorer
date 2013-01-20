@@ -34,6 +34,10 @@ my.Dashboard = Backbone.View.extend({
       project.showTitle = project.title || 'No title';
       return project;
     });
+    // sort by last modified (most recent first)
+    projects.sort(function(a, b) {
+      return a.last_modified < b.last_modified ?  1 : -1;
+    });
     var tmp = Mustache.render(this.template, {
       total: projects.length,
       projects: projects
