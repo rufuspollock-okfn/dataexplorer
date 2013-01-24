@@ -1,12 +1,12 @@
-@import url(http://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700);
+@import url(http://fonts.googleapis.com/css?family=Open+Sans:400,400italic,700);
 
 body {
   padding-top: 60px;
-  font-size: 12px;
+  font-size: 14px;
 }
 
 h1, h2, h3, h4, h5, h6, body, p, input, button, select, textarea {
-	font-family: 'PT Sans', Helvetica, Arial, sans-serif;
+	font-family: 'Open Sans', Helvetica, Arial, sans-serif;
 }
 
 /* we do not have a LH sidebar */
@@ -334,4 +334,12 @@ h1, h2, h3, h4, h5, h6, body, p, input, button, select, textarea {
 .view.about .actions a {
   width: 200px;
   margin: 30px;
+}
+
+/**********************************************************
+  * Tweaks to Recline
+  *********************************************************/
+
+.recline-slickgrid {
+  font-size: 12px;
 }
