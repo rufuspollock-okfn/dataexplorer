@@ -1,6 +1,7 @@
 // jQuery is referenced (but not used) by recline.dataset
 var jQuery = null;
 importScripts('../../vendor/underscore.js');
+importScripts('../../vendor/browser-request/request.js');
 importScripts('../../vendor/backbone.js');
 importScripts('../../vendor/recline/dist/recline.dataset.js');
 
