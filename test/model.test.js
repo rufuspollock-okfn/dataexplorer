@@ -7,7 +7,7 @@ test('Project: basics', function () {
   equal(project.scripts.length, 1);
   equal(project.get('manifest_version'), 1);
   equal(project.datasets.length, 0);
-  equal(project.get('views').length, 1);
+  equal(project.get('views').length, 3);
 });
 
 test('Project: datasets', function () {
