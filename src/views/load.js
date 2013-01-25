@@ -90,7 +90,7 @@ my.Load = Backbone.View.extend({
   
   template: ' \
     <div class="view load"> \
-      <p><strong>Create a project by importing data</strong></p> \
+      <h3>Create a project by importing data</h3> \
       <hr /> \
       <div class="tabbable tabs-left tab-import"> \
         <ul class="nav nav-tabs"> \
