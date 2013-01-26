@@ -86,57 +86,10 @@ my.Project = Backbone.Model.extend({
     localStorage.setItem(this.id, JSON.stringify(data));
   },
 
-  _prepareForGist: function() {
-    var self = this;
-    var data = this.toJSON();
-
-    var gistJSON = {
-      description: this.get('description'),
-      files: {
-        'datapackage.json': {
-        }
-      }
-    };
-
-    _.each(data.scripts, function(script) {
-      script.path = 'scripts/' + script.id;
-      gistJSON.files[script.path] = {
-        content: script.content
-      };
-      delete script.content;
-    });
-
-    _.each(data.datasets, function(dsInfo, idx) {
-      // TODO: check dsInfo.path does not over-write anything important (e.g. datapackage.json ...)
-      if (dsInfo.path) {
-        var ds = self.datasets.at(idx);
-        gistJSON.files[dsInfo.path] = {
-          content: self._serializeDatasetToCSV(ds._store)
-        }
-      }
-    });
-
-    gistJSON.files['datapackage.json'].content = JSON.stringify(data, null, 2)
-
-    return gistJSON;
-  },
-
-  _serializeDatasetToCSV: function(dataset) {
-  	var records = [];
-  	records.push(_.pluck(dataset.fields, 'id'));
-  	_.each(dataset.records, function(record, index) {
-  	  var tmp = _.map(dataset.fields, function(field) {
-        return record[field.id];
-  	  });
-  	  records.push(tmp);
-  	});
-  	return recline.Backend.CSV.serializeCSV(records);
-  },
-
   saveToGist: function() {
     var self = this;
     var gh = my.github();
-    var gistJSON = this._prepareForGist();
+    var gistJSON = my.serializeProject(this);
 
     if (this.get('gist_id')) {
       var gist = gh.getGist(this.get('gist_id'));
@@ -205,6 +158,90 @@ my.Project = Backbone.Model.extend({
     });
   }
 });
+
+// ### serializeProject
+//
+// Serialize a project to "Data Package" structure. The specific JS structure shown here follows that of gists
+//
+// <pre>
+// {
+//    // optional
+//    description
+//    files: {
+//      'datapackage.json': {
+//        content: ... 
+//      },
+//      'filename': ...
+//    }
+// }
+// </pre>
+my.serializeProject = function(project) {
+  var data = project.toJSON();
+
+  var gistJSON = {
+    description: project.get('description'),
+    files: {
+      'datapackage.json': {
+      }
+    }
+  };
+
+  _.each(data.scripts, function(script) {
+    script.path = 'scripts/' + script.id;
+    gistJSON.files[script.path] = {
+      content: script.content
+    };
+    delete script.content;
+  });
+
+  _.each(data.datasets, function(dsInfo, idx) {
+    // TODO: check dsInfo.path does not over-write anything important (e.g. datapackage.json ...)
+    if (dsInfo.path) {
+      var ds = project.datasets.at(idx);
+      gistJSON.files[dsInfo.path] = {
+        content: my.serializeDatasetToCSV(ds._store)
+      }
+      // for good measure remove any data attribute
+      // TODO: should this be done when we loaded from the data and moved it into the dataset data store
+      delete dsInfo.data;
+    }
+  });
+
+  gistJSON.files['datapackage.json'].content = JSON.stringify(data, null, 2)
+  return gistJSON;
+};
+
+my.unserializeProject = function(serialized) {
+  var dp = JSON.parse(serialized.files['datapackage.json'].content);
+  _.each(dp.scripts, function(script) {
+    // we could be more careful ...
+    // if (script.path && _.has(serialized.files, script.path)) {
+    if (script.path) {
+      script.content = serialized.files[script.path].content;
+    }
+  });
+  _.each(dp.datasets, function(ds) {
+    if (ds.path) {
+      ds.data = serialized.files[ds.path].content;
+    }
+  });
+  var project = new my.Project(dp);
+  return project;
+}
+
+// TODO: move to util?
+my.serializeDatasetToCSV = function(dataset) {
+  var records = [];
+  records.push(_.pluck(dataset.fields, 'id'));
+  _.each(dataset.records, function(record, index) {
+    var tmp = _.map(dataset.fields, function(field) {
+      return record[field.id];
+    });
+    records.push(tmp);
+  });
+  return recline.Backend.CSV.serializeCSV(records);
+};
+
 
 my.ProjectList = Backbone.Collection.extend({
   model: my.Project,
