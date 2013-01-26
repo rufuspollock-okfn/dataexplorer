@@ -86,17 +86,58 @@ my.Project = Backbone.Model.extend({
     localStorage.setItem(this.id, JSON.stringify(data));
   },
 
-  saveToGist: function() {
+  _prepareForGist: function() {
     var self = this;
-    var gh = my.github();
+    var data = this.toJSON();
+
     var gistJSON = {
       description: this.get('description'),
       files: {
         'datapackage.json': {
-          'content': JSON.stringify(this.toJSON(), null, 2)
         }
       }
     };
+
+    _.each(data.scripts, function(script) {
+      script.path = 'scripts/' + script.id;
+      gistJSON.files[script.path] = {
+        content: script.content
+      };
+      delete script.content;
+    });
+
+    _.each(data.datasets, function(dsInfo, idx) {
+      // TODO: check dsInfo.path does not over-write anything important (e.g. datapackage.json ...)
+      if (dsInfo.path) {
+        var ds = self.datasets.at(idx);
+        gistJSON.files[dsInfo.path] = {
+          content: self._serializeDatasetToCSV(ds._store)
+        }
+      }
+    });
+
+    gistJSON.files['datapackage.json'].content = JSON.stringify(data, null, 2)
+
+    return gistJSON;
+  },
+
+  _serializeDatasetToCSV: function(dataset) {
+  	var records = [];
+  	records.push(_.pluck(dataset.fields, 'id'));
+  	_.each(dataset.records, function(record, index) {
+  	  var tmp = _.map(dataset.fields, function(field) {
+        return record[field.id];
+  	  });
+  	  records.push(tmp);
+  	});
+  	return recline.Backend.CSV.serializeCSV(records);
+  },
+
+  saveToGist: function() {
+    var self = this;
+    var gh = my.github();
+    var gistJSON = this._prepareForGist();
+
     if (this.get('gist_id')) {
       var gist = gh.getGist(this.get('gist_id'));
       gist.update(gistJSON, function(err, gist) {

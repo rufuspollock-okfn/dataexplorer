@@ -40,4 +40,26 @@ test('Project: loadSourceDataset', function () {
   });
 });
 
+test('Project: _prepareForGist', function () {
+  var project = new DataExplorer.Model.Project({
+    datasets: [ 
+      {
+        id: 'xyz',
+        backend: 'csv',
+        data: 'Date,Yield\n2012,1.8',
+        path: 'data.csv'
+      }
+    ]
+  });
+  project.loadSourceDataset(function() {});
+  var out = project._prepareForGist();
+  var dataFile = 'data.csv';
+  var dp = JSON.parse(out.files['datapackage.json'].content);
+  deepEqual(_.keys(out.files), ['datapackage.json', 'scripts/main.js', dataFile]);
+  ok(!_.hasOwnProperty(dp.scripts[0], 'content'), 'content key should be removed');
+  deepEqual(out.files['scripts/main.js'].content, 'print("hello world")');
+
+  deepEqual(out.files['data.csv'].content, 'Date,Yield\n2012,1.8\n');
+});
+
 })();
