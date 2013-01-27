@@ -17,6 +17,8 @@ this.DataExplorer.Model = this.DataExplorer.Model || {};
 my.Project = Backbone.Model.extend({
   defaults: function() {
     return {
+      name: '',
+      readme: '',
       manifest_version: 1,
       created: new Date().toISOString(),
       scripts: [
@@ -186,6 +188,9 @@ my.serializeProject = function(project) {
     }
   };
 
+  gistJSON.files['README.md'] = { content: data.readme };
+  delete data.readme;
+
   _.each(data.scripts, function(script) {
     script.path = 'scripts/' + script.id;
     gistJSON.files[script.path] = {
@@ -213,6 +218,9 @@ my.serializeProject = function(project) {
 
 my.unserializeProject = function(serialized) {
   var dp = JSON.parse(serialized.files['datapackage.json'].content);
+  if ('README.md' in serialized.files) {
+    dp.readme = serialized.files['README.md'].content;
+  }
   _.each(dp.scripts, function(script) {
     // we could be more careful ...
     // if (script.path && _.has(serialized.files, script.path)) {
