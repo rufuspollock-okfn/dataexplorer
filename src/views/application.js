@@ -144,7 +144,7 @@ my.Application = Backbone.View.extend({
     } else {
       var gist = DataExplorer.Model.github().getGist(projectId);
       gist.read(function(err, gist) {
-        var project = new DataExplorer.Model.Project(JSON.parse(gist.files['datapackage.json'].content));
+        var project = DataExplorer.Model.unserializeProject(gist);
         checkDatasetLoaded(project)
       });
     }
