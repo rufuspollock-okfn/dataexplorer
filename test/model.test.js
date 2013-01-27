@@ -62,17 +62,17 @@ test('serializeProject', function () {
   var dataFile = 'data.csv';
   var dp = JSON.parse(out.files['datapackage.json'].content);
   deepEqual(_.keys(out.files),
-      ['datapackage.json', 'README.md', 'scripts/main.js', dataFile]
+      ['datapackage.json', 'README.md', 'main.js', dataFile]
     );
   ok(!_.hasOwnProperty(dp.scripts[0], 'content'), 'content key should be removed');
-  deepEqual(out.files['scripts/main.js'].content, 'print("hello world")');
+  deepEqual(out.files['main.js'].content, 'print("hello world")');
   deepEqual(out.files['data.csv'].content, csvData);
   equal(dp.datasets[0].data, undefined, 'We removed data attribute from the dataset');
   equal(out.files['README.md'].content, readme, 'README content correct');
 
   var newScriptContent = 'request("...")';
   var newReadme = 'New readme';
-  out.files['scripts/main.js'].content = newScriptContent;
+  out.files['main.js'].content = newScriptContent;
   out.files['README.md'].content = newReadme;
 
   // now unserialize ...

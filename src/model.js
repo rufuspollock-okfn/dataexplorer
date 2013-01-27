@@ -99,6 +99,7 @@ my.Project = Backbone.Model.extend({
         if (err) {
           alert('Failed to save project to gist');
           console.log(err);
+          console.log(gistJSON);
         } else {
           console.log('Saved to gist successfully');
         }
@@ -110,6 +111,7 @@ my.Project = Backbone.Model.extend({
         if (err) {
           alert('Initial save of project to gist failed');
           console.log(err);
+          console.log(gistJSON);
         } else {
           // we do not want to trigger an immediate resave to the gist
           self.set({gist_id: gist.id, gist_url: gist.url}, {silent: true});
@@ -188,13 +190,29 @@ my.serializeProject = function(project) {
     }
   };
 
-  gistJSON.files['README.md'] = { content: data.readme };
+  // Ensure we set content of files to something non-empty (or remove the
+  // file from the list of those saved!) to avoid mysterious errors of the
+  // form:
+  //
+  // <pre>
+  // {
+  //   "errors": [
+  //     {
+  //       "code": "missing_field",
+  //       "field": "files",
+  //       "resource": "Gist"
+  //     }
+  //   ],
+  //   "message": "Validation Failed"
+  // }
+  // </pre>
+  gistJSON.files['README.md'] = { content: data.readme || 'README is empty' };
   delete data.readme;
 
   _.each(data.scripts, function(script) {
-    script.path = 'scripts/' + script.id;
+    script.path = script.id;
     gistJSON.files[script.path] = {
-      content: script.content
+      content: script.content || '// empty script'
     };
     delete script.content;
   });
@@ -203,8 +221,10 @@ my.serializeProject = function(project) {
     // TODO: check dsInfo.path does not over-write anything important (e.g. datapackage.json ...)
     if (dsInfo.path) {
       var ds = project.datasets.at(idx);
-      gistJSON.files[dsInfo.path] = {
-        content: my.serializeDatasetToCSV(ds._store)
+      var content = my.serializeDatasetToCSV(ds._store);
+      // if content is empty we cannot add this file (see above note re github weirdness)
+      if (content) {
+        gistJSON.files[dsInfo.path] = { content: content }
       }
       // for good measure remove any data attribute
       // TODO: should this be done when we loaded from the data and moved it into the dataset data store
@@ -229,8 +249,13 @@ my.unserializeProject = function(serialized) {
     }
   });
   _.each(dp.datasets, function(ds) {
+    // it is possible the path does not exist if there was no data
     if (ds.path) {
-      ds.data = serialized.files[ds.path].content;
+      if (ds.path in serialized.files) {
+        ds.data = serialized.files[ds.path].content;
+      } else {
+        ds.data = '';
+      }
     }
   });
   var project = new my.Project(dp);
