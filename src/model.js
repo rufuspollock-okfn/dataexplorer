@@ -152,10 +152,12 @@ my.Project = Backbone.Model.extend({
     user =  url.split("/")[3];
     repo = url.split("/")[4];
     branch = url.split("/")[6];
+    path = url.split('/').slice(7).join('/')
+      ;
 
     var repo = getRepo(user, repo);
 
-    repo.read(branch, 'data/data.csv', function(err, raw_csv) {
+    repo.read(branch, path, function(err, raw_csv) {
       // TODO: need to do this properly ...
       self.datasets.reset([new recline.Model.Dataset({data: raw_csv, backend: 'csv'})]);
       cb(err, self.dataset);
