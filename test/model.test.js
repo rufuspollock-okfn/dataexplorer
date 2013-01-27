@@ -57,9 +57,10 @@ test('serializeProject', function () {
   });
   project.loadSourceDataset(function() {});
 
-  // serialize test start
-  var out = DataExplorer.Model.serializeProject(project);
   var dataFile = 'data.csv';
+  // test serialize
+  var out = DataExplorer.Model.serializeProject(project);
+  equal(out.description, project.get('name') + ' - ' + readme);
   var dp = JSON.parse(out.files['datapackage.json'].content);
   deepEqual(_.keys(out.files),
       ['datapackage.json', 'README.md', 'main.js', dataFile]

@@ -17,7 +17,7 @@ this.DataExplorer.Model = this.DataExplorer.Model || {};
 my.Project = Backbone.Model.extend({
   defaults: function() {
     return {
-      name: '',
+      name: 'No name',
       readme: '',
       manifest_version: 1,
       created: new Date().toISOString(),
@@ -179,39 +179,45 @@ my.Project = Backbone.Model.extend({
 //    }
 // }
 // </pre>
+//
+// Note that one *must* ensure that content attribute of any file is
+// non-empty to avoid mysterious errors of the form:
+//
+// <pre>
+// {
+//   "errors": [
+//     {
+//       "code": "missing_field",
+//       "field": "files",
+//       "resource": "Gist"
+//     }
+//   ],
+//   "message": "Validation Failed"
+// }
+// </pre>
 my.serializeProject = function(project) {
   var data = project.toJSON();
 
+  var description = data.name;
+  if (data.readme) {
+    description += ' - ' + data.readme.split('.')[0];
+  }
   var gistJSON = {
-    description: project.get('description'),
+    description: description,
     files: {
-      'datapackage.json': {
+      'datapackage.json': {},
+      'README.md': {
+        // must ensure file content is non-empty - see note above
+        content: data.readme || 'README is empty'
       }
     }
   };
-
-  // Ensure we set content of files to something non-empty (or remove the
-  // file from the list of those saved!) to avoid mysterious errors of the
-  // form:
-  //
-  // <pre>
-  // {
-  //   "errors": [
-  //     {
-  //       "code": "missing_field",
-  //       "field": "files",
-  //       "resource": "Gist"
-  //     }
-  //   ],
-  //   "message": "Validation Failed"
-  // }
-  // </pre>
-  gistJSON.files['README.md'] = { content: data.readme || 'README is empty' };
   delete data.readme;
 
   _.each(data.scripts, function(script) {
     script.path = script.id;
     gistJSON.files[script.path] = {
+      // must ensure file content is non-empty - see note above
       content: script.content || '// empty script'
     };
     delete script.content;
