@@ -1,6 +1,18 @@
 (function () {
 module("Views - Project");
 
+// stub some stuff
+Backbone.history = {
+  fragment: ''
+};
+DataExplorer.app = {
+  instance: {
+    router: {
+      navigate: function() {}
+    }
+  }
+}
+
 test('Project', function () {
   var project = new DataExplorer.Model.Project({
     id: 'data',
