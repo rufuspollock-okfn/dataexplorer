@@ -41,6 +41,13 @@ h1, h2, h3, h4, h5, h6, body, p, input, button, select, textarea {
   color: #434C50;
 }
 
+.navbar-inner .brand .subtitle {
+  max-width: 400px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .navbar .divider-vertical {
   background-color: #acbfca;
   border-right: 1px solid #f5f7f8;
@@ -223,6 +230,14 @@ h1, h2, h3, h4, h5, h6, body, p, input, button, select, textarea {
 .header .recline-pager .pagination a {
   line-height: 26px;
   padding: 0 6px;
+}
+
+/**********************************************************
+  * Dashboard
+  *********************************************************/
+
+.dashboard .load-btn {
+  float: right;
 }
 
 

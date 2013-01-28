@@ -4,12 +4,11 @@ my.Dashboard = Backbone.View.extend({
   template: ' \
     <div class="view dashboard"> \
       <div class="page-header"> \
-      <h2>Existing Projects ({{total}})</h2> \
-  </div> \
-      <p> \
-        Not looking for an existing project? <a href="#load">Create a new project by loading some data here &raquo;</a>\
-      </p> \
-      <hr /> \
+        <h2> \
+          Existing Data Projects ({{total}}) \
+          <a href="#load" class="btn btn-large load-btn">Create a new project &raquo;</a> \
+        </h2> \
+      </div> \
       {{#projects}} \
       <div class="project summary"> \
         <h3 class="title"><a href="#project/{{id}}" class="js-load-project">{{showTitle}}</a></h3> \

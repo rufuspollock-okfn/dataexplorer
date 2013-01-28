@@ -17,6 +17,8 @@ this.DataExplorer.Model = this.DataExplorer.Model || {};
 my.Project = Backbone.Model.extend({
   defaults: function() {
     return {
+      name: 'No name',
+      readme: '',
       manifest_version: 1,
       created: new Date().toISOString(),
       scripts: [
@@ -89,20 +91,15 @@ my.Project = Backbone.Model.extend({
   saveToGist: function() {
     var self = this;
     var gh = my.github();
-    var gistJSON = {
-      description: this.get('description'),
-      files: {
-        'datapackage.json': {
-          'content': JSON.stringify(this.toJSON(), null, 2)
-        }
-      }
-    };
+    var gistJSON = my.serializeProject(this);
+
     if (this.get('gist_id')) {
       var gist = gh.getGist(this.get('gist_id'));
       gist.update(gistJSON, function(err, gist) {
         if (err) {
           alert('Failed to save project to gist');
           console.log(err);
+          console.log(gistJSON);
         } else {
           console.log('Saved to gist successfully');
         }
@@ -114,6 +111,7 @@ my.Project = Backbone.Model.extend({
         if (err) {
           alert('Initial save of project to gist failed');
           console.log(err);
+          console.log(gistJSON);
         } else {
           // we do not want to trigger an immediate resave to the gist
           self.set({gist_id: gist.id, gist_url: gist.url}, {silent: true});
@@ -154,16 +152,137 @@ my.Project = Backbone.Model.extend({
     user =  url.split("/")[3];
     repo = url.split("/")[4];
     branch = url.split("/")[6];
+    path = url.split('/').slice(7).join('/')
+      ;
 
     var repo = getRepo(user, repo);
 
-    repo.read(branch, 'data/data.csv', function(err, raw_csv) {
+    repo.read(branch, path, function(err, raw_csv) {
       // TODO: need to do this properly ...
       self.datasets.reset([new recline.Model.Dataset({data: raw_csv, backend: 'csv'})]);
       cb(err, self.dataset);
     });
   }
 });
+
+// ### serializeProject
+//
+// Serialize a project to "Data Package" structure. The specific JS structure shown here follows that of gists
+//
+// <pre>
+// {
+//    // optional
+//    description
+//    files: {
+//      'datapackage.json': {
+//        content: ... 
+//      },
+//      'filename': ...
+//    }
+// }
+// </pre>
+//
+// Note that one *must* ensure that content attribute of any file is
+// non-empty to avoid mysterious errors of the form:
+//
+// <pre>
+// {
+//   "errors": [
+//     {
+//       "code": "missing_field",
+//       "field": "files",
+//       "resource": "Gist"
+//     }
+//   ],
+//   "message": "Validation Failed"
+// }
+// </pre>
+my.serializeProject = function(project) {
+  var data = project.toJSON();
+
+  var description = data.name;
+  if (data.readme) {
+    description += ' - ' + data.readme.split('.')[0];
+  }
+  var gistJSON = {
+    description: description,
+    files: {
+      'datapackage.json': {},
+      'README.md': {
+        // must ensure file content is non-empty - see note above
+        content: data.readme || 'README is empty'
+      }
+    }
+  };
+  delete data.readme;
+
+  _.each(data.scripts, function(script) {
+    script.path = script.id;
+    gistJSON.files[script.path] = {
+      // must ensure file content is non-empty - see note above
+      content: script.content || '// empty script'
+    };
+    delete script.content;
+  });
+
+  _.each(data.datasets, function(dsInfo, idx) {
+    // TODO: check dsInfo.path does not over-write anything important (e.g. datapackage.json ...)
+    if (dsInfo.path) {
+      var ds = project.datasets.at(idx);
+      var content = my.serializeDatasetToCSV(ds._store);
+      // if content is empty we cannot add this file (see above note re github weirdness)
+      if (content) {
+        gistJSON.files[dsInfo.path] = { content: content }
+      }
+      // for good measure remove any data attribute
+      // TODO: should this be done when we loaded from the data and moved it into the dataset data store
+      delete dsInfo.data;
+    }
+  });
+
+  gistJSON.files['datapackage.json'].content = JSON.stringify(data, null, 2)
+  return gistJSON;
+};
+
+my.unserializeProject = function(serialized) {
+  var dp = JSON.parse(serialized.files['datapackage.json'].content);
+  if ('README.md' in serialized.files) {
+    dp.readme = serialized.files['README.md'].content;
+  }
+  _.each(dp.scripts, function(script) {
+    // we could be more careful ...
+    // if (script.path && _.has(serialized.files, script.path)) {
+    if (script.path) {
+      script.content = serialized.files[script.path].content;
+    }
+  });
+  _.each(dp.datasets, function(ds) {
+    // it is possible the path does not exist if there was no data
+    if (ds.path) {
+      if (ds.path in serialized.files) {
+        ds.data = serialized.files[ds.path].content;
+      } else {
+        ds.data = '';
+      }
+    }
+  });
+  var project = new my.Project(dp);
+  return project;
+}
+
+// TODO: move to util?
+my.serializeDatasetToCSV = function(dataset) {
+  var records = [];
+  records.push(_.pluck(dataset.fields, 'id'));
+  _.each(dataset.records, function(record, index) {
+    var tmp = _.map(dataset.fields, function(field) {
+      return record[field.id];
+    });
+    records.push(tmp);
+  });
+  return recline.Backend.CSV.serializeCSV(records);
+};
+
 
 my.ProjectList = Backbone.Collection.extend({
   model: my.Project,

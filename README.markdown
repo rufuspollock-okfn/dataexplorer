@@ -1,18 +1,34 @@
 View, visualize and transform data in the browser.
 
-Powerful open-source data explorer application built in pure javascript and
-html. Integrates well with any source of tabular data. Load and save from
-multiple sources include google spreadsheets, CSVs and Github.
+Data Explorer is a browser-based (pure HTML + JS) open-source application for
+exploring and transforming data.
+
+It works well with any source of tabular data. Load and save from multiple
+sources include google spreadsheets, CSVs and Github. Graph and map data, write
+javascript to clean and transform data.
 
 Built on [Recline JS](http://okfnlabs.org/recline/).
 
-## Install
+## Use it
+
+Visit <http://explorer.datahub.io/>
+
+Want to use it locally? Just do "save as" and save the html (with all
+associated files) to your hard disk. Note that for github login to work you
+willneed to have the app opened at a non file:/// url e.g.
+http://localhost/dataexplorer.
+
+## Developers
+
+Install:
 
     git clone https://github.com/okfn/dataexplorer
     git submodule init
     git submodule update
 
-Open index.html in your browser!
+Then open index.html in your browser!
+
+To learn more about the the code see doc/developers.md
 
 ## License and Credits
 
