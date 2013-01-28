@@ -8,7 +8,8 @@
   var Github;
   var API_URL = 'https://api.github.com';
 
-  Github = window.Github = function(options) {
+  // this.Github works in both browser and web worker
+  Github = this.Github = function(options) {
 
     // HTTP Request Abstraction
     // =======
