@@ -1,8 +1,12 @@
 (function(my) {
+var showdown = new Showdown.converter();
 
 my.Project = Backbone.View.extend({
   template: ' \
     <div class="view project"> \
+      {{#readme}} \
+      <div class="readme">{{{readmeRendered}}}</div> \
+      {{/readme}} \
       <div class="header"> \
         <div class="navigation"> \
           <div class="btn-group" data-toggle="buttons-radio"> \
@@ -59,7 +63,9 @@ my.Project = Backbone.View.extend({
 
   render: function() {
     var self = this;
-    var tmpl = Mustache.render(this.template, this.model.toJSON());
+    var tmplData = this.model.toJSON();
+    tmplData.readmeRendered = showdown.makeHtml(tmplData.readme);
+    var tmpl = Mustache.render(this.template, tmplData);
     this.el.html(tmpl);
 
     var $dataViewContainer = this.el.find('.data-view-container');

@@ -131,12 +131,21 @@ h1, h2, h3, h4, h5, h6, body, p, input, button, select, textarea {
   * Project 
   *********************************************************/
 
+.view.project {
+  margin-top: -8px;
+}
+
+.view.project .readme {
+  margin-bottom: 15px;
+  padding-bottom: 8px;
+	border-bottom: 2px solid #ececec;
+}
+
 .view.project .recline-slickgrid {
   height: 500px;
 }
 
 .view.project .header {
-  margin-top: -5px;
   margin-bottom: 5px;
   height: 35px;
 }
