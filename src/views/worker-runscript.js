@@ -1,9 +1,13 @@
 // jQuery is referenced (but not used) by recline.dataset
 var jQuery = null;
-importScripts('../../vendor/underscore.js');
+importScripts('../../vendor/recline/vendor/underscore/1.4.2/underscore.js');
+importScripts('../../vendor/recline/vendor/underscore.deferred/0.4.0/underscore.deferred.js');
 importScripts('../../vendor/browser-request/request.js');
+importScripts('../../vendor/github.js');
+importScripts('../util.js');
 importScripts('../../vendor/backbone.js');
 importScripts('../../vendor/recline/dist/recline.dataset.js');
+importScripts('../../vendor/recline/src/backend.csv.js');
 
 // Convert all arguments to Strings (Objects will be JSONified).
 var print = function() {

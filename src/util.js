@@ -10,19 +10,16 @@ my.loadData = function(options, callback) {
     options = JSON.parse(JSON.stringify(options)); // Use a duplicate for mutating.
 
   if (
-    options.url.indexOf('https://github.com')!=-1
+    options.url.indexOf('https://github.com')==0
     ||
-    options.url.indexOf('http://github.com')!=-1
+    options.url.indexOf('http://github.com')==0
     ) {
     my.loadGithubFile(options.url, callback)
   } else {
-    recline.Backend.DataProxy.fetch(options)
-      .done(function(data) {
-          callback(null, data);
-        })
-      .fail(function(err) {
-        callback(err, null);
-      });
+    var url = 'http://jsonpdataproxy.appspot.com/?format=json&max-results=500000&url=' + options.url;
+    request.get(url, function(err, res, body) {
+      callback(err, body);
+    });
   }
 }
 
