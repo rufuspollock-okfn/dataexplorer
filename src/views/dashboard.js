@@ -11,7 +11,10 @@ my.Dashboard = Backbone.View.extend({
       </div> \
       {{#projects}} \
       <div class="project summary"> \
-        <h3 class="title"><a href="#project/{{id}}" class="js-load-project">{{showTitle}}</a></h3> \
+        <h3 class="title"> \
+          <a href="#project/{{id}}" class="js-load-project">{{showTitle}}</a> \
+          <a class="btn btn-danger js-trash-project" data-project-id="{{id}}">Move to Trash</a> \
+        </h3> \
         Last modified: {{last_modified_nice}} \
         <br /> \
         Data source: {{datasource}} \
@@ -20,11 +23,16 @@ my.Dashboard = Backbone.View.extend({
     </div> \
   ',
 
+  events: {
+    'click .js-trash-project': 'onTrashProject'
+  },
+
   initialize: function() {
     _.bindAll(this, 'render');
     this.collection.bind('add', this.render);
     this.collection.bind('reset', this.render);
     this.collection.bind('remove', this.render);
+    this.collection.bind('change', this.render);
   },
 
   render: function() {
@@ -38,6 +46,9 @@ my.Dashboard = Backbone.View.extend({
       }
       return project;
     });
+    projects = _.filter(projects, function(project) {
+      return project.state != 'trash'
+    });
     // sort by last modified (most recent first)
     projects.sort(function(a, b) {
       return a.last_modified < b.last_modified ?  1 : -1;
@@ -47,6 +58,12 @@ my.Dashboard = Backbone.View.extend({
       projects: projects
     });
     this.$el.html(tmp);
+  },
+
+  onTrashProject: function(e) {
+    e.preventDefault(); 
+    var id = $(e.target).attr('data-project-id');
+    this.collection.get(id).set({state: 'trash'});
   }
 });
 

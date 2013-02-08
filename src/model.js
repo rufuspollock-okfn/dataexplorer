@@ -20,6 +20,7 @@ my.Project = Backbone.Model.extend({
       name: 'No name',
       readme: '',
       manifest_version: 1,
+      state: 'active',
       created: new Date().toISOString(),
       scripts: [
         {
