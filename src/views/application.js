@@ -113,6 +113,13 @@ my.Application = Backbone.View.extend({
     } else {
       this.router.navigate(name);
     }
+    this._setTitle(name);
+  },
+
+  _setTitle: function(title) {
+    title = title[0].toUpperCase() + title.slice(1);
+    $('.subtitle').text(title).attr('title', title);
+    document.title = title + ' - Recline Data Explorer';
   },
 
   finishLogin: function(cb) {
@@ -170,8 +177,7 @@ my.Application = Backbone.View.extend({
       // housekeeping
       self.currentProject = project;
       self.saveView.project = project;
-      jQuery('.subtitle').text(project.get('name')).attr('title', project.get('name'));
-      document.title = project.get('name') + ' - Project - Recline Data Explorer';
+      self._setTitle(project.get('name'));
 
       // if this project does in fact have remote backing let's set the username so it is sharable
       // we only want to do this where this is a "local" project url (i.e. one using local id stuff)
