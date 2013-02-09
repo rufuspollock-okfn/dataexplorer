@@ -80,7 +80,9 @@ test('serializeProject', function () {
   ok(!_.hasOwnProperty(dp.scripts[0], 'content'), 'content key should be removed');
   deepEqual(out.files['main.js'].content, 'xyz');
   deepEqual(out.files['data.csv'].content, csvData);
-  equal(dp.datasets[0].data, undefined, 'We removed data attribute from the dataset');
+  equal(dp.datasets, undefined, 'on datapackage.json datasets is named files');
+  equal(dp.files[0].backend, 'csv');
+  equal(dp.files[0].data, undefined, 'We removed data attribute from the dataset');
   equal(out.files['README.md'].content, readme, 'README content correct');
 
   var newScriptContent = 'request("...")';
