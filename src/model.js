@@ -199,7 +199,9 @@ my.Project = Backbone.Model.extend({
 // }
 // </pre>
 my.serializeProject = function(project) {
-  var data = project.toJSON();
+  // deep clone
+  // we alter the data object below and toJSON in backbone is a shallow copy
+  var data = $.extend(true, {}, project.toJSON());
 
   var description = data.name;
   if (data.readme) {

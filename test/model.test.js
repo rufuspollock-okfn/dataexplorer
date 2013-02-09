@@ -53,20 +53,32 @@ test('serializeProject', function () {
         data: csvData,
         path: 'data.csv'
       }
+    ],
+    scripts: [
+      {
+        id: 'main.js',
+        content: 'xyz'
+      }
     ]
   });
   project.loadSourceDataset(function() {});
 
   var dataFile = 'data.csv';
+  // ==============
   // test serialize
+
   var out = DataExplorer.Model.serializeProject(project);
+
+  equal(project.toJSON().readme, readme, 'Check we have not changed the original project');
+  equal(project.toJSON().scripts[0].content, 'xyz', 'Check we have not changed the original project');
+
   equal(out.description, project.get('name') + ' - ' + readme);
   var dp = JSON.parse(out.files['datapackage.json'].content);
   deepEqual(_.keys(out.files),
       ['datapackage.json', 'README.md', 'main.js', dataFile]
     );
   ok(!_.hasOwnProperty(dp.scripts[0], 'content'), 'content key should be removed');
-  deepEqual(out.files['main.js'].content, 'print("hello world")');
+  deepEqual(out.files['main.js'].content, 'xyz');
   deepEqual(out.files['data.csv'].content, csvData);
   equal(dp.datasets[0].data, undefined, 'We removed data attribute from the dataset');
   equal(out.files['README.md'].content, readme, 'README content correct');
