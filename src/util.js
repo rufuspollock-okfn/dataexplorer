@@ -18,6 +18,12 @@ my.loadData = function(options, callback) {
   } else {
     var url = 'http://jsonpdataproxy.appspot.com/?format=json&max-results=500000&url=' + options.url;
     request.get(url, function(err, res, body) {
+      try {
+        body = JSON.parse(body);
+      } catch(e) {
+        // do nothing
+        console.error('Failed to parse body');
+      }
       callback(err, body);
     });
   }
