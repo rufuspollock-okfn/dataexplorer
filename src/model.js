@@ -168,7 +168,9 @@ my.Project = Backbone.Model.extend({
 
 // ### serializeProject
 //
-// Serialize a project to "Data Package" structure. The specific JS structure shown here follows that of gists
+// Serialize a project to "Data Package" structure in line with the Data Package spec <http://www.dataprotocols.org/en/latest/data-packages.html>
+//
+// The specific JS structure shown here follows that of gists
 //
 // <pre>
 // {
@@ -183,7 +185,9 @@ my.Project = Backbone.Model.extend({
 // }
 // </pre>
 //
-// Note that one *must* ensure that content attribute of any file is
+// datapackage.json structure etc should be as defined in <http://www.dataprotocols.org/en/latest/data-packages.html>
+//
+// Implementation Note: one *must* ensure that content attribute of any file is
 // non-empty to avoid mysterious errors of the form:
 //
 // <pre>
@@ -219,6 +223,10 @@ my.serializeProject = function(project) {
   };
   delete data.readme;
 
+  // as per http://www.dataprotocols.org/en/latest/data-packages.html list of "datasets" is listed in files attribute
+  data.files = data.datasets;
+  delete data.datasets;
+
   _.each(data.scripts, function(script) {
     script.path = script.id;
     gistJSON.files[script.path] = {
@@ -228,7 +236,7 @@ my.serializeProject = function(project) {
     delete script.content;
   });
 
-  _.each(data.datasets, function(dsInfo, idx) {
+  _.each(data.files, function(dsInfo, idx) {
     // TODO: check dsInfo.path does not over-write anything important (e.g. datapackage.json ...)
     if (dsInfo.path) {
       var ds = project.datasets.at(idx);
@@ -249,6 +257,14 @@ my.serializeProject = function(project) {
 
 my.unserializeProject = function(serialized) {
   var dp = JSON.parse(serialized.files['datapackage.json'].content);
+
+  // files attribute lists data sources in data package spec
+  // if statement for backwards compatibility
+  if (dp.files && !dp.datasets) {
+    dp.datasets = dp.files;
+    delete dp.files;
+  }
+
   if ('README.md' in serialized.files) {
     dp.readme = serialized.files['README.md'].content;
   }
