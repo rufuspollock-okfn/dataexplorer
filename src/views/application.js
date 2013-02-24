@@ -168,6 +168,7 @@ my.Application = Backbone.View.extend({
 
   projectShow: function(username, projectId, viewId) {
     var self = this;
+    // call both here and below. Here so we hide current view and below to show project view ...
     self.switchView('project', username + '/' + projectId);
     var projectViewState = {};
     if (viewId) {
@@ -203,6 +204,8 @@ my.Application = Backbone.View.extend({
       $('#main .view.project').remove();
       $('#main').append(ds.el);
       ds.render();
+      // now that the element is definitely in the DOM make sure we show it
+      self.switchView('project', username + '/' + projectId);
     }
   },
 
