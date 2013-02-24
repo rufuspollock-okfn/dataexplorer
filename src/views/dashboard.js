@@ -1,8 +1,9 @@
 (function(my) {
 
 my.Dashboard = Backbone.View.extend({
+  className: 'view dashboard',
   template: ' \
-    <div class="view dashboard"> \
+    <div> \
       <div class="page-header"> \
         <h2> \
           Existing Data Projects ({{total}}) \
