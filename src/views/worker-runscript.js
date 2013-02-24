@@ -1,5 +1,4 @@
-// jQuery is referenced (but not used) by recline.dataset
-var jQuery = null;
+// Convert all arguments to Strings (Objects will be JSONified).
 importScripts('../../vendor/recline/vendor/underscore/1.4.2/underscore.js');
 importScripts('../../vendor/recline/vendor/underscore.deferred/0.4.0/underscore.deferred.js');
 importScripts('../../vendor/browser-request/request.js');
@@ -21,6 +20,9 @@ var print = function() {
   var msg = items.join(" ");
   self.postMessage({msg: 'print', data: msg})
 };
+
+console = {};
+console.log = print;
 
 var saveDataset = function(dataset) {
   self.postMessage({msg: 'saveDataset', fields: dataset.fields, records: dataset.records });
