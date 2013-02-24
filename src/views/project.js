@@ -2,8 +2,9 @@
 var showdown = new Showdown.converter();
 
 my.Project = Backbone.View.extend({
+  className: 'view project',
   template: ' \
-    <div class="view project"> \
+    <div> \
       {{#readme}} \
       <div class="readme">{{{readmeRendered}}}</div> \
       {{/readme}} \
@@ -178,6 +179,7 @@ my.Project = Backbone.View.extend({
         if (current.indexOf('/view')!= -1) {
           DataExplorer.app.instance.router.navigate(newpath);
         } else {
+          // we are on the default view so need to explicitly navigate - just replace
           DataExplorer.app.instance.router.navigate(newpath, {replace: true});
         }
       } else {
