@@ -168,10 +168,12 @@ my.Application = Backbone.View.extend({
 
   projectShow: function(username, projectId, viewId) {
     var self = this;
+    // call both here and below. Here so we hide current view and below to show project view ...
     self.switchView('project', username + '/' + projectId);
-    var projectViewState = {
-      currentView: viewId
-    };
+    var projectViewState = {};
+    if (viewId) {
+      projectViewState.currentView = viewId;
+    }
     this._loadProject(username, projectId, displayIt);
     function displayIt(err, project) {
       // housekeeping
@@ -190,6 +192,7 @@ my.Application = Backbone.View.extend({
 
       if (err) {
         // this.notify('error', 'The requested resource could not be found.');
+        console.log('We were unable to load the gist');
         return;
       }
       var ds = new DataExplorer.View.Project({
@@ -201,6 +204,8 @@ my.Application = Backbone.View.extend({
       $('#main .view.project').remove();
       $('#main').append(ds.el);
       ds.render();
+      // now that the element is definitely in the DOM make sure we show it
+      self.switchView('project', username + '/' + projectId);
     }
   },
 
