@@ -42,7 +42,6 @@ my.Application = Backbone.View.extend({
     this.router.route('', 'home', function() {
       // special case - we have project config in the query string
       var state = recline.View.parseQueryString(decodeURIComponent(window.location.search));
-      console.log(state);
       if (state.backend) {
         var project = new DataExplorer.Model.Project({datasets: [state]});
         project.save();
