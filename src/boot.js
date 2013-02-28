@@ -41,7 +41,9 @@ window.args = _(this.DataExplorer.app).toArray();
         // from handleGithubLogin function (see below)
         if (evt.data.token) {
           $.cookie('oauth-token', evt.data.token);
-          DataExplorer.app.instance.finishLogin();
+          DataExplorer.Model.loadUserInfo(function() {
+            DataExplorer.app.instance.finishUserSetup();
+          });
         }
       }
       , false
@@ -58,6 +60,7 @@ window.args = _(this.DataExplorer.app).toArray();
           <div class="authorize"> \
             <h1>Completing Login</h1> \
             <p>We are completing your login!</p> \
+            <img src="http://assets/images/icons/ajaxload-circle.gif" alt="" /> \
           </div> \
         </div> \
       </div> \

@@ -37,17 +37,24 @@ my.Application = Backbone.View.extend({
     this.router = new Backbone.Router();
     this.projectList = new DataExplorer.Model.ProjectList();
     this.projectList.load();
+    this.authenticated = false;
 
-    // TODO: make this somewhat nicer - e.g. show a loading message etc
-    var state = recline.View.parseQueryString(decodeURIComponent(window.location.search));
-    if (state.backend) {
-      var project = new DataExplorer.Model.Project({datasets: [state]});
-      project.save();
-      self.onLoadProject(project);
-    }
-    
     this.router.route('', 'home', function() {
-      self.router.navigate('dashboard', {trigger: true});
+      // special case - we have project config in the query string
+      var state = recline.View.parseQueryString(decodeURIComponent(window.location.search));
+      console.log(state);
+      if (state.backend) {
+        var project = new DataExplorer.Model.Project({datasets: [state]});
+        project.save();
+        self.onLoadProject(project);
+        return;
+      }
+      // normal case
+      if (self.authenticated) {
+        self.router.navigate('dashboard', {trigger: true});
+      } else {
+        self.router.navigate('about', {trigger: true});
+      }
     });
     this.router.route('about', 'about', function() {
       self.switchView('about');
@@ -75,9 +82,7 @@ my.Application = Backbone.View.extend({
     this.el.find('.user-status').addClass('logged-out');
 
     if ($.cookie("oauth-token")) {
-      // set the username immediately to avoid race conditions between this and project loading (where we use the username)
-      self.username = $.cookie('username');
-      this.finishLogin();
+      this.finishUserSetup();
     }
 
     // now append views
@@ -122,18 +127,13 @@ my.Application = Backbone.View.extend({
     document.title = title + ' - Recline Data Explorer';
   },
 
-  finishLogin: function(cb) {
+  finishUserSetup: function() {
     var self = this;
-    DataExplorer.Model.loadUserInfo(function() {
-      self.el.find('.user-status').removeClass('logged-out');
-      self.el.find('.user-status .username').text(DataExplorer.app.username);
-      self.username = DataExplorer.app.username;
-      self.authenticated = true;
-      window.authenticated = true;
-      if (cb) {
-        cb();
-      }
-    });
+    self.username = $.cookie('username');
+    self.el.find('.user-status').removeClass('logged-out');
+    self.el.find('.user-status .username').text(self.username);
+    self.authenticated = true;
+    window.authenticated = true;
   },
 
   onLoadProject: function(project) {
@@ -166,6 +166,9 @@ my.Application = Backbone.View.extend({
     }
   },
 
+  // ### projectShow
+  //
+  // The router for showing a project
   projectShow: function(username, projectId, viewId) {
     var self = this;
     self.switchView('project', username + '/' + projectId);
