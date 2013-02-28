@@ -39,16 +39,22 @@ my.Application = Backbone.View.extend({
     this.projectList.load();
     this.authenticated = false;
 
-    // TODO: make this somewhat nicer - e.g. show a loading message etc
-    var state = recline.View.parseQueryString(decodeURIComponent(window.location.search));
-    if (state.backend) {
-      var project = new DataExplorer.Model.Project({datasets: [state]});
-      project.save();
-      self.onLoadProject(project);
-    }
-    
     this.router.route('', 'home', function() {
-      self.router.navigate('dashboard', {trigger: true});
+      // special case - we have project config in the query string
+      var state = recline.View.parseQueryString(decodeURIComponent(window.location.search));
+      console.log(state);
+      if (state.backend) {
+        var project = new DataExplorer.Model.Project({datasets: [state]});
+        project.save();
+        self.onLoadProject(project);
+        return;
+      }
+      // normal case
+      if (self.authenticated) {
+        self.router.navigate('dashboard', {trigger: true});
+      } else {
+        self.router.navigate('about', {trigger: true});
+      }
     });
     this.router.route('about', 'about', function() {
       self.switchView('about');
