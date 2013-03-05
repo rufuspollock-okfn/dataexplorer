@@ -23,6 +23,7 @@ var print = function() {
 
 console = {};
 console.log = print;
+console.error = print;
 
 var saveDataset = function(dataset) {
   self.postMessage({msg: 'saveDataset', fields: dataset.fields, records: dataset.records });
