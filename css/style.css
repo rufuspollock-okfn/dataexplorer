@@ -14,10 +14,6 @@ h1, h2, h3, h4, h5, h6, body, p, input, button, select, textarea {
   margin-left: 0;
 }
 
-.page-home .row.instructions .span4 .well {
-  height: 100px;
-}
-
 .loading {
   margin: 150px auto;
   width: 50px;
@@ -336,7 +332,7 @@ h1, h2, h3, h4, h5, h6, body, p, input, button, select, textarea {
   *********************************************************/
 
 body.about {
-  padding-top: 0;
+  padding-top: 40px;
   background-color: #eee;
 }
 
@@ -347,11 +343,6 @@ body.about .content {
   -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.15);
      -moz-box-shadow: 0 1px 2px rgba(0,0,0,.15);
           box-shadow: 0 1px 2px rgba(0,0,0,.15);
-}
-
-
-body.about .navbar {
-  display: none;
 }
 
 body.about .page-header {
@@ -365,6 +356,7 @@ body.about .page-header {
 
 .view.about .instructions .well {
   padding-bottom: 25px;
+  background-color: #E0E7EB;
 }
 
 .view.about .instructions .well h3 {
