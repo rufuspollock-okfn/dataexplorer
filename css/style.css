@@ -141,9 +141,11 @@ a {
 }
 
 .view.project .readme {
+  max-width: 740px;
+  margin: auto;
   margin-bottom: 15px;
   padding-bottom: 8px;
-	border-bottom: 2px solid #ececec;
+  font-size: 14px;
 }
 
 .view.project .recline-slickgrid {
