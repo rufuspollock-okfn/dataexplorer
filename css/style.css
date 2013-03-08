@@ -1,12 +1,20 @@
-@import url(http://fonts.googleapis.com/css?family=Open+Sans:400,400italic,700);
+@import url(http://fonts.googleapis.com/css?family=News+Cycle:400,700|Merriweather:400,300,700);
 
 body {
-  padding-top: 60px;
-  font-size: 14px;
+  padding-top: 50px;
 }
 
-h1, h2, h3, h4, h5, h6, body, p, input, button, select, textarea {
-	font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+body, p, input, button, select, textarea {
+  font-size: 14px;
+	font-family: 'Merriweather', serif;
+}
+
+h1, h2, h3, h4, h5, h6, .navbar {
+	font-family: 'News Cycle', Arial, sans-serif;
+}
+
+a {
+  font-weight: 700;
 }
 
 /* we do not have a LH sidebar */
@@ -35,6 +43,7 @@ h1, h2, h3, h4, h5, h6, body, p, input, button, select, textarea {
 
 .navbar-inner .brand {
   color: #434C50;
+  padding-top: 7px;
 }
 
 .navbar-inner .brand .subtitle {
@@ -365,7 +374,6 @@ body.about .page-header {
 
 .view.about .followup {
   text-align: center;
-  font-style: italic;
   margin-top: 20px;
 }
 
@@ -374,7 +382,7 @@ body.about .page-header {
 }
 
 .view.about .actions a {
-  width: 200px;
+  width: 250px;
   margin: 30px;
 }
 

@@ -7,7 +7,7 @@ my.Dashboard = Backbone.View.extend({
       <div class="page-header"> \
         <h2> \
           Existing Data Projects ({{total}}) \
-          <a href="#load" class="btn btn-large load-btn">Create a new project &raquo;</a> \
+          <a href="#load" class="btn btn-large load-btn">Create a new project</a> \
         </h2> \
       </div> \
       {{#projects}} \
