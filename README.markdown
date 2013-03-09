@@ -34,12 +34,11 @@ To learn more about the the code see doc/developers.md
 
 Licensed under the MIT license.
 
-All Credits as per Recline. Also all the amazing vendor libraries including:
+All Credits as per Recline. Also all the great vendor libraries including:
 
 * Backbone
 * Bootstrap
 * Leaflet
-* Flot and Flotr2
+* Flot
 * [CodeMirror](http://codemirror.net/)
-* Runnable Codemirror thanks to Irene Ros
 
