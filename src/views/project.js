@@ -75,7 +75,9 @@ my.Project = Backbone.View.extend({
   render: function() {
     var self = this;
     var tmplData = this.model.toJSON();
-    tmplData.readmeRendered = showdown.makeHtml(tmplData.readme);
+    var readme = showdown.makeHtml(tmplData.readme);
+    readme = readme.replace(/--/g, '&mdash;');
+    tmplData.readmeRendered = readme;
     var tmpl = Mustache.render(this.template, tmplData);
     this.el.html(tmpl);
 
