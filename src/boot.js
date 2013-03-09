@@ -49,6 +49,19 @@ window.args = _(this.DataExplorer.app).toArray();
       , false
     );
 
+    // set up google analytics tracking that works with backbone routing
+    // based on https://github.com/kendagriff/backbone.analytics/blob/master/backbone.analytics.js
+    var _loadUrl = Backbone.History.prototype.loadUrl;
+    Backbone.History.prototype.loadUrl = function(fragmentOverride) {
+      var matched = _loadUrl.apply(this, arguments),
+          fragment = this.fragment = this.getFragment(fragmentOverride);
+
+      if (!/^\//.test(fragment)) fragment = '/' + fragment;
+      if (window._gaq !== undefined) window._gaq.push(['_trackPageview', fragment]);
+
+      return matched;
+    };
+
     // Start responding to routes
     Backbone.history.start();
   });
