@@ -5,36 +5,46 @@ my.Project = Backbone.View.extend({
   className: 'view project',
   template: ' \
     <div> \
-      {{#readme}} \
-      <div class="readme">{{{readmeRendered}}}</div> \
-      {{/readme}} \
-      <div class="header"> \
-        <div class="navigation"> \
-          <div class="btn-group" data-toggle="buttons-radio"> \
-          {{#views}} \
-          <a href="#{{id}}" data-view="{{id}}" class="btn">{{label}}</a> \
-          {{/views}} \
+      <div class="meta"> \
+        {{#readme}} \
+        <div class="readme"> \
+          {{{readmeRendered}}} \
+          <div class="controls"> \
+            <a href="#" class="btn js-go-to-data">Jump to the data &rarr;</a> \
           </div> \
         </div> \
-        <div class="recline-results-info"> \
-          <span class="doc-count">{{recordCount}}</span> records\
-        </div> \
-        <div class="menu-right"> \
-          <div class="btn-group" data-toggle="buttons-checkbox"> \
-            <a href="#" data-action="script-editor" class="btn">Script Editor</a> \
-          </div> \
-        </div> \
-        <div class="query-editor-here" style="display:inline;"></div> \
+        {{/readme}} \
       </div> \
-      <div class="script-editor"></div> \
-      <div class="data-view-sidebar"></div> \
-      <div class="data-view-container"></div> \
-      <div class="multiview-here"></div> \
+      <div id="data-app" class="data-app"> \
+        <div class="header"> \
+          <div class="navigation"> \
+            <div class="btn-group" data-toggle="buttons-radio"> \
+            {{#views}} \
+            <a href="#{{id}}" data-view="{{id}}" class="btn">{{label}}</a> \
+            {{/views}} \
+            </div> \
+          </div> \
+          <div class="recline-results-info"> \
+            <span class="doc-count">{{recordCount}}</span> records\
+          </div> \
+          <div class="menu-right"> \
+            <div class="btn-group" data-toggle="buttons-checkbox"> \
+              <a href="#" data-action="script-editor" class="btn">Script Editor</a> \
+            </div> \
+          </div> \
+          <div class="query-editor-here" style="display:inline;"></div> \
+        </div> \
+        <div class="script-editor"></div> \
+        <div class="data-view-sidebar"></div> \
+        <div class="data-view-container"></div> \
+        <div class="multiview-here"></div> \
+      </div> \
     </div> \
   ',
   events: {
     'click .menu-right a': '_onMenuClick',
-    'click .navigation a': '_onSwitchView'
+    'click .navigation a': '_onSwitchView',
+    'click .js-go-to-data': '_onGoToData'
   },
 
   initialize: function(options) {
@@ -193,6 +203,15 @@ my.Project = Backbone.View.extend({
       }
     });
   },
+
+  _onGoToData: function(e) {
+    e.preventDefault();
+    $('html,body').animate({
+        // the navbar takes up 60px so have to subtract it
+        scrollTop: $('#data-app').offset().top - 60
+      }
+    );
+  }
 });
 
 

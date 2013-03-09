@@ -1,15 +1,16 @@
 @import url(http://fonts.googleapis.com/css?family=News+Cycle:400,700|Merriweather:400,300,700);
 
 body {
-  padding-top: 50px;
+  padding-top: 60px;
 }
 
-body, p, input, button, select, textarea {
+body, p {
   font-size: 14px;
 	font-family: 'Merriweather', serif;
 }
 
-h1, h2, h3, h4, h5, h6, .navbar {
+h1, h2, h3, h4, h5, h6, .navbar, form, .btn, input, button, select, textarea
+{
 	font-family: 'News Cycle', Arial, sans-serif;
 }
 
@@ -38,7 +39,6 @@ a {
 .navbar-inner {
   background: #e0e7eb;
   padding-top: 0px;
-  font-size: 14px;
 }
 
 .navbar-inner .brand {
@@ -140,12 +140,35 @@ a {
   margin-top: -8px;
 }
 
+.view.project .meta {
+}
+
 .view.project .readme {
   max-width: 740px;
   margin: auto;
   margin-bottom: 15px;
   padding-bottom: 8px;
   font-size: 14px;
+  position: relative;
+}
+
+.view.project .readme .controls {
+  position: absolute;
+  top: 0px;
+  left: 100%;
+}
+
+.readme > h1 {
+  margin-top: 0px;
+  margin-bottom: 15px;
+}
+
+.readme .controls a {
+  width: 120px;
+}
+
+.view.project .data-app {
+  margin-bottom: 15px;
 }
 
 .view.project .recline-slickgrid {
@@ -237,10 +260,10 @@ a {
 
 .header .recline-pager .pagination input {
   width: 30px;
-  height: 18px;
+  height: 16px;
   padding: 2px 4px;
   margin: 0;
-  margin-top: -4px;
+  margin-top: -1px;
 }
 
 .header .recline-pager .pagination a {
