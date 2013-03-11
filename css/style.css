@@ -161,12 +161,14 @@ a {
   padding-bottom: 8px;
   font-size: 14px;
   position: relative;
+  max-height: 200px;
+  overflow: auto;
 }
 
 .view.project .readme .controls {
   position: absolute;
   top: 0px;
-  left: 100%;
+  left: 550px;
 }
 
 .readme > h1 {
