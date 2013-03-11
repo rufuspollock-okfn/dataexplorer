@@ -10,7 +10,6 @@ my.Project = Backbone.View.extend({
         <div class="readme"> \
           {{{readmeRendered}}} \
           <div class="controls"> \
-            <a href="#" class="btn js-go-to-data">Jump to the data &rarr;</a> \
           </div> \
         </div> \
         {{/readme}} \
