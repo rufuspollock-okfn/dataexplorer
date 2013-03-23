@@ -51,8 +51,8 @@ a {
 
 .feedback {
   position: absolute;
-  right: 5px;
-  top: 300px;
+  right: 9px;
+  top: 250px;
   width: 30px;
   -webkit-transform: rotate(90deg);
   -o-transform: rotate(90deg); 
@@ -62,11 +62,11 @@ a {
 .feedback a {
   color: #333;
   font-weight: bold;
-  font-size: 17px;
-  padding: 8px;
+  font-size: 20px;
+  padding: 10px;
   margin-top: 3px;
   background-color: white;
-  border: solid 3px #eee;
+  border: solid 1px #eee;
   border-top: none;
 }
 
