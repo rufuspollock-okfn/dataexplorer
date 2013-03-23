@@ -49,6 +49,32 @@ a {
   margin: 0 -20px -20px;
 }
 
+.feedback {
+  position: absolute;
+  right: 5px;
+  top: 300px;
+  width: 30px;
+  -webkit-transform: rotate(90deg);
+  -o-transform: rotate(90deg); 
+  transform: rotate(90deg);
+}
+
+.feedback a {
+  color: #333;
+  font-weight: bold;
+  font-size: 17px;
+  padding: 8px;
+  margin-top: 3px;
+  background-color: white;
+  border: solid 3px #eee;
+  border-top: none;
+}
+
+.feedback a:hover {
+  text-decoration: none;
+  background-color: #ddd;
+}
+
 /**********************************************************
   * Navigation
   *********************************************************/
