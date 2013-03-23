@@ -171,6 +171,7 @@ my.Application = Backbone.View.extend({
   projectShow: function(username, projectId, viewId) {
     var self = this;
     self.switchView('project', username + '/' + projectId);
+    self.showProcessing('Loading');
     var projectViewState = {};
     if (viewId) {
       projectViewState.currentView = viewId;
@@ -205,6 +206,7 @@ my.Application = Backbone.View.extend({
       $('#main .view.project').remove();
       $('#main').append(ds.el);
       ds.render();
+      self.hideProcessing();
     }
   },
 
@@ -212,8 +214,17 @@ my.Application = Backbone.View.extend({
     $('#main').append(new DataExplorer.View.Notification(type, message).render().el);
   },
 
-  loading: function(msg) {
-    $('#main').html('<div class="loading"><span>'+ msg || 'Loading ...' +'</span></div>');
+  showProcessing: function(msg) {
+    if (msg) {
+      $('.processing-notice span').text(msg);
+    }
+    $('.processing-notice').show();
+  },
+
+  hideProcessing: function(msg) {
+    $('.processing-notice').hide();
+    // reset it to original value
+    $('.processing-notice span').text('Processing');
   },
 
   loaded: function() {
