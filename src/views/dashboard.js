@@ -1,4 +1,5 @@
 (function(my) {
+"use strict";
 
 my.Dashboard = Backbone.View.extend({
   className: 'view dashboard',

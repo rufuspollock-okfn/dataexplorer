@@ -2,6 +2,7 @@ this.DataExplorer = this.DataExplorer || {};
 this.DataExplorer.View = this.DataExplorer.View || {};
 
 (function(my) {
+"use strict";
 
 my.Load = Backbone.View.extend({
   events: {

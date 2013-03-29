@@ -2,7 +2,7 @@ this.DataExplorer = this.DataExplorer || {};
 this.DataExplorer.View = this.DataExplorer.View || {};
 
 (function(my) {
-
+"use strict";
 // This is the top-level piece of UI.
 
 my.Application = Backbone.View.extend({

@@ -1,4 +1,5 @@
 (function(my) {
+"use strict";
 
 my.Save = Backbone.View.extend({
   id: 'save',

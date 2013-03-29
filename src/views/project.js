@@ -1,4 +1,6 @@
 (function(my) {
+"use strict";
+
 var showdown = new Showdown.converter();
 
 my.Project = Backbone.View.extend({
@@ -245,7 +247,6 @@ my.ScriptEditor = Backbone.View.extend({
       lineNumbers : true,
       theme : "default",
       mode : "javascript",
-      theme : "default",
       indentUnit : 2,
       indentWithTabs : false,
       tabMode: "shift",
