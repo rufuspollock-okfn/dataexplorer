@@ -2,6 +2,7 @@ this.DataExplorer = this.DataExplorer || {};
 this.DataExplorer.Util = {};
 
 (function(my) {
+"use strict";
 
 my.loadData = function(options, callback) {
   if(typeof options === 'string')
