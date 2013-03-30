@@ -2,6 +2,7 @@ this.DataExplorer = this.DataExplorer || {};
 this.DataExplorer.Model = this.DataExplorer.Model || {};
 
 (function(my) {
+  "use strict";
 
 // The central object in the Data Explorer
 //
@@ -150,13 +151,12 @@ my.Project = Backbone.Model.extend({
 
   loadGithubDataset: function(url, cb) {
     var self = this;
-    user =  url.split("/")[3];
-    repo = url.split("/")[4];
-    branch = url.split("/")[6];
-    path = url.split('/').slice(7).join('/')
-      ;
+    var user =  url.split("/")[3];
+    var repo = url.split("/")[4];
+    var branch = url.split("/")[6];
+    var path = url.split('/').slice(7).join('/');
 
-    var repo = getRepo(user, repo);
+    repo = getRepo(user, repo);
 
     repo.read(branch, path, function(err, raw_csv) {
       // TODO: need to do this properly ...
@@ -306,7 +306,7 @@ my.serializeDatasetToCSV = function(dataset) {
 my.ProjectList = Backbone.Collection.extend({
   model: my.Project,
   load: function() {
-    for(key in localStorage) {
+    for(var key in localStorage) {
       if (key.indexOf('dataexplorer-') == 0) {
         var projectInfo = localStorage.getItem(key);
         try {
