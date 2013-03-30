@@ -15,7 +15,7 @@ Visit <http://explorer.datahub.io/>
 
 Want to use it locally? Just do "save as" and save the html (with all
 associated files) to your hard disk. Note that for github login to work you
-willneed to have the app opened at a non file:/// url e.g.
+will need to have the app opened at a non file:/// url e.g.
 http://localhost/dataexplorer.
 
 ## Developers
