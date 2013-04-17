@@ -140,9 +140,6 @@ my.Project = Backbone.View.extend({
     this.el.find('.script-editor').append(this.editor.el);
     this.editor.render();
 
-    // now hide this element for the moment
-    this.editor.el.parent().hide();
-
     // HACK - for some reason the grid view of multiview is massively wide by default
     this.el.find('.view.project .recline-data-explorer').width(width);
 
