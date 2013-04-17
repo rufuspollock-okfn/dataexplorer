@@ -357,32 +357,45 @@ a {
   * CodeMirror editable areas
   *********************************************************/
 
+.script-editor {
+  position: relative;
+}
+
 .script-editor-widget {
-  margin-bottom: 5px;
+  height: 250px;
 }
 
 .script-editor-widget .CodeMirror {
   border: 1px solid #ddd;
-  margin-right: 302px;
-  height: 250px;
+  height: 100%;
 }
 
-.script-editor-widget .output {
+.script-editor .output {
   overflow: auto;
   border: 1px solid #ddd;
-  border-left: none;
-  padding-left: 5px;
   font-family: monospace;
   font-size: 80%;
-  float: right;
-  width: 300px;
-  height: 250px;
+  padding: 5px 10px;
+  height: 40px;
   background-color: #eee;
 }
 
-.script-editor-widget .output .error {
+.script-editor .output .error {
   color: red;
   font-style: italic;
+}
+
+button.clear, button.runsandbox {
+  position: absolute;
+  top: -40px;
+}
+
+button.clear {
+  right: 0;
+}
+
+button.runsandbox {
+  right: 90px;
 }
 
 .script-editor-widget .button {
