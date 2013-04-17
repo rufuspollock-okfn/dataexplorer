@@ -190,17 +190,17 @@ a {
 }
 
 .view.project .meta {
+  height: 100%;
+  overflow: auto;
 }
 
 .view.project .readme {
-  max-width: 740px;
-  margin: auto;
-  margin-bottom: 15px;
-  padding-bottom: 8px;
   font-size: 14px;
-  position: relative;
-  max-height: 200px;
   overflow: auto;
+}
+
+.top-row {
+  height: 300px;
 }
 
 .view.project .readme .controls {

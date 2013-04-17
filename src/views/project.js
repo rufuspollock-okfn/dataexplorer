@@ -6,8 +6,12 @@ var showdown = new Showdown.converter();
 my.Project = Backbone.View.extend({
   className: 'view project',
   template: ' \
-    <div> \
-      <div class="meta"> \
+    <div class="row-fluid"> \
+      <h4 class="span6">Description</h4> \
+      <h4 class="span6">Code</h4> \
+    </div> \
+    <div class="top-row row-fluid"> \
+      <div class="meta span6"> \
         {{#readme}} \
         <div class="readme"> \
           {{{readmeRendered}}} \
@@ -16,30 +20,26 @@ my.Project = Backbone.View.extend({
         </div> \
         {{/readme}} \
       </div> \
-      <div id="data-app" class="data-app"> \
-        <div class="header"> \
-          <div class="navigation"> \
-            <div class="btn-group" data-toggle="buttons-radio"> \
-            {{#views}} \
-            <a href="#{{id}}" data-view="{{id}}" class="btn">{{label}}</a> \
-            {{/views}} \
-            </div> \
+      <div class="script-editor span6"></div> \
+    </div> \
+    <hr /> \
+    <div id="data-app" class="data-app"> \
+      <div class="header"> \
+        <div class="navigation"> \
+          <div class="btn-group" data-toggle="buttons-radio"> \
+          {{#views}} \
+          <a href="#{{id}}" data-view="{{id}}" class="btn">{{label}}</a> \
+          {{/views}} \
           </div> \
-          <div class="recline-results-info"> \
-            <span class="doc-count">{{recordCount}}</span> records\
-          </div> \
-          <div class="menu-right"> \
-            <div class="btn-group" data-toggle="buttons-checkbox"> \
-              <a href="#" data-action="script-editor" class="btn">Script Editor</a> \
-            </div> \
-          </div> \
-          <div class="query-editor-here" style="display:inline;"></div> \
         </div> \
-        <div class="script-editor"></div> \
-        <div class="data-view-sidebar"></div> \
-        <div class="data-view-container"></div> \
-        <div class="multiview-here"></div> \
+        <div class="recline-results-info"> \
+          <span class="doc-count">{{recordCount}}</span> records\
+        </div> \
+        <div class="query-editor-here" style="display:inline;"></div> \
       </div> \
+      <div class="data-view-sidebar"></div> \
+      <div class="data-view-container"></div> \
+      <div class="multiview-here"></div> \
     </div> \
   ',
   events: {
