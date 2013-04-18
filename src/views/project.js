@@ -1,8 +1,6 @@
 (function(my) {
 "use strict";
 
-var showdown = new Showdown.converter();
-
 my.Project = Backbone.View.extend({
   className: 'view project',
   template: ' \
@@ -11,15 +9,7 @@ my.Project = Backbone.View.extend({
       <h4 class="span6">Code</h4> \
     </div> \
     <div class="top-row row-fluid"> \
-      <div class="meta span6"> \
-        {{#readme}} \
-        <div class="readme"> \
-          {{{readmeRendered}}} \
-          <div class="controls"> \
-          </div> \
-        </div> \
-        {{/readme}} \
-      </div> \
+      <div class="meta span6"></div> \
       <div class="script-editor span6"></div> \
     </div> \
     <hr /> \
@@ -76,9 +66,6 @@ my.Project = Backbone.View.extend({
   render: function() {
     var self = this;
     var tmplData = this.model.toJSON();
-    var readme = showdown.makeHtml(tmplData.readme);
-    readme = readme.replace(/--/g, '&mdash;');
-    tmplData.readmeRendered = readme;
     var tmpl = Mustache.render(this.template, tmplData);
     this.el.html(tmpl);
 
@@ -117,6 +104,11 @@ my.Project = Backbone.View.extend({
 
       return out;
     });
+
+    var readme = new DataExplorer.View.ReadmeView({
+      model: this.model
+    });
+    this.el.find(".meta").append(readme.render().el);
 
     var pager = new recline.View.Pager({
       model: this.model.datasets.at(0).queryState
@@ -297,6 +289,19 @@ my.ScriptEditor = Backbone.View.extend({
     }
     msg += '<br />';
     this.$output.append(msg);
+  }
+});
+
+my.ReadmeView = Backbone.View.extend({
+  className: "readme",
+  initialize: function () {
+    this.showdown = new Showdown.converter();
+  },
+  render: function () {
+    var readme = this.showdown.makeHtml(this.model.get("readme"));
+    readme = readme.replace(/--/g, '&mdash;');
+    this.$el.html(readme);
+    return this;
   }
 });
 
