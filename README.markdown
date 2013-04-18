@@ -22,9 +22,7 @@ http://localhost/dataexplorer.
 
 Install:
 
-    git clone https://github.com/okfn/dataexplorer
-    git submodule init
-    git submodule update
+    git clone --recursive https://github.com/okfn/dataexplorer
 
 Then open index.html in your browser!
 
