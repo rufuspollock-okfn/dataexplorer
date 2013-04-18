@@ -75,8 +75,6 @@ my.Application = Backbone.View.extend({
   // Should be rendered just once
   render: function () {
     var self = this;
-    var loginUrl = 'https://github.com/login/oauth/authorize?client_id=' + DataExplorer.app.config.oauth_client_id + '&scope=repo, user&redirect_uri=' + window.location.href;
-    this.el.find('.user-status login a').attr('href', loginUrl);
     // we will override if logged in
     this.el.find('.user-status').addClass('logged-out');
 
