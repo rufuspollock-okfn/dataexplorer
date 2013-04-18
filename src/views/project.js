@@ -297,15 +297,38 @@ my.ScriptEditor = Backbone.View.extend({
 });
 
 my.ReadmeView = Backbone.View.extend({
+  events: {
+    "click .editreadme": "edit",
+    "click .savereadme": "save"
+  },
   initialize: function () {
     this.showdown = new Showdown.converter();
-    this.model.on("change:readme", this.render);
+    this.model.on("change:readme", this.render, this);
   },
   render: function () {
     var readme = this.showdown.makeHtml(this.model.get("readme"));
     readme = readme.replace(/--/g, '&mdash;');
     this.$el.find(".readme").html(readme);
     return this;
+  },
+  edit: function () {
+    this.$el.find(".readme").hide();
+
+    var options = {
+      lineWrapping: true,
+      theme : "default",
+      mode : "markdown",
+      value: this.model.get("readme")
+    };
+    this.editor = CodeMirror(this.el, options);
+
+    this.$el.find(".editreadme").text("Save").addClass("btn-success savereadme").removeClass("editreadme");
+  },
+  save: function () {
+    this.model.set("readme", this.editor.getValue());
+    $(this.editor.getWrapperElement()).remove();
+    this.$el.find(".readme").show();
+    this.$el.find(".savereadme").text("Edit").removeClass("btn-success savereadme").addClass("editreadme");
   }
 });
 

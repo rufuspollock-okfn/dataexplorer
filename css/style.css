@@ -385,12 +385,12 @@ a {
   font-style: italic;
 }
 
-button.clear, button.runsandbox, button.editreadme {
+button.clear, button.runsandbox, button.editreadme, button.savereadme {
   position: absolute;
   top: -40px;
 }
 
-button.clear, button.editreadme {
+button.clear, button.editreadme, button.savereadme {
   right: 0;
 }
 
