@@ -74,7 +74,7 @@ window.args = _(this.DataExplorer.app).toArray();
           <div class="authorize"> \
             <h1>Completing Login</h1> \
             <p>We are completing your login!</p> \
-            <img src="http://assets/images/icons/ajaxload-circle.gif" alt="" /> \
+            <img src="http://assets.okfn.org/images/icons/ajaxload-circle.gif" alt="" /> \
           </div> \
         </div> \
       </div> \
