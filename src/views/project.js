@@ -9,7 +9,10 @@ my.Project = Backbone.View.extend({
       <h4 class="span6">Code</h4> \
     </div> \
     <div class="top-row row-fluid"> \
-      <div class="meta span6"></div> \
+      <div class="meta span6"> \
+        <button class="btn btn-small editreadme">Edit</button> \
+        <div class="readme"></div> \
+      </div> \
       <div class="script-editor span6"></div> \
     </div> \
     <hr /> \
@@ -106,9 +109,10 @@ my.Project = Backbone.View.extend({
     });
 
     var readme = new DataExplorer.View.ReadmeView({
+      el: this.el.find(".meta")[0],
       model: this.model
     });
-    this.el.find(".meta").append(readme.render().el);
+    readme.render();
 
     var pager = new recline.View.Pager({
       model: this.model.datasets.at(0).queryState
@@ -293,14 +297,14 @@ my.ScriptEditor = Backbone.View.extend({
 });
 
 my.ReadmeView = Backbone.View.extend({
-  className: "readme",
   initialize: function () {
     this.showdown = new Showdown.converter();
+    this.model.on("change:readme", this.render);
   },
   render: function () {
     var readme = this.showdown.makeHtml(this.model.get("readme"));
     readme = readme.replace(/--/g, '&mdash;');
-    this.$el.html(readme);
+    this.$el.find(".readme").html(readme);
     return this;
   }
 });

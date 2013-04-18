@@ -191,11 +191,11 @@ a {
 
 .view.project .meta {
   height: 100%;
-  overflow: auto;
 }
 
 .view.project .readme {
   font-size: 14px;
+  height: 100%;
   overflow: auto;
 }
 
@@ -357,7 +357,7 @@ a {
   * CodeMirror editable areas
   *********************************************************/
 
-.script-editor {
+.script-editor, .meta {
   position: relative;
 }
 
@@ -385,12 +385,12 @@ a {
   font-style: italic;
 }
 
-button.clear, button.runsandbox {
+button.clear, button.runsandbox, button.editreadme {
   position: absolute;
   top: -40px;
 }
 
-button.clear {
+button.clear, button.editreadme {
   right: 0;
 }
 
