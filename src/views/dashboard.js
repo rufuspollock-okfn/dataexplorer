@@ -49,7 +49,7 @@ my.Dashboard = Backbone.View.extend({
       return project;
     });
     projects = _.filter(projects, function(project) {
-      return project.state != 'trash'
+      return project.state != 'trash';
     });
     // sort by last modified (most recent first)
     projects.sort(function(a, b) {

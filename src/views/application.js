@@ -151,14 +151,14 @@ my.Application = Backbone.View.extend({
       var gist = DataExplorer.Model.github().getGist(projectId);
       gist.read(function(err, gist) {
         var project = DataExplorer.Model.unserializeProject(gist);
-        checkDatasetLoaded(project)
+        checkDatasetLoaded(project);
       });
     }
 
     function checkDatasetLoaded(project) {
       // if we not yet have data loaded, load it now ...
       if (project.datasets.at(0).recordCount === null) {
-        project.loadSourceDataset(function(err) { cb(err, project) });
+        project.loadSourceDataset(function(err) { cb(err, project); });
       } else {
         cb(null, project);
       }

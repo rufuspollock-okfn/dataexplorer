@@ -27,7 +27,7 @@ my.Load = Backbone.View.extend({
       if (data.backend != 'gdocs') {
         data.name = data.url.split('/')
           .pop()
-          .split('.')[0]
+          .split('.')[0];
       }
     }
     // special case for file form

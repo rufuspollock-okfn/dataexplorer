@@ -11,11 +11,11 @@ my.loadData = function(options, callback) {
     options = JSON.parse(JSON.stringify(options)); // Use a duplicate for mutating.
 
   if (
-    options.url.indexOf('https://github.com')==0
+    options.url.indexOf('https://github.com') === 0
     ||
-    options.url.indexOf('http://github.com')==0
+    options.url.indexOf('http://github.com') === 0
     ) {
-    my.loadGithubFile(options.url, callback)
+    my.loadGithubFile(options.url, callback);
   } else {
     var url = 'http://jsonpdataproxy.appspot.com/?format=json&max-results=500000&url=' + options.url;
     request.get(url, function(err, res, body) {
@@ -28,7 +28,7 @@ my.loadData = function(options, callback) {
       callback(err, body);
     });
   }
-}
+};
 
 my.loadGithubFile = function(url, cb) {
   var gh = new Github({}),
@@ -38,14 +38,14 @@ my.loadGithubFile = function(url, cb) {
     path = url.split('/').slice(7).join('/')
       ;
 
-  var repo = gh.getRepo(user, repo);
+  repo = gh.getRepo(user, repo);
 
   repo.read(branch, path, function(err, fileData) {
     cb(err, fileData);
   });
-}
+};
 
 var types = {
-}
+};
 
 })(DataExplorer.Util);

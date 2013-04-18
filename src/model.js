@@ -48,7 +48,7 @@ my.Project = Backbone.Model.extend({
           type: 'Map'
         }
       ]
-    }
+    };
   },
 
   initialize: function() {
@@ -59,7 +59,7 @@ my.Project = Backbone.Model.extend({
       // generate a unique id with guard against duplication
       // there is some still small risk of a race condition if 2 apps doing this at the same time but we can live with it!
       var _generateId = function() {
-        return 'dataexplorer-' + parseInt(Math.random() * 1000000)
+        return 'dataexplorer-' + parseInt(Math.random() * 1000000, 10);
       };
       var _id = _generateId();
       while(_id in localStorage) {
@@ -69,11 +69,11 @@ my.Project = Backbone.Model.extend({
     }
     this.scripts.reset(_.map(
       self.get('scripts'),
-      function(scriptData) { return new my.Script(scriptData) }
+      function(scriptData) { return new my.Script(scriptData); }
     ));
     this.datasets.reset(_.map(
       self.get('datasets'),
-      function(datasetData) { return new recline.Model.Dataset(datasetData) }
+      function(datasetData) { return new recline.Model.Dataset(datasetData); }
     ));
     this.scripts.bind('change', function() {
       self.set({scripts: self.scripts.toJSON()});
@@ -94,9 +94,10 @@ my.Project = Backbone.Model.extend({
     var self = this;
     var gh = my.github();
     var gistJSON = my.serializeProject(this);
+    var gist;
 
     if (this.get('gist_id')) {
-      var gist = gh.getGist(this.get('gist_id'));
+      gist = gh.getGist(this.get('gist_id'));
       gist.update(gistJSON, function(err, gist) {
         if (err) {
           alert('Failed to save project to gist');
@@ -108,7 +109,7 @@ my.Project = Backbone.Model.extend({
       });
     } else {
       gistJSON.public = false;
-      var gist = gh.getGist();
+      gist = gh.getGist();
       gist.create(gistJSON, function(err, gist) {
         if (err) {
           alert('Initial save of project to gist failed');
@@ -243,7 +244,7 @@ my.serializeProject = function(project) {
       var content = my.serializeDatasetToCSV(ds._store);
       // if content is empty we cannot add this file (see above note re github weirdness)
       if (content) {
-        gistJSON.files[dsInfo.path] = { content: content }
+        gistJSON.files[dsInfo.path] = { content: content };
       }
       // for good measure remove any data attribute
       // TODO: should this be done when we loaded from the data and moved it into the dataset data store
@@ -251,7 +252,7 @@ my.serializeProject = function(project) {
     }
   });
 
-  gistJSON.files['datapackage.json'].content = JSON.stringify(data, null, 2)
+  gistJSON.files['datapackage.json'].content = JSON.stringify(data, null, 2);
   return gistJSON;
 };
 
@@ -287,7 +288,7 @@ my.unserializeProject = function(serialized) {
   });
   var project = new my.Project(dp);
   return project;
-}
+};
 
 // TODO: move to util?
 my.serializeDatasetToCSV = function(dataset) {
@@ -307,7 +308,7 @@ my.ProjectList = Backbone.Collection.extend({
   model: my.Project,
   load: function() {
     for(var key in localStorage) {
-      if (key.indexOf('dataexplorer-') == 0) {
+      if (key.indexOf('dataexplorer-') === 0) {
         var projectInfo = localStorage.getItem(key);
         try {
           var data = JSON.parse(projectInfo);
@@ -328,7 +329,7 @@ my.Script = Backbone.Model.extend({
       last_modified: new Date().toISOString(),
       language: 'javascript',
       content: ''
-    }
+    };
   }
 });
 
@@ -342,7 +343,7 @@ my.github = function() {
     username: $.cookie('username'),
     auth: "oauth"
   });
-}
+};
 
 var currentRepo = {
   user: null,
@@ -394,7 +395,7 @@ my.loadUserInfo = function(cb) {
       cb('error');
     }
   });
-}
+};
 
 // Authentication
 // -------
@@ -402,17 +403,17 @@ my.loadUserInfo = function(cb) {
 my.logout = function() {
   window.authenticated = false;
   $.cookie("oauth-token", null);
-}
+};
 
 // Save Dataset
 // -------
 
 my.saveDataset = function(user, repo, branch, data, commitMessage, cb) {
-  var repo = getRepo(user, repo);
+  repo = getRepo(user, repo);
 
   repo.write(branch, 'data/data.csv', data, commitMessage, function(err) {
     cb(err);
   });
-}
+};
 
 }(this.DataExplorer.Model));

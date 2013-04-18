@@ -46,8 +46,8 @@ window.args = _(this.DataExplorer.app).toArray();
             DataExplorer.app.instance.finishUserSetup();
           });
         }
-      }
-      , false
+      },
+      false
     );
 
     // set up google analytics tracking that works with backbone routing
@@ -83,9 +83,9 @@ window.args = _(this.DataExplorer.app).toArray();
     $('#main').html(html);
     // complete the login process
     $.getJSON(DataExplorer.app.config.gatekeeper_url + '/authenticate/'+match[1], function(data) {
-      window.opener.postMessage({token: data.token}, window.location)
+      window.opener.postMessage({token: data.token}, window.location);
       window.close();
     });
-  }
+  };
 
 }).apply(this, window.args);

@@ -62,7 +62,7 @@ my.Project = Backbone.View.extend({
       var curr = self.model.get('views');
       _.each(curr, function(viewModel, idx) {
         if (viewModel.id == self.state.currentView) {
-          viewModel.queryState = self.model.datasets.at(0).queryState.toJSON()
+          viewModel.queryState = self.model.datasets.at(0).queryState.toJSON();
           curr[idx] = viewModel;
         }
       });
@@ -106,7 +106,7 @@ my.Project = Backbone.View.extend({
         // update the view info on the model corresponding to the one being changed
         _.each(curr, function(viewModel) {
           if (viewModel.id == out.id) {
-            viewModel.state = out.view.state.toJSON()
+            viewModel.state = out.view.state.toJSON();
           }
         });
         self.model.set('views', curr);
@@ -166,7 +166,7 @@ my.Project = Backbone.View.extend({
 
   _updateNav: function(pageName) {
     this.state.currentView = pageName;
-    var view = _.filter(this.model.get('views'), function(view) {return (view.id === pageName) })[0];
+    var view = _.filter(this.model.get('views'), function(view) {return (view.id === pageName); })[0];
     if (view.queryState) {
       this.model.datasets.at(0).query(view.queryState);
     } else {
@@ -266,7 +266,7 @@ my.ScriptEditor = Backbone.View.extend({
     this.model.set({content: this.editor.getValue()});
     var worker = new Worker('src/views/worker-runscript.js');
     worker.addEventListener('message',
-        function(e) { self._handleWorkerCommunication(e) },
+        function(e) { self._handleWorkerCommunication(e); },
         false);
     var codeToRun = this.editor.getValue();
     worker.postMessage({
