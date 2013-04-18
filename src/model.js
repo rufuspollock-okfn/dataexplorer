@@ -53,6 +53,7 @@ my.Project = Backbone.Model.extend({
 
   initialize: function() {
     var self = this;
+    this.currentUserIsOwner = true;
     this.scripts = new Backbone.Collection();
     this.datasets = new Backbone.Collection();
     if (!this.id) {
@@ -127,7 +128,7 @@ my.Project = Backbone.Model.extend({
   save: function() {
     this.saveToStorage();
     // TODO: do not want to save *all* the time so should probably check and only save every 5m or something
-    if (window.authenticated) {
+    if (window.authenticated && this.currentUserIsOwner) {
       this.saveToGist();
     }
   },
