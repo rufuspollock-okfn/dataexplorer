@@ -308,18 +308,30 @@ my.serializeDatasetToCSV = function(dataset) {
 my.ProjectList = Backbone.Collection.extend({
   model: my.Project,
   load: function() {
-    for(var key in localStorage) {
-      if (key.indexOf('dataexplorer-') === 0) {
-        var projectInfo = localStorage.getItem(key);
-        try {
-          var data = JSON.parse(projectInfo);
-          var tmp = new my.Project(data);
-          this.add(tmp);
-        } catch(e) {
-          alert('Failed to load project ' + projectInfo);
-        }
+    var self = this;
+    var gh = my.github();
+
+    gh.getUser().gists(function (err, gists) {
+
+      if (err) {
+        alert("Failed to retrieve your gists");
+        return;
       }
-    }
+
+      // Only gists that contain datapackage.json
+      gists = _.filter(gists, function (gist) {
+        return "datapackage.json" in gist.files
+      });
+
+      _.each(gists, function (gist) {
+        // We could do lazy loading, but for now lets get the datapackage immediately
+        gh.getGist(gist.id).read(function (err, gist) {
+          var dp = my.unserializeProject(gist);
+          self.add(dp);
+        });
+      });
+
+    });
   }
 });
 
