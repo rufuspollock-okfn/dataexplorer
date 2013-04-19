@@ -1,4 +1,5 @@
 (function(my) {
+"use strict";
 
 my.Save = Backbone.View.extend({
   id: 'save',
@@ -28,31 +29,31 @@ my.Save = Backbone.View.extend({
   },
 
   _serializeCSV: function (dataset) {
-  	var records = [];
-  	records.push(dataset.fields.pluck('id'));
-  	_.each(dataset._store.data, function(record, index) {
-  	  // TODO: WTF?!
-  	  if (index > 20) return;
-  	  // TODO: WTF?! END
-  	  var tmp = [];
-  	  dataset.fields.each(function(field) {
-  		tmp.push(record[field.id]);
-  	  });
-  	  records.push(tmp);
-  	});
-  	return recline.Backend.CSV.serializeCSV(records);
+    var records = [];
+    records.push(dataset.fields.pluck('id'));
+    _.each(dataset._store.data, function(record, index) {
+      // TODO: WTF?!
+      if (index > 20) return;
+      // TODO: WTF?! END
+      var tmp = [];
+      dataset.fields.each(function(field) {
+      tmp.push(record[field.id]);
+      });
+      records.push(tmp);
+    });
+    return recline.Backend.CSV.serializeCSV(records);
   },
 
   saveDataset: function(location) {
-  	var rawCSV = this._serializeCSV(this.project.dataset);
+    var rawCSV = this._serializeCSV(this.project.dataset);
     DataExplorer.Model.saveDataset(location.user, location.repo, location.branch, rawCSV, "updated file", function(err) {
-	  alert((function() { 
-		if (!err) return "Saved."
-		switch (err.error) {
-		  case 404: return "Error saving: not logged in or URL not found";
+    alert((function() { 
+    if (!err) return "Saved.";
+    switch (err.error) {
+      case 404: return "Error saving: not logged in or URL not found";
           default: return "Error saving, HTTP code: " + err;
-		}})());
-	});		   
+    }})());
+  });
     return false;
   },
 

@@ -19,6 +19,7 @@ this.DataExplorer.app = {
 window.args = _(this.DataExplorer.app).toArray();
 
 (function(config, models, views, routers, utils, templates) {
+  "use strict";
   $(window).load(function() {
 
     // check for special case where this window is being used for doing the login
@@ -45,8 +46,8 @@ window.args = _(this.DataExplorer.app).toArray();
             DataExplorer.app.instance.finishUserSetup();
           });
         }
-      }
-      , false
+      },
+      false
     );
 
     // set up google analytics tracking that works with backbone routing
@@ -73,7 +74,7 @@ window.args = _(this.DataExplorer.app).toArray();
           <div class="authorize"> \
             <h1>Completing Login</h1> \
             <p>We are completing your login!</p> \
-            <img src="http://assets/images/icons/ajaxload-circle.gif" alt="" /> \
+            <img src="http://assets.okfn.org/images/icons/ajaxload-circle.gif" alt="" /> \
           </div> \
         </div> \
       </div> \
@@ -82,9 +83,9 @@ window.args = _(this.DataExplorer.app).toArray();
     $('#main').html(html);
     // complete the login process
     $.getJSON(DataExplorer.app.config.gatekeeper_url + '/authenticate/'+match[1], function(data) {
-      window.opener.postMessage({token: data.token}, window.location)
+      window.opener.postMessage({token: data.token}, window.location);
       window.close();
     });
-  }
+  };
 
 }).apply(this, window.args);

@@ -36,7 +36,7 @@
 <div class="transformer-app">
   <div class="navbar navbar-fixed-top">
     <div class="navbar-inner">
-      <div class="container">
+      <div class="container-fluid">
         <a class="brand" href="./">
           Data Explorer - <span class="subtitle">view, clean &amp; share data in the browser</span>
         </a>
@@ -49,17 +49,17 @@
           <li class="logged-in"><a class="username"></a></li>
           <li class="logged-in"><a class="logout" href="#" title="sign out"><i class="icon-off"></i></a></li>
           <li class="not-logged-in">
-            <a class="login" href="#">Sign in using Github</a>
+            <a class="login" href="#">Sign in using GitHub</a>
           </li>
           <li class="okf-logo">
-            <a href="http://okfnlabs.org" title="An Open Knowledge Foundation Labs project" target="_blank"><img src="http://assets/p/okfn/img/logo_28x30.png" alt="OKF logo" /></a>
+            <a href="http://okfnlabs.org" title="An Open Knowledge Foundation Labs project" target="_blank"><img src="http://assets.okfn.org/p/okfn/img/logo_28x30.png" alt="OKF logo" /></a>
           </li>
         </ul>
       </div>
     </div>
   </div>
 
-  <div class='container'><div class="content">
+  <div class='container-fluid'><div class="content">
     <div id='main'>
       <div class="view about" style="display: none;">
         <div class="page-header">
@@ -68,7 +68,7 @@
             <small>View, Clean and Share Data in the Browser</small>
           </h1>
         </div>
-        <div class="row instructions">
+        <div class="row-fluid instructions">
           <div class="span4">
             <div class="well">
               <h3>Explore &amp; Visualize</h2>
@@ -121,6 +121,7 @@
   <script src='vendor/github.js'></script>
   <script type="text/javascript" src="vendor/codemirror/3.0/codemirror.js"></script>
   <script type="text/javascript" src="vendor/codemirror/3.0/mode/javascript/javascript.js"></script>
+  <script type="text/javascript" src="vendor/codemirror/3.0/mode/markdown/markdown.js"></script>
   <script src="vendor/bootstrap/2.2.2/bootstrap.min.js"></script>
 
   <script type="text/javascript" src="vendor/recline/vendor/moment/1.6.2/moment.js"></script>

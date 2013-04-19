@@ -2,7 +2,7 @@ this.DataExplorer = this.DataExplorer || {};
 this.DataExplorer.View = this.DataExplorer.View || {};
 
 (function(my) {
-
+"use strict";
 // This is the top-level piece of UI.
 
 my.Application = Backbone.View.extend({
@@ -24,7 +24,7 @@ my.Application = Backbone.View.extend({
   _login: function(e) {
     e.preventDefault();
     var url = 'https://github.com/login/oauth/authorize?client_id=' + DataExplorer.app.config.oauth_client_id + '&scope=repo, user, gist';
-    window.open(url, 'Data Explorer - Github Login', 'height=750,width=1000');
+    window.open(url, 'Data Explorer - GitHub Login', 'height=750,width=1000');
   },
 
   // Initialize
@@ -75,8 +75,6 @@ my.Application = Backbone.View.extend({
   // Should be rendered just once
   render: function () {
     var self = this;
-    var loginUrl = 'https://github.com/login/oauth/authorize?client_id=' + DataExplorer.app.config.oauth_client_id + '&scope=repo, user&redirect_uri=' + window.location.href;
-    this.el.find('.user-status login a').attr('href', loginUrl);
     // we will override if logged in
     this.el.find('.user-status').addClass('logged-out');
 
@@ -144,6 +142,7 @@ my.Application = Backbone.View.extend({
   // ----------
 
   _loadProject: function(username, projectId, cb) {
+    var self = this;
     if (username == 'project') {
       var project = this.projectList.get(projectId);
       checkDatasetLoaded(project);
@@ -151,14 +150,15 @@ my.Application = Backbone.View.extend({
       var gist = DataExplorer.Model.github().getGist(projectId);
       gist.read(function(err, gist) {
         var project = DataExplorer.Model.unserializeProject(gist);
-        checkDatasetLoaded(project)
+        project.currentUserIsOwner = (self.username === gist.user.login);
+        checkDatasetLoaded(project);
       });
     }
 
     function checkDatasetLoaded(project) {
       // if we not yet have data loaded, load it now ...
       if (project.datasets.at(0).recordCount === null) {
-        project.loadSourceDataset(function(err) { cb(err, project) });
+        project.loadSourceDataset(function(err) { cb(err, project); });
       } else {
         cb(null, project);
       }

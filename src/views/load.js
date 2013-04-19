@@ -2,6 +2,7 @@ this.DataExplorer = this.DataExplorer || {};
 this.DataExplorer.View = this.DataExplorer.View || {};
 
 (function(my) {
+"use strict";
 
 my.Load = Backbone.View.extend({
   events: {
@@ -26,7 +27,7 @@ my.Load = Backbone.View.extend({
       if (data.backend != 'gdocs') {
         data.name = data.url.split('/')
           .pop()
-          .split('.')[0]
+          .split('.')[0];
       }
     }
     // special case for file form
