@@ -321,6 +321,7 @@ my.ReadmeView = Backbone.View.extend({
       value: this.model.get("readme")
     };
     this.editor = CodeMirror(this.el, options);
+    this.editor.focus();
 
     this.$el.find(".editreadme").text("Save").addClass("btn-success savereadme").removeClass("editreadme");
   },
