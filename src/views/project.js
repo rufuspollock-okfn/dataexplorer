@@ -1,45 +1,38 @@
 (function(my) {
 "use strict";
 
-var showdown = new Showdown.converter();
-
 my.Project = Backbone.View.extend({
   className: 'view project',
   template: ' \
-    <div> \
-      <div class="meta"> \
-        {{#readme}} \
-        <div class="readme"> \
-          {{{readmeRendered}}} \
-          <div class="controls"> \
+    <div class="row-fluid"> \
+      <h4 class="span6">Description</h4> \
+      <h4 class="span6">Code</h4> \
+    </div> \
+    <div class="top-row row-fluid"> \
+      <div class="meta span6"> \
+        <button class="btn btn-small editreadme">Edit</button> \
+        <div class="readme"></div> \
+      </div> \
+      <div class="script-editor span6"></div> \
+    </div> \
+    <hr /> \
+    <div id="data-app" class="data-app"> \
+      <div class="header"> \
+        <div class="navigation"> \
+          <div class="btn-group" data-toggle="buttons-radio"> \
+          {{#views}} \
+          <a href="#{{id}}" data-view="{{id}}" class="btn">{{label}}</a> \
+          {{/views}} \
           </div> \
         </div> \
-        {{/readme}} \
-      </div> \
-      <div id="data-app" class="data-app"> \
-        <div class="header"> \
-          <div class="navigation"> \
-            <div class="btn-group" data-toggle="buttons-radio"> \
-            {{#views}} \
-            <a href="#{{id}}" data-view="{{id}}" class="btn">{{label}}</a> \
-            {{/views}} \
-            </div> \
-          </div> \
-          <div class="recline-results-info"> \
-            <span class="doc-count">{{recordCount}}</span> records\
-          </div> \
-          <div class="menu-right"> \
-            <div class="btn-group" data-toggle="buttons-checkbox"> \
-              <a href="#" data-action="script-editor" class="btn">Script Editor</a> \
-            </div> \
-          </div> \
-          <div class="query-editor-here" style="display:inline;"></div> \
+        <div class="recline-results-info"> \
+          <span class="doc-count">{{recordCount}}</span> records\
         </div> \
-        <div class="script-editor"></div> \
-        <div class="data-view-sidebar"></div> \
-        <div class="data-view-container"></div> \
-        <div class="multiview-here"></div> \
+        <div class="query-editor-here" style="display:inline;"></div> \
       </div> \
+      <div class="data-view-sidebar"></div> \
+      <div class="data-view-container"></div> \
+      <div class="multiview-here"></div> \
     </div> \
   ',
   events: {
@@ -76,9 +69,6 @@ my.Project = Backbone.View.extend({
   render: function() {
     var self = this;
     var tmplData = this.model.toJSON();
-    var readme = showdown.makeHtml(tmplData.readme);
-    readme = readme.replace(/--/g, '&mdash;');
-    tmplData.readmeRendered = readme;
     var tmpl = Mustache.render(this.template, tmplData);
     this.el.html(tmpl);
 
@@ -118,6 +108,12 @@ my.Project = Backbone.View.extend({
       return out;
     });
 
+    var readme = new DataExplorer.View.ReadmeView({
+      el: this.el.find(".meta")[0],
+      model: this.model
+    });
+    readme.render();
+
     var pager = new recline.View.Pager({
       model: this.model.datasets.at(0).queryState
     });
@@ -139,9 +135,6 @@ my.Project = Backbone.View.extend({
 
     this.el.find('.script-editor').append(this.editor.el);
     this.editor.render();
-
-    // now hide this element for the moment
-    this.editor.el.parent().hide();
 
     // HACK - for some reason the grid view of multiview is massively wide by default
     this.el.find('.view.project .recline-data-explorer').width(width);
@@ -220,16 +213,16 @@ my.Project = Backbone.View.extend({
 
 my.ScriptEditor = Backbone.View.extend({
   template: ' \
+    <button class="btn btn-small btn-primary runsandbox">Run the Code</button> \
+    <button class="btn btn-small btn-danger clear">Clear Output</button> \
     <div class="script-editor-widget"> \
-      <div class="button runsandbox">Run the Code</div> \
-      <div class="button clear">Clear Output</div> \
-      <div class="output"></div> \
       <textarea class="content"></textarea> \
     </div> \
+    <div class="output"></div> \
   ',
   events: {
-    'click .button.clear': '_onClear',
-    'click .button.runsandbox': '_onRunSandboxed'
+    'click button.clear': '_onClear',
+    'click button.runsandbox': '_onRunSandboxed'
   },
 
   initialize: function(options) {
@@ -300,6 +293,43 @@ my.ScriptEditor = Backbone.View.extend({
     }
     msg += '<br />';
     this.$output.append(msg);
+  }
+});
+
+my.ReadmeView = Backbone.View.extend({
+  events: {
+    "click .editreadme": "edit",
+    "click .savereadme": "save"
+  },
+  initialize: function () {
+    this.showdown = new Showdown.converter();
+    this.model.on("change:readme", this.render, this);
+  },
+  render: function () {
+    var readme = this.showdown.makeHtml(this.model.get("readme"));
+    readme = readme.replace(/--/g, '&mdash;');
+    this.$el.find(".readme").html(readme);
+    return this;
+  },
+  edit: function () {
+    this.$el.find(".readme").hide();
+
+    var options = {
+      lineWrapping: true,
+      theme : "default",
+      mode : "markdown",
+      value: this.model.get("readme")
+    };
+    this.editor = CodeMirror(this.el, options);
+    this.editor.focus();
+
+    this.$el.find(".editreadme").text("Save").addClass("btn-success savereadme").removeClass("editreadme");
+  },
+  save: function () {
+    this.model.set("readme", this.editor.getValue());
+    $(this.editor.getWrapperElement()).remove();
+    this.$el.find(".readme").show();
+    this.$el.find(".savereadme").text("Edit").removeClass("btn-success savereadme").addClass("editreadme");
   }
 });
 
