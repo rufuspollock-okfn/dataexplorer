@@ -32,7 +32,6 @@ my.Application = Backbone.View.extend({
 
   initialize: function () {
     var self = this;
-    this.el = $(this.el);
     _.bindAll(this);
     this.router = new Backbone.Router();
     this.projectList = new DataExplorer.Model.ProjectList();
@@ -76,7 +75,7 @@ my.Application = Backbone.View.extend({
   render: function () {
     var self = this;
     // we will override if logged in
-    this.el.find('.user-status').addClass('logged-out');
+    this.$el.find('.user-status').addClass('logged-out');
 
     if ($.cookie("oauth-token")) {
       this.finishUserSetup();
@@ -127,8 +126,8 @@ my.Application = Backbone.View.extend({
   finishUserSetup: function() {
     var self = this;
     self.username = $.cookie('username');
-    self.el.find('.user-status').removeClass('logged-out');
-    self.el.find('.user-status .username').text(self.username);
+    self.$el.find('.user-status').removeClass('logged-out');
+    self.$el.find('.user-status .username').text(self.username);
     self.authenticated = true;
     window.authenticated = true;
   },

@@ -43,11 +43,10 @@ my.Project = Backbone.View.extend({
 
   initialize: function(options) {
     var self = this;
-    this.el = $(this.el);
     this.state = _.extend({currentView: 'grid'}, options.state);
 
     this.model.datasets.at(0).bind('query:done', function() {
-      self.el.find('.doc-count').text(self.model.datasets.at(0).recordCount || 'Unknown');
+      self.$el.find('.doc-count').text(self.model.datasets.at(0).recordCount || 'Unknown');
     });
 
     // update view queryState on the current view
@@ -70,10 +69,10 @@ my.Project = Backbone.View.extend({
     var self = this;
     var tmplData = this.model.toJSON();
     var tmpl = Mustache.render(this.template, tmplData);
-    this.el.html(tmpl);
+    this.$el.html(tmpl);
 
-    var $dataViewContainer = this.el.find('.data-view-container');
-    var $dataSidebar = this.el.find('.data-view-sidebar');
+    var $dataViewContainer = this.$el.find('.data-view-container');
+    var $dataSidebar = this.$el.find('.data-view-sidebar');
 
     // create the Views (graphs, maps etc)
     this.views = _.map(this.model.get('views'), function(viewInfo) {
@@ -109,7 +108,7 @@ my.Project = Backbone.View.extend({
     });
 
     var readme = new DataExplorer.View.ReadmeView({
-      el: this.el.find(".meta")[0],
+      el: this.$el.find(".meta")[0],
       model: this.model
     });
     readme.render();
@@ -117,15 +116,15 @@ my.Project = Backbone.View.extend({
     var pager = new recline.View.Pager({
       model: this.model.datasets.at(0).queryState
     });
-    this.el.find('.recline-results-info').after(pager.el);
+    this.$el.find('.recline-results-info').after(pager.el);
 
     var queryEditor = new recline.View.QueryEditor({
       model: this.model.datasets.at(0).queryState
     });
-    this.el.find('.query-editor-here').append(queryEditor.el);
+    this.$el.find('.query-editor-here').append(queryEditor.el);
 
     // see below!
-    var width = this.el.find('.multiview-here').width();
+    var width = this.$el.find('.multiview-here').width();
 
 		this.editor = new DataExplorer.View.ScriptEditor({
       model: this.model.scripts.get('main.js')
@@ -133,11 +132,11 @@ my.Project = Backbone.View.extend({
     // TODO: hmmm, this is not that elegant ...
     this.editor.dataset = this.model.datasets.at(0);
 
-    this.el.find('.script-editor').append(this.editor.el);
+    this.$el.find('.script-editor').append(this.editor.el);
     this.editor.render();
 
     // HACK - for some reason the grid view of multiview is massively wide by default
-    this.el.find('.view.project .recline-data-explorer').width(width);
+    this.$el.find('.view.project .recline-data-explorer').width(width);
 
     // set the current view
     this._updateNav(this.state.currentView);
@@ -148,7 +147,7 @@ my.Project = Backbone.View.extend({
   _onMenuClick: function(e) {
     e.preventDefault();
     var action = $(e.target).attr('data-action');
-    this.el.find('.' + action).toggle('slow');
+    this.$el.find('.' + action).toggle('slow');
   },
 
   _onSwitchView: function(e) {
@@ -165,9 +164,8 @@ my.Project = Backbone.View.extend({
     } else {
       this.model.datasets.at(0).query({size: this.model.datasets.at(0).recordCount});
     }
-    this.el.find('.navigation a').removeClass('active');
-    var $el = this.el.find('.navigation a[data-view="' + pageName + '"]');
-    $el.addClass('active');
+    this.$el.find('.navigation a').removeClass('active');
+    this.$el.find('.navigation a[data-view="' + pageName + '"]').addClass('active');
     // show the specific page
     _.each(this.views, function(view, idx) {
       if (view.id === pageName) {
@@ -226,14 +224,13 @@ my.ScriptEditor = Backbone.View.extend({
   },
 
   initialize: function(options) {
-    this.el = $(this.el);
     this.editor = null;
     this.$output = null;
   },
 
   render: function() {
-    this.el.html(this.template);
-    var $textarea = this.el.find('textarea.content');
+    this.$el.html(this.template);
+    var $textarea = this.$el.find('textarea.content');
     $textarea.val(this.model.get('content'));
     // enable codemirror
     var options = {

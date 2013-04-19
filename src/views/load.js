@@ -52,10 +52,6 @@ my.Load = Backbone.View.extend({
     return false;
   },
 
-  initialize: function(options) {
-    this.$el = $(this.el);
-  },
-
   render: function() {
     var rendered = _.template(this.template, {});
     this.$el.html(rendered);
