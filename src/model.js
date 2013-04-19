@@ -62,10 +62,7 @@ my.Project = Backbone.Model.extend({
       var _generateId = function() {
         return 'dataexplorer-' + parseInt(Math.random() * 1000000, 10);
       };
-      var _id = _generateId();
-      while(_id in localStorage) {
-        _id = _generateId();
-      }
+      var _id = _generateId(); // TODO: Check in project list?
       this.set({id: _id});
     }
     this.scripts.reset(_.map(
@@ -83,12 +80,6 @@ my.Project = Backbone.Model.extend({
       self.set({datasets: self.datasets.toJSON()});
     });
     this.bind('change', this.save);
-  },
-
-  saveToStorage: function() {
-    var data = this.toJSON();
-    data.last_modified = new Date().toISOString();
-    localStorage.setItem(this.id, JSON.stringify(data));
   },
 
   saveToGist: function() {
@@ -119,14 +110,12 @@ my.Project = Backbone.Model.extend({
         } else {
           // we do not want to trigger an immediate resave to the gist
           self.set({gist_id: gist.id, gist_url: gist.url}, {silent: true});
-          self.saveToStorage();
         }
       });
     }
   },
 
   save: function() {
-    this.saveToStorage();
     // TODO: do not want to save *all* the time so should probably check and only save every 5m or something
     if (window.authenticated && this.currentUserIsOwner) {
       this.saveToGist();
