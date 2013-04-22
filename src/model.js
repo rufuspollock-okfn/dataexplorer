@@ -54,6 +54,7 @@ my.Project = Backbone.Model.extend({
   initialize: function() {
     var self = this;
     this.currentUserIsOwner = true;
+    this.pending = false;
     this.scripts = new Backbone.Collection();
     this.datasets = new Backbone.Collection();
     if (!this.id) {
@@ -83,6 +84,13 @@ my.Project = Backbone.Model.extend({
   },
 
   saveToGist: function() {
+
+    if (this.pending) {
+      console.log("Pending initial gist creation. Will try again in 1s.");
+      setTimeout(_.bind(this.saveToGist, this), 1000);
+      return;
+    }
+
     var self = this;
     var gh = my.github();
     var gistJSON = my.serializeProject(this);
@@ -100,6 +108,7 @@ my.Project = Backbone.Model.extend({
         }
       });
     } else {
+      this.pending = true;
       gistJSON.public = false;
       gist = gh.getGist();
       gist.create(gistJSON, function(err, gist) {
@@ -110,6 +119,7 @@ my.Project = Backbone.Model.extend({
         } else {
           // we do not want to trigger an immediate resave to the gist
           self.set({gist_id: gist.id, gist_url: gist.url}, {silent: true});
+          self.pending = false;
         }
       });
     }
