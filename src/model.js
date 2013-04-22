@@ -54,6 +54,7 @@ my.Project = Backbone.Model.extend({
   initialize: function() {
     var self = this;
     this.currentUserIsOwner = true;
+    this.pending = false;
     this.scripts = new Backbone.Collection();
     this.datasets = new Backbone.Collection();
     if (!this.id) {
@@ -62,10 +63,7 @@ my.Project = Backbone.Model.extend({
       var _generateId = function() {
         return 'dataexplorer-' + parseInt(Math.random() * 1000000, 10);
       };
-      var _id = _generateId();
-      while(_id in localStorage) {
-        _id = _generateId();
-      }
+      var _id = _generateId(); // TODO: Check in project list?
       this.set({id: _id});
     }
     this.scripts.reset(_.map(
@@ -85,13 +83,14 @@ my.Project = Backbone.Model.extend({
     this.bind('change', this.save);
   },
 
-  saveToStorage: function() {
-    var data = this.toJSON();
-    data.last_modified = new Date().toISOString();
-    localStorage.setItem(this.id, JSON.stringify(data));
-  },
-
   saveToGist: function() {
+
+    if (this.pending) {
+      console.log("Pending initial gist creation. Will try again in 1s.");
+      setTimeout(_.bind(this.saveToGist, this), 1000);
+      return;
+    }
+
     var self = this;
     var gh = my.github();
     var gistJSON = my.serializeProject(this);
@@ -109,6 +108,7 @@ my.Project = Backbone.Model.extend({
         }
       });
     } else {
+      this.pending = true;
       gistJSON.public = false;
       gist = gh.getGist();
       gist.create(gistJSON, function(err, gist) {
@@ -119,14 +119,13 @@ my.Project = Backbone.Model.extend({
         } else {
           // we do not want to trigger an immediate resave to the gist
           self.set({gist_id: gist.id, gist_url: gist.url}, {silent: true});
-          self.saveToStorage();
+          self.pending = false;
         }
       });
     }
   },
 
   save: function() {
-    this.saveToStorage();
     // TODO: do not want to save *all* the time so should probably check and only save every 5m or something
     if (window.authenticated && this.currentUserIsOwner) {
       this.saveToGist();
@@ -308,18 +307,30 @@ my.serializeDatasetToCSV = function(dataset) {
 my.ProjectList = Backbone.Collection.extend({
   model: my.Project,
   load: function() {
-    for(var key in localStorage) {
-      if (key.indexOf('dataexplorer-') === 0) {
-        var projectInfo = localStorage.getItem(key);
-        try {
-          var data = JSON.parse(projectInfo);
-          var tmp = new my.Project(data);
-          this.add(tmp);
-        } catch(e) {
-          alert('Failed to load project ' + projectInfo);
-        }
+    var self = this;
+    var gh = my.github();
+
+    gh.getUser().gists(function (err, gists) {
+
+      if (err) {
+        alert("Failed to retrieve your gists");
+        return;
       }
-    }
+
+      // Only gists that contain datapackage.json
+      gists = _.filter(gists, function (gist) {
+        return "datapackage.json" in gist.files
+      });
+
+      _.each(gists, function (gist) {
+        // We could do lazy loading, but for now lets get the datapackage immediately
+        gh.getGist(gist.id).read(function (err, gist) {
+          var dp = my.unserializeProject(gist);
+          self.add(dp);
+        });
+      });
+
+    });
   }
 });
 
