@@ -130,8 +130,6 @@ $.fn.splitter = function(args){
 			return sum;
 		}
 		function resize(size){
-			// debugger;
-			console.log(size);
 			// Determine new width/height of splitter container
 			splitter._DF = splitter[0][opts.pxFixed] - splitter._PBF;
 			splitter._DA = splitter[0][opts.pxSplit] - splitter._PBA;
