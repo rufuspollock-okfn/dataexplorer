@@ -4,16 +4,17 @@
 my.Project = Backbone.View.extend({
   className: 'view project',
   template: ' \
-    <div class="row-fluid"> \
-      <h4 class="span6">Description</h4> \
-      <h4 class="span6">Code</h4> \
-    </div> \
-    <div class="top-row row-fluid"> \
-      <div class="meta span6"> \
-        <button class="btn btn-small editreadme">Edit</button> \
-        <div class="readme"></div> \
+    <div class="top-row"> \
+      <div class="top-panel"> \
+        <h4>Description</h4> \
+        <div class="meta"> \
+          <button class="btn btn-small editreadme">Edit</button> \
+          <div class="readme"></div> \
+        </div> \
+      </div><div class="top-panel"> \
+        <h4>Code</h4> \
+        <div class="script-editor"></div> \
       </div> \
-      <div class="script-editor span6"></div> \
     </div> \
     <hr /> \
     <div id="data-app" class="data-app"> \
@@ -140,6 +141,12 @@ my.Project = Backbone.View.extend({
 
     // set the current view
     this._updateNav(this.state.currentView);
+
+    this.$el.find(".top-row").splitter({
+      minLeft: 250,
+      minRight: 250,
+      resizeToWidth: true
+    });
 
     return this;
   },

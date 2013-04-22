@@ -190,17 +190,28 @@ a {
 }
 
 .view.project .meta {
+  position: absolute;
+  top: 45px;
+  bottom: 0;
+}
+
+.top-row {
+  height: 300px;
+  width: 100%;
+}
+
+.top-panel {
+  display: inline-block;
+  width: 50%;
   height: 100%;
+  position: relative;
+  vertical-align: top;
 }
 
 .view.project .readme {
   font-size: 14px;
   height: 100%;
   overflow: auto;
-}
-
-.top-row {
-  height: 300px;
 }
 
 .view.project .readme .controls {
@@ -358,11 +369,28 @@ a {
   *********************************************************/
 
 .script-editor, .meta {
+  position: absolute;
+  top: 40px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.meta .CodeMirror {
+  height: 100%;
+}
+
+.script-editor > div {
   position: relative;
+  height: 100%;
 }
 
 .script-editor-widget {
-  height: 250px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 50px;
 }
 
 .script-editor-widget .CodeMirror {
@@ -371,6 +399,10 @@ a {
 }
 
 .script-editor .output {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
   overflow: auto;
   border: 1px solid #ddd;
   font-family: monospace;
@@ -387,7 +419,7 @@ a {
 
 button.clear, button.runsandbox, button.editreadme, button.savereadme {
   position: absolute;
-  top: -40px;
+  top: -36px;
 }
 
 button.clear, button.editreadme, button.savereadme {
@@ -481,4 +513,8 @@ body.about .page-header {
 
 .recline-slickgrid {
   font-size: 12px;
+}
+
+.splitter-bar {
+  width: 10px;
 }
