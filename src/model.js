@@ -125,6 +125,67 @@ my.Project = Backbone.Model.extend({
     }
   },
 
+  saveDatasetsToGist: function () {
+    var self = this;
+
+    if (this.pending) {
+      console.log("Pending initial gist creation. Will try again in 1s.");
+      setTimeout(_.bind(this.saveDatasetsToGist, this), 1000);
+      return;
+    }
+
+    var gh = my.github();
+    var gist;
+    var gistJSON = {
+      files: {}
+    };
+
+    // Do serialize stuff from below
+    _.each(this.get("datasets"), function (ds_meta, idx) {
+
+      if (!ds_meta.path) {
+        // For now, add a path based on its name.
+        ds_meta.path = ds_meta.name + ".csv";
+      }
+
+      var ds = self.datasets.at(idx);
+      var content = my.serializeDatasetToCSV(ds._store);
+
+      if (content) gistJSON.files[ds_meta.path] = {"content": content};
+
+    });
+
+
+    if (self.get('gist_id')) {
+      gist = gh.getGist(self.get('gist_id'));
+      gist.update(gistJSON, function(err, gist) {
+        if (err) {
+          alert('Failed to save project to gist');
+          console.log(err);
+          console.log(gistJSON);
+        } else {
+          console.log('Saved to gist successfully');
+        }
+      });
+    } else {
+      self.pending = true;
+      gistJSON.public = false;
+      gist = gh.getGist();
+      gist.create(gistJSON, function(err, gist) {
+        if (err) {
+          alert('Initial save of project to gist failed');
+          console.log(err);
+          console.log(gistJSON);
+        } else {
+          // we do not want to trigger an immediate resave to the gist
+          self.set({gist_id: gist.id, gist_url: gist.url}, {silent: true});
+          self.pending = false;
+        }
+      });
+    }
+
+  },
+
   save: function() {
     // TODO: do not want to save *all* the time so should probably check and only save every 5m or something
     if (window.authenticated && this.currentUserIsOwner) {
@@ -139,12 +200,14 @@ my.Project = Backbone.Model.extend({
     if (datasetInfo.backend == 'github') {
       self.loadGithubDataset(datasetInfo.url, function(err, whocares) {
         self.datasets.at(0).fetch().done(function() {
+          self.saveDatasetsToGist();
           cb(null, self);
         });
       });
     } else {
       self.datasets.at(0).fetch().done(function() {
         // TODO: should we set dataset metadata onto project source?
+        self.saveDatasetsToGist();
         cb(null, self);
       });
     }
@@ -235,21 +298,6 @@ my.serializeProject = function(project) {
       content: script.content || '// empty script'
     };
     delete script.content;
-  });
-
-  _.each(data.files, function(dsInfo, idx) {
-    // TODO: check dsInfo.path does not over-write anything important (e.g. datapackage.json ...)
-    if (dsInfo.path) {
-      var ds = project.datasets.at(idx);
-      var content = my.serializeDatasetToCSV(ds._store);
-      // if content is empty we cannot add this file (see above note re github weirdness)
-      if (content) {
-        gistJSON.files[dsInfo.path] = { content: content };
-      }
-      // for good measure remove any data attribute
-      // TODO: should this be done when we loaded from the data and moved it into the dataset data store
-      delete dsInfo.data;
-    }
   });
 
   gistJSON.files['datapackage.json'].content = JSON.stringify(data, null, 2);
