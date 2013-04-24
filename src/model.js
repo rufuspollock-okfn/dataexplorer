@@ -23,6 +23,7 @@ my.Project = Backbone.Model.extend({
       manifest_version: 1,
       state: 'active',
       created: new Date().toISOString(),
+      sources: [],
       scripts: [
         {
           id: 'main.js',
@@ -144,14 +145,20 @@ my.Project = Backbone.Model.extend({
     _.each(this.get("datasets"), function (ds_meta, idx) {
 
       if (!ds_meta.path) {
-        // For now, add a path based on its name.
+        // We're going to change the data source to be a local copy.
+        // First, move the URL to the sources array
+        self.get("sources").push({"web": ds_meta.url}); // we dont use the setter so this wont emit an event
+        delete ds_meta.url;
+        // Second, add a path based on its name.
         ds_meta.path = ds_meta.name + ".csv";
+        // Third, force the backend to csv
+        ds_meta.backend = "csv";
       }
 
       var ds = self.datasets.at(idx);
       var content = my.serializeDatasetToCSV(ds._store);
 
-      if (content) gistJSON.files[ds_meta.path] = {"content": content};
+      gistJSON.files[ds_meta.path] = {"content": content || "# No data"};
 
     });
 
