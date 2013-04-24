@@ -150,7 +150,7 @@ my.Project = Backbone.Model.extend({
         self.get("sources").push({"web": ds_meta.url}); // we dont use the setter so this wont emit an event
         delete ds_meta.url;
         // Second, add a path based on its name.
-        ds_meta.path = ds_meta.name + ".csv";
+        ds_meta.path = (ds_meta.name || "data") + ".csv";
         // Third, force the backend to csv
         ds_meta.backend = "csv";
       }
