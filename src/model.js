@@ -307,6 +307,11 @@ my.serializeProject = function(project) {
     delete script.content;
   });
 
+  _.each(data.files, function(dsInfo, idx) {
+    // Make sure we don't persist inline data
+    delete dsInfo.data;
+  });
+
   gistJSON.files['datapackage.json'].content = JSON.stringify(data, null, 2);
   return gistJSON;
 };
