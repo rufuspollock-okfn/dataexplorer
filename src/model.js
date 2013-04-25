@@ -294,8 +294,8 @@ my.serializeProject = function(project) {
   };
   delete data.readme;
 
-  // as per http://www.dataprotocols.org/en/latest/data-packages.html list of "datasets" is listed in files attribute
-  data.files = data.datasets;
+  // as per http://www.dataprotocols.org/en/latest/data-packages.html list of "datasets" is listed in resources attribute
+  data.resources = data.datasets;
   delete data.datasets;
 
   _.each(data.scripts, function(script) {
@@ -307,7 +307,7 @@ my.serializeProject = function(project) {
     delete script.content;
   });
 
-  _.each(data.files, function(dsInfo, idx) {
+  _.each(data.resources, function(dsInfo, idx) {
     // Make sure we don't persist inline data
     delete dsInfo.data;
   });
@@ -319,9 +319,12 @@ my.serializeProject = function(project) {
 my.unserializeProject = function(serialized) {
   var dp = JSON.parse(serialized.files['datapackage.json'].content);
 
-  // files attribute lists data sources in data package spec
-  // if statement for backwards compatibility
-  if (dp.files && !dp.datasets) {
+  // resources attribute lists data sources in data package spec
+  // if statements for backwards compatibility
+  if (dp.resources && !dp.datasets) {
+    dp.datasets = dp.resources;
+    delete dp.resources;
+  } else if (dp.files && !dp.datasets) {
     dp.datasets = dp.files;
     delete dp.files;
   }
