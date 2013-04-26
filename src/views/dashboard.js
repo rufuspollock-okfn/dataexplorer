@@ -17,11 +17,15 @@ my.Dashboard = Backbone.View.extend({
           <a href="{{url}}" class="js-load-project">{{showTitle}}</a> \
           <a class="btn btn-danger js-trash-project" data-project-id="{{id}}">Move to Trash</a> \
         </h3> \
-        Last modified: {{last_modified_nice}} \
+        <dl class="dl-horizontal"> \
+          <dt>Last modified</dt><dd>{{last_modified_nice}}</dd> \
         {{#datasource}} \
-        <br /> \
-        Data source: {{datasource}} \
+          <dt>Data source</dt><dd>{{datasource}}</dd> \
         {{/datasource}} \
+        {{#fork_of}} \
+          <dt>Forked from</dt><dd><a href="{{fork_of}}">{{fork_of}}</a></dd> \
+        {{/fork_of}} \
+        </dl> \
       </div> \
       {{/projects}} \
     </div> \
@@ -53,6 +57,10 @@ my.Dashboard = Backbone.View.extend({
         context.url = "#" + DataExplorer.app.instance.username + "/" + project.gist_id;
       } else {
         context.url = "#project/" + context.id;
+      }
+
+      if (project.fork_of) {
+        context.fork_of = "#" + project.fork_of.owner + "/" + project.fork_of.id;
       }
 
       return context;

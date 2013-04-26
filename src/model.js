@@ -404,6 +404,9 @@ my.ProjectList = Backbone.Collection.extend({
           dp.gist_id = gist.id;
           dp.gist_url = gist.url;
           dp.last_modified = new Date(gist.updated_at);
+          if (gist.fork_of) {
+            dp.fork_of = {id: gist.fork_of.id, owner: gist.fork_of.user.login};
+          }
           self.add(dp);
         });
       });
