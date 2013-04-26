@@ -14,12 +14,14 @@ my.Dashboard = Backbone.View.extend({
       {{#projects}} \
       <div class="project summary"> \
         <h3 class="title"> \
-          <a href="#project/{{id}}" class="js-load-project">{{showTitle}}</a> \
+          <a href="{{url}}" class="js-load-project">{{showTitle}}</a> \
           <a class="btn btn-danger js-trash-project" data-project-id="{{id}}">Move to Trash</a> \
         </h3> \
         Last modified: {{last_modified_nice}} \
+        {{#datasource}} \
         <br /> \
         Data source: {{datasource}} \
+        {{/datasource}} \
       </div> \
       {{/projects}} \
     </div> \
@@ -38,17 +40,25 @@ my.Dashboard = Backbone.View.extend({
   },
 
   render: function() {
-    var projects = _.map(this.collection.toJSON(), function(project) {
-      project.last_modified_nice = new Date(project.last_modified).toString();
-      project.showTitle = project.name || 'No name';
+    var projects = this.collection.map(function(project) {
+      var context = project.toJSON();
+      context.last_modified_nice = new Date(context.last_modified).toString();
+      context.showTitle = context.name || 'No name';
 
-      if (project.sources) {
-        project.datasource = _.pluck(project.sources, "web").join(", ");
+      if (context.sources) {
+        context.datasource = _.pluck(context.sources, "web").join(", ");
       }
-      return project;
+
+      if (project.gist_id) {
+        context.url = "#" + DataExplorer.app.instance.username + "/" + project.gist_id;
+      } else {
+        context.url = "#project/" + context.id;
+      }
+
+      return context;
     });
     projects = _.filter(projects, function(project) {
-      return project.state != 'trash';
+      return project.state !== 'trash';
     });
     // sort by last modified (most recent first)
     projects.sort(function(a, b) {
