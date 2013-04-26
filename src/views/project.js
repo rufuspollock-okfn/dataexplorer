@@ -72,6 +72,9 @@ my.Project = Backbone.View.extend({
     var tmpl = Mustache.render(this.template, tmplData);
     this.$el.html(tmpl);
 
+    // Alter UI if user isn't the owner
+    this.$el.find(".editreadme").toggle(this.model.currentUserIsOwner);
+
     var $dataViewContainer = this.$el.find('.data-view-container');
     var $dataSidebar = this.$el.find('.data-view-sidebar');
 
