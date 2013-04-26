@@ -97,8 +97,8 @@ my.Project = Backbone.Model.extend({
     var gistJSON = my.serializeProject(this);
     var gist;
 
-    if (this.get('gist_id')) {
-      gist = gh.getGist(this.get('gist_id'));
+    if (this.gist_id) {
+      gist = gh.getGist(this.gist_id);
       gist.update(gistJSON, function(err, gist) {
         if (err) {
           alert('Failed to save project to gist');
@@ -118,8 +118,8 @@ my.Project = Backbone.Model.extend({
           console.log(err);
           console.log(gistJSON);
         } else {
-          // we do not want to trigger an immediate resave to the gist
-          self.set({gist_id: gist.id, gist_url: gist.url}, {silent: true});
+          self.gist_id = gist.id;
+          self.gist_url = gist.url;
           self.pending = false;
         }
       });
@@ -165,8 +165,8 @@ my.Project = Backbone.Model.extend({
     });
 
 
-    if (self.get('gist_id')) {
-      gist = gh.getGist(self.get('gist_id'));
+    if (self.gist_id) {
+      gist = gh.getGist(self.gist_id);
       gist.update(gistJSON, function(err, gist) {
         if (err) {
           alert('Failed to save project to gist');
@@ -186,8 +186,8 @@ my.Project = Backbone.Model.extend({
           console.log(err);
           console.log(gistJSON);
         } else {
-          // we do not want to trigger an immediate resave to the gist
-          self.set({gist_id: gist.id, gist_url: gist.url}, {silent: true});
+          self.gist_id = gist.id;
+          self.gist_url = gist.url;
           self.pending = false;
         }
       });
@@ -351,6 +351,11 @@ my.unserializeProject = function(serialized) {
       }
     }
   });
+
+  // We don't want these anymore
+  delete dp.gist_id;
+  delete dp.gist_url;
+
   var project = new my.Project(dp);
   return project;
 };
@@ -391,6 +396,8 @@ my.ProjectList = Backbone.Collection.extend({
         // We could do lazy loading, but for now lets get the datapackage immediately
         gh.getGist(gist.id).read(function (err, gist) {
           var dp = my.unserializeProject(gist);
+          dp.gist_id = gist.id;
+          dp.gist_url = gist.url;
           self.add(dp);
         });
       });

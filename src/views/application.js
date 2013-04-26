@@ -184,9 +184,9 @@ my.Application = Backbone.View.extend({
 
       // if this project does in fact have remote backing let's set the username so it is sharable
       // we only want to do this where this is a "local" project url (i.e. one using local id stuff)
-      if (username === 'project' && self.username && project.get('gist_id')) {
+      if (username === 'project' && self.username && project.gist_id) {
         self.router.navigate(
-          self.username + '/' + project.get('gist_id'),
+          self.username + '/' + project.gist_id,
           {replace: true}
           );
       }
