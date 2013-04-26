@@ -41,10 +41,9 @@ my.Dashboard = Backbone.View.extend({
     var projects = _.map(this.collection.toJSON(), function(project) {
       project.last_modified_nice = new Date(project.last_modified).toString();
       project.showTitle = project.name || 'No name';
-      if (project.datasets.length > 0 && project.datasets[0]) {
-        project.datasource = project.datasets[0].file ? project.datasets[0].filename : project.datasets[0].url;
-      } else {
-        project.datasource = '';
+
+      if (project.sources) {
+        project.datasource = _.pluck(project.sources, "web").join(", ");
       }
       return project;
     });
