@@ -129,6 +129,8 @@ my.Project = Backbone.Model.extend({
   saveDatasetsToGist: function () {
     var self = this;
 
+    if (!window.authenticated || !this.currentUserIsOwner) return;
+
     if (this.pending) {
       console.log("Pending initial gist creation. Will try again in 1s.");
       setTimeout(_.bind(this.saveDatasetsToGist, this), 1000);
