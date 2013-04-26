@@ -4,6 +4,9 @@
 my.Project = Backbone.View.extend({
   className: 'view project',
   template: ' \
+    {{#fork_of}} \
+    <p class="text-right muted"><small>Forked from <a href="{{fork_of}}">{{fork_of}}</a></small></p> \
+    {{/fork_of}} \
     <div class="top-row"> \
       <div class="top-panel"> \
         <h4>Description</h4> \
@@ -69,6 +72,9 @@ my.Project = Backbone.View.extend({
   render: function() {
     var self = this;
     var tmplData = this.model.toJSON();
+    if (this.model.fork_of) {
+      tmplData.fork_of = "#" + this.model.fork_of.owner + "/" + this.model.fork_of.id;
+    }
     var tmpl = Mustache.render(this.template, tmplData);
     this.$el.html(tmpl);
 
