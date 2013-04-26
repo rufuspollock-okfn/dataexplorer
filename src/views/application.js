@@ -152,6 +152,7 @@ my.Application = Backbone.View.extend({
         project.currentUserIsOwner = (self.username === gist.user.login);
         project.gist_id = gist.id;
         project.gist_url = gist.url;
+        project.last_modified = new Date(gist.updated_at);
         checkDatasetLoaded(project);
       });
     }

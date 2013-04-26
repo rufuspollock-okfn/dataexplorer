@@ -42,7 +42,7 @@ my.Dashboard = Backbone.View.extend({
   render: function() {
     var projects = this.collection.map(function(project) {
       var context = project.toJSON();
-      context.last_modified_nice = new Date(context.last_modified).toString();
+      context.last_modified_nice = project.last_modified.toString();
       context.showTitle = context.name || 'No name';
 
       if (context.sources) {
@@ -59,10 +59,6 @@ my.Dashboard = Backbone.View.extend({
     });
     projects = _.filter(projects, function(project) {
       return project.state !== 'trash';
-    });
-    // sort by last modified (most recent first)
-    projects.sort(function(a, b) {
-      return a.last_modified < b.last_modified ?  1 : -1;
     });
     var tmp = Mustache.render(this.template, {
       total: projects.length,

@@ -120,6 +120,7 @@ my.Project = Backbone.Model.extend({
         } else {
           self.gist_id = gist.id;
           self.gist_url = gist.url;
+          self.last_modified = new Date();
           self.pending = false;
         }
       });
@@ -188,6 +189,7 @@ my.Project = Backbone.Model.extend({
         } else {
           self.gist_id = gist.id;
           self.gist_url = gist.url;
+          self.last_modified = new Date();
           self.pending = false;
         }
       });
@@ -376,6 +378,9 @@ my.serializeDatasetToCSV = function(dataset) {
 
 my.ProjectList = Backbone.Collection.extend({
   model: my.Project,
+  comparator: function (a, b) {
+    return a.last_modified < b.last_modified;
+  },
   load: function() {
     var self = this;
     var gh = my.github();
@@ -398,6 +403,7 @@ my.ProjectList = Backbone.Collection.extend({
           var dp = my.unserializeProject(gist);
           dp.gist_id = gist.id;
           dp.gist_url = gist.url;
+          dp.last_modified = new Date(gist.updated_at);
           self.add(dp);
         });
       });
