@@ -285,11 +285,11 @@ my.ScriptEditor = Backbone.View.extend({
     } else if (e.data.msg == 'error') {
       this._writeToOutput(e.data.data, 'error');
     } else if (e.data.msg == 'saveDataset') {
-      // Do we want to persist these changes?
       this.dataset._store.records = e.data.records;
       this.dataset._store.fields = e.data.fields;
       this.dataset.fields.reset(this.dataset._store.fields);
       this.dataset.query({size: this.dataset._store.records.length});
+      this.model.saveDatasetsToGist();
     }
   },
 
