@@ -131,10 +131,8 @@ my.Project = Backbone.View.extend({
     var width = this.$el.find('.multiview-here').width();
 
 		this.editor = new DataExplorer.View.ScriptEditor({
-      model: this.model.scripts.get('main.js')
+      model: this.model
     });
-    // TODO: hmmm, this is not that elegant ...
-    this.editor.dataset = this.model.datasets.at(0);
 
     this.$el.find('.script-editor').append(this.editor.el);
     this.editor.render();
@@ -236,12 +234,14 @@ my.ScriptEditor = Backbone.View.extend({
   initialize: function(options) {
     this.editor = null;
     this.$output = null;
+    this.script = this.model.scripts.get('main.js');
+    this.dataset = this.model.datasets.at(0);
   },
 
   render: function() {
     this.$el.html(this.template);
     var $textarea = this.$el.find('textarea.content');
-    $textarea.val(this.model.get('content'));
+    $textarea.val(this.script.get('content'));
     // enable codemirror
     var options = {
       lineNumbers : true,
@@ -263,7 +263,7 @@ my.ScriptEditor = Backbone.View.extend({
   _onRunSandboxed: function(e) {
     var self = this;
     // save the script ...
-    this.model.set({content: this.editor.getValue()});
+    this.script.set({content: this.editor.getValue()});
     var worker = new Worker('src/views/worker-runscript.js');
     worker.addEventListener('message',
         function(e) { self._handleWorkerCommunication(e); },
