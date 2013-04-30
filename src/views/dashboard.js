@@ -46,7 +46,7 @@ my.Dashboard = Backbone.View.extend({
   render: function() {
     var projects = this.collection.map(function(project) {
       var context = project.toJSON();
-      context.last_modified_nice = project.last_modified.toString();
+      context.last_modified_nice = project.last_modified ? project.last_modified.toString() : '';
       context.showTitle = context.name || 'No name';
 
       if (context.sources) {
