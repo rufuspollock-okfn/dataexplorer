@@ -14,12 +14,18 @@ my.Dashboard = Backbone.View.extend({
       {{#projects}} \
       <div class="project summary"> \
         <h3 class="title"> \
-          <a href="#project/{{id}}" class="js-load-project">{{showTitle}}</a> \
+          <a href="{{url}}" class="js-load-project">{{showTitle}}</a> \
           <a class="btn btn-danger js-trash-project" data-project-id="{{id}}">Move to Trash</a> \
         </h3> \
-        Last modified: {{last_modified_nice}} \
-        <br /> \
-        Data source: {{datasource}} \
+        <dl class="dl-horizontal"> \
+          <dt>Last modified</dt><dd>{{last_modified_nice}}</dd> \
+        {{#datasource}} \
+          <dt>Data source</dt><dd>{{datasource}}</dd> \
+        {{/datasource}} \
+        {{#fork_of}} \
+          <dt>Forked from</dt><dd><a href="{{fork_of}}">{{fork_of}}</a></dd> \
+        {{/fork_of}} \
+        </dl> \
       </div> \
       {{/projects}} \
     </div> \
@@ -38,22 +44,29 @@ my.Dashboard = Backbone.View.extend({
   },
 
   render: function() {
-    var projects = _.map(this.collection.toJSON(), function(project) {
-      project.last_modified_nice = new Date(project.last_modified).toString();
-      project.showTitle = project.name || 'No name';
-      if (project.datasets.length > 0 && project.datasets[0]) {
-        project.datasource = project.datasets[0].file ? project.datasets[0].filename : project.datasets[0].url;
-      } else {
-        project.datasource = '';
+    var projects = this.collection.map(function(project) {
+      var context = project.toJSON();
+      context.last_modified_nice = project.last_modified.toString();
+      context.showTitle = context.name || 'No name';
+
+      if (context.sources) {
+        context.datasource = _.pluck(context.sources, "web").join(", ");
       }
-      return project;
+
+      if (project.gist_id) {
+        context.url = "#" + DataExplorer.app.instance.username + "/" + project.gist_id;
+      } else {
+        context.url = "#project/" + context.id;
+      }
+
+      if (project.fork_of) {
+        context.fork_of = "#" + project.fork_of.owner + "/" + project.fork_of.id;
+      }
+
+      return context;
     });
     projects = _.filter(projects, function(project) {
-      return project.state != 'trash';
-    });
-    // sort by last modified (most recent first)
-    projects.sort(function(a, b) {
-      return a.last_modified < b.last_modified ?  1 : -1;
+      return project.state !== 'trash';
     });
     var tmp = Mustache.render(this.template, {
       total: projects.length,

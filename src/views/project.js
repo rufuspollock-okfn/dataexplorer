@@ -4,16 +4,20 @@
 my.Project = Backbone.View.extend({
   className: 'view project',
   template: ' \
-    <div class="row-fluid"> \
-      <h4 class="span6">Description</h4> \
-      <h4 class="span6">Code</h4> \
-    </div> \
-    <div class="top-row row-fluid"> \
-      <div class="meta span6"> \
-        <button class="btn btn-small editreadme">Edit</button> \
-        <div class="readme"></div> \
+    {{#fork_of}} \
+    <p class="text-right muted"><small>Forked from <a href="{{fork_of}}">{{fork_of}}</a></small></p> \
+    {{/fork_of}} \
+    <div class="top-row"> \
+      <div class="top-panel"> \
+        <h4>Description</h4> \
+        <div class="meta"> \
+          <button class="btn btn-small editreadme">Edit</button> \
+          <div class="readme"></div> \
+        </div> \
+      </div><div class="top-panel"> \
+        <h4>Code</h4> \
+        <div class="script-editor"></div> \
       </div> \
-      <div class="script-editor span6"></div> \
     </div> \
     <hr /> \
     <div id="data-app" class="data-app"> \
@@ -43,11 +47,10 @@ my.Project = Backbone.View.extend({
 
   initialize: function(options) {
     var self = this;
-    this.el = $(this.el);
     this.state = _.extend({currentView: 'grid'}, options.state);
 
     this.model.datasets.at(0).bind('query:done', function() {
-      self.el.find('.doc-count').text(self.model.datasets.at(0).recordCount || 'Unknown');
+      self.$el.find('.doc-count').text(self.model.datasets.at(0).recordCount || 'Unknown');
     });
 
     // update view queryState on the current view
@@ -69,11 +72,17 @@ my.Project = Backbone.View.extend({
   render: function() {
     var self = this;
     var tmplData = this.model.toJSON();
+    if (this.model.fork_of) {
+      tmplData.fork_of = "#" + this.model.fork_of.owner + "/" + this.model.fork_of.id;
+    }
     var tmpl = Mustache.render(this.template, tmplData);
-    this.el.html(tmpl);
+    this.$el.html(tmpl);
 
-    var $dataViewContainer = this.el.find('.data-view-container');
-    var $dataSidebar = this.el.find('.data-view-sidebar');
+    // Alter UI if user isn't the owner
+    this.$el.find(".editreadme").toggle(this.model.currentUserIsOwner);
+
+    var $dataViewContainer = this.$el.find('.data-view-container');
+    var $dataSidebar = this.$el.find('.data-view-sidebar');
 
     // create the Views (graphs, maps etc)
     this.views = _.map(this.model.get('views'), function(viewInfo) {
@@ -109,7 +118,7 @@ my.Project = Backbone.View.extend({
     });
 
     var readme = new DataExplorer.View.ReadmeView({
-      el: this.el.find(".meta")[0],
+      el: this.$el.find(".meta")[0],
       model: this.model
     });
     readme.render();
@@ -117,30 +126,34 @@ my.Project = Backbone.View.extend({
     var pager = new recline.View.Pager({
       model: this.model.datasets.at(0).queryState
     });
-    this.el.find('.recline-results-info').after(pager.el);
+    this.$el.find('.recline-results-info').after(pager.el);
 
     var queryEditor = new recline.View.QueryEditor({
       model: this.model.datasets.at(0).queryState
     });
-    this.el.find('.query-editor-here').append(queryEditor.el);
+    this.$el.find('.query-editor-here').append(queryEditor.el);
 
     // see below!
-    var width = this.el.find('.multiview-here').width();
+    var width = this.$el.find('.multiview-here').width();
 
 		this.editor = new DataExplorer.View.ScriptEditor({
-      model: this.model.scripts.get('main.js')
+      model: this.model
     });
-    // TODO: hmmm, this is not that elegant ...
-    this.editor.dataset = this.model.datasets.at(0);
 
-    this.el.find('.script-editor').append(this.editor.el);
+    this.$el.find('.script-editor').append(this.editor.el);
     this.editor.render();
 
     // HACK - for some reason the grid view of multiview is massively wide by default
-    this.el.find('.view.project .recline-data-explorer').width(width);
+    this.$el.find('.view.project .recline-data-explorer').width(width);
 
     // set the current view
     this._updateNav(this.state.currentView);
+
+    this.$el.find(".top-row").splitter({
+      minLeft: 250,
+      minRight: 250,
+      resizeToWidth: true
+    });
 
     return this;
   },
@@ -148,7 +161,7 @@ my.Project = Backbone.View.extend({
   _onMenuClick: function(e) {
     e.preventDefault();
     var action = $(e.target).attr('data-action');
-    this.el.find('.' + action).toggle('slow');
+    this.$el.find('.' + action).toggle('slow');
   },
 
   _onSwitchView: function(e) {
@@ -165,9 +178,8 @@ my.Project = Backbone.View.extend({
     } else {
       this.model.datasets.at(0).query({size: this.model.datasets.at(0).recordCount});
     }
-    this.el.find('.navigation a').removeClass('active');
-    var $el = this.el.find('.navigation a[data-view="' + pageName + '"]');
-    $el.addClass('active');
+    this.$el.find('.navigation a').removeClass('active');
+    this.$el.find('.navigation a[data-view="' + pageName + '"]').addClass('active');
     // show the specific page
     _.each(this.views, function(view, idx) {
       if (view.id === pageName) {
@@ -226,15 +238,16 @@ my.ScriptEditor = Backbone.View.extend({
   },
 
   initialize: function(options) {
-    this.el = $(this.el);
     this.editor = null;
     this.$output = null;
+    this.script = this.model.scripts.get('main.js');
+    this.dataset = this.model.datasets.at(0);
   },
 
   render: function() {
-    this.el.html(this.template);
-    var $textarea = this.el.find('textarea.content');
-    $textarea.val(this.model.get('content'));
+    this.$el.html(this.template);
+    var $textarea = this.$el.find('textarea.content');
+    $textarea.val(this.script.get('content'));
     // enable codemirror
     var options = {
       lineNumbers : true,
@@ -256,7 +269,7 @@ my.ScriptEditor = Backbone.View.extend({
   _onRunSandboxed: function(e) {
     var self = this;
     // save the script ...
-    this.model.set({content: this.editor.getValue()});
+    this.script.set({content: this.editor.getValue()});
     var worker = new Worker('src/views/worker-runscript.js');
     worker.addEventListener('message',
         function(e) { self._handleWorkerCommunication(e); },
@@ -282,6 +295,7 @@ my.ScriptEditor = Backbone.View.extend({
       this.dataset._store.fields = e.data.fields;
       this.dataset.fields.reset(this.dataset._store.fields);
       this.dataset.query({size: this.dataset._store.records.length});
+      this.model.saveDatasetsToGist();
     }
   },
 

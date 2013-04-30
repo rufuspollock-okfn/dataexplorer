@@ -23,6 +23,7 @@ my.Project = Backbone.Model.extend({
       manifest_version: 1,
       state: 'active',
       created: new Date().toISOString(),
+      sources: [],
       scripts: [
         {
           id: 'main.js',
@@ -54,6 +55,7 @@ my.Project = Backbone.Model.extend({
   initialize: function() {
     var self = this;
     this.currentUserIsOwner = true;
+    this.pending = false;
     this.scripts = new Backbone.Collection();
     this.datasets = new Backbone.Collection();
     if (!this.id) {
@@ -62,10 +64,7 @@ my.Project = Backbone.Model.extend({
       var _generateId = function() {
         return 'dataexplorer-' + parseInt(Math.random() * 1000000, 10);
       };
-      var _id = _generateId();
-      while(_id in localStorage) {
-        _id = _generateId();
-      }
+      var _id = _generateId(); // TODO: Check in project list?
       this.set({id: _id});
     }
     this.scripts.reset(_.map(
@@ -85,20 +84,21 @@ my.Project = Backbone.Model.extend({
     this.bind('change', this.save);
   },
 
-  saveToStorage: function() {
-    var data = this.toJSON();
-    data.last_modified = new Date().toISOString();
-    localStorage.setItem(this.id, JSON.stringify(data));
-  },
-
   saveToGist: function() {
+
+    if (this.pending) {
+      console.log("Pending initial gist creation. Will try again in 1s.");
+      setTimeout(_.bind(this.saveToGist, this), 1000);
+      return;
+    }
+
     var self = this;
     var gh = my.github();
     var gistJSON = my.serializeProject(this);
     var gist;
 
-    if (this.get('gist_id')) {
-      gist = gh.getGist(this.get('gist_id'));
+    if (this.gist_id) {
+      gist = gh.getGist(this.gist_id);
       gist.update(gistJSON, function(err, gist) {
         if (err) {
           alert('Failed to save project to gist');
@@ -109,6 +109,7 @@ my.Project = Backbone.Model.extend({
         }
       });
     } else {
+      this.pending = true;
       gistJSON.public = false;
       gist = gh.getGist();
       gist.create(gistJSON, function(err, gist) {
@@ -117,16 +118,86 @@ my.Project = Backbone.Model.extend({
           console.log(err);
           console.log(gistJSON);
         } else {
-          // we do not want to trigger an immediate resave to the gist
-          self.set({gist_id: gist.id, gist_url: gist.url}, {silent: true});
-          self.saveToStorage();
+          self.gist_id = gist.id;
+          self.gist_url = gist.url;
+          self.last_modified = new Date();
+          self.pending = false;
         }
       });
     }
   },
 
+  saveDatasetsToGist: function () {
+    var self = this;
+
+    if (!window.authenticated || !this.currentUserIsOwner) return;
+
+    if (this.pending) {
+      console.log("Pending initial gist creation. Will try again in 1s.");
+      setTimeout(_.bind(this.saveDatasetsToGist, this), 1000);
+      return;
+    }
+
+    var gh = my.github();
+    var gist;
+    var gistJSON = {
+      files: {}
+    };
+
+    // Do serialize stuff from below
+    _.each(this.get("datasets"), function (ds_meta, idx) {
+
+      if (!ds_meta.path) {
+        // We're going to change the data source to be a local copy.
+        // First, move the URL to the sources array
+        self.get("sources").push({"web": ds_meta.url}); // we dont use the setter so this wont emit an event
+        delete ds_meta.url;
+        // Second, add a path based on its name.
+        ds_meta.path = (ds_meta.name || "data") + ".csv";
+        // Third, force the backend to csv
+        ds_meta.backend = "csv";
+      }
+
+      var ds = self.datasets.at(idx);
+      var content = my.serializeDatasetToCSV(ds._store);
+
+      gistJSON.files[ds_meta.path] = {"content": content || "# No data"};
+
+    });
+
+
+    if (self.gist_id) {
+      gist = gh.getGist(self.gist_id);
+      gist.update(gistJSON, function(err, gist) {
+        if (err) {
+          alert('Failed to save project to gist');
+          console.log(err);
+          console.log(gistJSON);
+        } else {
+          console.log('Saved to gist successfully');
+        }
+      });
+    } else {
+      self.pending = true;
+      gistJSON.public = false;
+      gist = gh.getGist();
+      gist.create(gistJSON, function(err, gist) {
+        if (err) {
+          alert('Initial save of project to gist failed');
+          console.log(err);
+          console.log(gistJSON);
+        } else {
+          self.gist_id = gist.id;
+          self.gist_url = gist.url;
+          self.last_modified = new Date();
+          self.pending = false;
+        }
+      });
+    }
+
+  },
+
   save: function() {
-    this.saveToStorage();
     // TODO: do not want to save *all* the time so should probably check and only save every 5m or something
     if (window.authenticated && this.currentUserIsOwner) {
       this.saveToGist();
@@ -140,12 +211,14 @@ my.Project = Backbone.Model.extend({
     if (datasetInfo.backend == 'github') {
       self.loadGithubDataset(datasetInfo.url, function(err, whocares) {
         self.datasets.at(0).fetch().done(function() {
+          self.saveDatasetsToGist();
           cb(null, self);
         });
       });
     } else {
       self.datasets.at(0).fetch().done(function() {
         // TODO: should we set dataset metadata onto project source?
+        self.saveDatasetsToGist();
         cb(null, self);
       });
     }
@@ -225,8 +298,8 @@ my.serializeProject = function(project) {
   };
   delete data.readme;
 
-  // as per http://www.dataprotocols.org/en/latest/data-packages.html list of "datasets" is listed in files attribute
-  data.files = data.datasets;
+  // as per http://www.dataprotocols.org/en/latest/data-packages.html list of "datasets" is listed in resources attribute
+  data.resources = data.datasets;
   delete data.datasets;
 
   _.each(data.scripts, function(script) {
@@ -238,19 +311,9 @@ my.serializeProject = function(project) {
     delete script.content;
   });
 
-  _.each(data.files, function(dsInfo, idx) {
-    // TODO: check dsInfo.path does not over-write anything important (e.g. datapackage.json ...)
-    if (dsInfo.path) {
-      var ds = project.datasets.at(idx);
-      var content = my.serializeDatasetToCSV(ds._store);
-      // if content is empty we cannot add this file (see above note re github weirdness)
-      if (content) {
-        gistJSON.files[dsInfo.path] = { content: content };
-      }
-      // for good measure remove any data attribute
-      // TODO: should this be done when we loaded from the data and moved it into the dataset data store
-      delete dsInfo.data;
-    }
+  _.each(data.resources, function(dsInfo, idx) {
+    // Make sure we don't persist inline data
+    delete dsInfo.data;
   });
 
   gistJSON.files['datapackage.json'].content = JSON.stringify(data, null, 2);
@@ -260,9 +323,12 @@ my.serializeProject = function(project) {
 my.unserializeProject = function(serialized) {
   var dp = JSON.parse(serialized.files['datapackage.json'].content);
 
-  // files attribute lists data sources in data package spec
-  // if statement for backwards compatibility
-  if (dp.files && !dp.datasets) {
+  // resources attribute lists data sources in data package spec
+  // if statements for backwards compatibility
+  if (dp.resources && !dp.datasets) {
+    dp.datasets = dp.resources;
+    delete dp.resources;
+  } else if (dp.files && !dp.datasets) {
     dp.datasets = dp.files;
     delete dp.files;
   }
@@ -287,6 +353,11 @@ my.unserializeProject = function(serialized) {
       }
     }
   });
+
+  // We don't want these anymore
+  delete dp.gist_id;
+  delete dp.gist_url;
+
   var project = new my.Project(dp);
   return project;
 };
@@ -307,19 +378,40 @@ my.serializeDatasetToCSV = function(dataset) {
 
 my.ProjectList = Backbone.Collection.extend({
   model: my.Project,
+  comparator: function (a, b) {
+    return a.last_modified < b.last_modified;
+  },
   load: function() {
-    for(var key in localStorage) {
-      if (key.indexOf('dataexplorer-') === 0) {
-        var projectInfo = localStorage.getItem(key);
-        try {
-          var data = JSON.parse(projectInfo);
-          var tmp = new my.Project(data);
-          this.add(tmp);
-        } catch(e) {
-          alert('Failed to load project ' + projectInfo);
-        }
+    var self = this;
+    var gh = my.github();
+
+    gh.getUser().gists(function (err, gists) {
+
+      if (err) {
+        alert("Failed to retrieve your gists");
+        return;
       }
-    }
+
+      // Only gists that contain datapackage.json
+      gists = _.filter(gists, function (gist) {
+        return "datapackage.json" in gist.files
+      });
+
+      _.each(gists, function (gist) {
+        // We could do lazy loading, but for now lets get the datapackage immediately
+        gh.getGist(gist.id).read(function (err, gist) {
+          var dp = my.unserializeProject(gist);
+          dp.gist_id = gist.id;
+          dp.gist_url = gist.url;
+          dp.last_modified = new Date(gist.updated_at);
+          if (gist.fork_of) {
+            dp.fork_of = {id: gist.fork_of.id, owner: gist.fork_of.user.login};
+          }
+          self.add(dp);
+        });
+      });
+
+    });
   }
 });
 

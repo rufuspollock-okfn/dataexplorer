@@ -52,10 +52,6 @@ my.Load = Backbone.View.extend({
     return false;
   },
 
-  initialize: function(options) {
-    this.$el = $(this.el);
-  },
-
   render: function() {
     var rendered = _.template(this.template, {});
     this.$el.html(rendered);
@@ -98,6 +94,7 @@ my.Load = Backbone.View.extend({
           <li class="active"><a href="#gdocs">Google Docs Spreadsheet</a></li>  \
           <li><a href="#csv-disk">This computer</a></li>  \
           <li><a href="#csv-online">CSV online</a></li>  \
+          <li><a href="#paste">Copy &amp; Paste</a></li>  \
           <li><a href="#github">Github (JSON or CSV)</a></li>  \
         </ul> \
         <div class="tab-content"> \
@@ -128,19 +125,24 @@ my.Load = Backbone.View.extend({
               <div class="control-group"> \
                 <label class="control-label">Separator</label> \
                 <div class="controls"> \
-                  <input type="text" name="delimiter" value="," class="spam1"/> \
+                  <select name="delimiter" class="input-small"> \
+                    <option value="" selected>Comma</option> \
+                    <option value="&#09;">Tab</option> \
+                    <option value=" ">Space</option> \
+                    <option value=";">Semicolon</option> \
+                  </select> \
                 </div> \
               </div> \
               <div class="control-group"> \
                 <label class="control-label">Text delimiter</label> \
                 <div class="controls"> \
-                  <input type="text" name="quotechar" value=\'"\' /> \
+                  <input type="text" name="quotechar" value=\'"\' class="input-mini" /> \
                 </div> \
               </div> \
               <div class="control-group"> \
                 <label class="control-label">Encoding</label> \
                 <div class="controls"> \
-                  <input type="text" name="encoding" value="UTF-8" /> \
+                  <input type="text" name="encoding" value="UTF-8" class="input-mini" /> \
                 </div> \
               </div> \
               <div class="form-actions"> \
@@ -159,6 +161,39 @@ my.Load = Backbone.View.extend({
                     <p class="help-block"> \
                       The CSV must either be on the same server or on a domain that supports cross domain requests (via CORS) \
                     </p> \
+                  </div> \
+                </div> \
+              </fieldset> \
+              <div class="form-actions"> \
+                <button type="submit" class="btn btn-primary load-dataset">Load</button> \
+              </div> \
+            </form> \
+          </div> \
+          <div id="paste" class="tab-pane fade"> \
+            <form class="form-horizontal"> \
+              <input type="hidden" name="backend" value="csv" /> \
+              <fieldset> \
+                <div class="control-group"> \
+                  <label for="data" class="control-label">Data</label> \
+                  <div class="controls"> \
+                    <textarea name="data" class="input-block-level" rows="10" placeholder="Paste CSV data into here" /> \
+                  </div> \
+                </div> \
+                <div class="control-group"> \
+                  <label class="control-label">Separator</label> \
+                  <div class="controls"> \
+                    <select name="delimiter" class="input-small"> \
+                      <option value="" selected>Comma</option> \
+                      <option value="&#09;">Tab</option> \
+                      <option value=" ">Space</option> \
+                      <option value=";">Semicolon</option> \
+                    </select> \
+                  </div> \
+                </div> \
+                <div class="control-group"> \
+                  <label class="control-label">Text delimiter</label> \
+                  <div class="controls"> \
+                    <input type="text" name="quotechar" value=\'"\' class="input-mini" /> \
                   </div> \
                 </div> \
               </fieldset> \

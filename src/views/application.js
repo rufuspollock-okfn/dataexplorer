@@ -32,7 +32,6 @@ my.Application = Backbone.View.extend({
 
   initialize: function () {
     var self = this;
-    this.el = $(this.el);
     _.bindAll(this);
     this.router = new Backbone.Router();
     this.projectList = new DataExplorer.Model.ProjectList();
@@ -76,7 +75,7 @@ my.Application = Backbone.View.extend({
   render: function () {
     var self = this;
     // we will override if logged in
-    this.el.find('.user-status').addClass('logged-out');
+    this.$el.find('.user-status').addClass('logged-out');
 
     if ($.cookie("oauth-token")) {
       this.finishUserSetup();
@@ -127,8 +126,8 @@ my.Application = Backbone.View.extend({
   finishUserSetup: function() {
     var self = this;
     self.username = $.cookie('username');
-    self.el.find('.user-status').removeClass('logged-out');
-    self.el.find('.user-status .username').text(self.username);
+    self.$el.find('.user-status').removeClass('logged-out');
+    self.$el.find('.user-status .username').text(self.username);
     self.authenticated = true;
     window.authenticated = true;
   },
@@ -151,6 +150,12 @@ my.Application = Backbone.View.extend({
       gist.read(function(err, gist) {
         var project = DataExplorer.Model.unserializeProject(gist);
         project.currentUserIsOwner = (self.username === gist.user.login);
+        project.gist_id = gist.id;
+        project.gist_url = gist.url;
+        project.last_modified = new Date(gist.updated_at);
+        if (gist.fork_of) {
+          project.fork_of = {id: gist.fork_of.id, owner: gist.fork_of.user.login};
+        }
         checkDatasetLoaded(project);
       });
     }
@@ -185,9 +190,9 @@ my.Application = Backbone.View.extend({
 
       // if this project does in fact have remote backing let's set the username so it is sharable
       // we only want to do this where this is a "local" project url (i.e. one using local id stuff)
-      if (username === 'project' && self.username && project.get('gist_id')) {
+      if (username === 'project' && self.username && project.gist_id) {
         self.router.navigate(
-          self.username + '/' + project.get('gist_id'),
+          self.username + '/' + project.gist_id,
           {replace: true}
           );
       }
