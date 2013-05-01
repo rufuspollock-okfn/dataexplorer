@@ -4,9 +4,14 @@
 my.Project = Backbone.View.extend({
   className: 'view project',
   template: ' \
-    {{#fork_of}} \
-    <p class="text-right muted"><small>Forked from <a href="{{fork_of}}">{{fork_of}}</a></small></p> \
-    {{/fork_of}} \
+    <div id="fork"> \
+      {{#fork_of}} \
+      <p class="muted"><small>Forked from <a href="{{fork_of}}">{{fork_of}}</a></small></p> \
+      {{/fork_of}} \
+      {{^currentUserIsOwner}} \
+      <button class="btn btn-small forkme">Fork</button> \
+      {{/currentUserIsOwner}} \
+    </div> \
     <div class="top-row"> \
       <div class="top-panel"> \
         <h4>Description</h4> \
@@ -42,7 +47,8 @@ my.Project = Backbone.View.extend({
   events: {
     'click .menu-right a': '_onMenuClick',
     'click .navigation a': '_onSwitchView',
-    'click .js-go-to-data': '_onGoToData'
+    'click .js-go-to-data': '_onGoToData',
+    'click .forkme': 'forkProject'
   },
 
   initialize: function(options) {
@@ -75,6 +81,7 @@ my.Project = Backbone.View.extend({
     if (this.model.fork_of) {
       tmplData.fork_of = "#" + this.model.fork_of.owner + "/" + this.model.fork_of.id;
     }
+    tmplData.currentUserIsOwner = this.model.currentUserIsOwner;
     var tmpl = Mustache.render(this.template, tmplData);
     this.$el.html(tmpl);
 
@@ -219,6 +226,14 @@ my.Project = Backbone.View.extend({
         scrollTop: $('#data-app').offset().top - 60
       }
     );
+  },
+
+  forkProject: function () {
+    var gh = DataExplorer.Model.github();
+    gh.getGist(this.model.gist_id).fork(function (err, gist) {
+      var newpath = "#" + gist.user.login + "/" + gist.id;
+      DataExplorer.app.instance.router.navigate(newpath, {trigger: true});
+    });
   }
 });
 

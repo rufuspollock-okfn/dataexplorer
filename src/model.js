@@ -156,6 +156,7 @@ my.Project = Backbone.Model.extend({
         ds_meta.path = (ds_meta.name || "data") + ".csv";
         // Third, force the backend to csv
         ds_meta.backend = "csv";
+        self.trigger("change");
       }
 
       var ds = self.datasets.at(idx);

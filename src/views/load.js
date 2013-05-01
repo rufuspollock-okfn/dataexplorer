@@ -126,7 +126,7 @@ my.Load = Backbone.View.extend({
                 <label class="control-label">Separator</label> \
                 <div class="controls"> \
                   <select name="delimiter" class="input-small"> \
-                    <option value="" selected>Comma</option> \
+                    <option value="," selected>Comma</option> \
                     <option value="&#09;">Tab</option> \
                     <option value=" ">Space</option> \
                     <option value=";">Semicolon</option> \
@@ -183,7 +183,7 @@ my.Load = Backbone.View.extend({
                   <label class="control-label">Separator</label> \
                   <div class="controls"> \
                     <select name="delimiter" class="input-small"> \
-                      <option value="" selected>Comma</option> \
+                      <option value="," selected>Comma</option> \
                       <option value="&#09;">Tab</option> \
                       <option value=" ">Space</option> \
                       <option value=";">Semicolon</option> \
