@@ -55,6 +55,7 @@ my.Project = Backbone.Model.extend({
   initialize: function() {
     var self = this;
     this.currentUserIsOwner = true;
+    this.last_modified = new Date();
     this.pending = false;
     this.scripts = new Backbone.Collection();
     this.datasets = new Backbone.Collection();
