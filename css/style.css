@@ -229,6 +229,18 @@ a {
   width: 120px;
 }
 
+#fork {
+  text-align: right;
+}
+
+#fork p {
+  display: inline-block;
+}
+
+.forkme {
+  margin-left: 5px;
+}
+
 .view.project .data-app {
   margin-bottom: 15px;
 }
