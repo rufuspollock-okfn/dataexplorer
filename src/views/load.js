@@ -8,7 +8,34 @@ my.Load = Backbone.View.extend({
   events: {
     'submit form': 'onLoadDataset',
     'click .tab-import .nav a': '_onImportTabClick',
-    'click .gdrive-import': '_onSearchGdocs'
+    'click .gdrive-import': '_onSearchGdocs',
+    'change input[type=url]': '_checkUrl'
+  },
+
+  _checkUrl: function (e) {
+    var url = e.target.value;
+
+    if (this._guessBackend(url) !== "csv") {
+      // We dont access these URLs directly, so we won't bother checking them
+      e.target.setCustomValidity("");
+      return;
+    }
+
+    $.ajax(url, {
+      type: "HEAD",
+      success: function (jqXHR) {
+        e.target.setCustomValidity("");
+      },
+      error: function (jqXHR, textStatus) {
+        var error;
+        if (jqXHR.status === 404) {
+          error = "That URL doesn't exist";
+        } else {
+          error = "We could not retrieve this URL";
+        }
+        e.target.setCustomValidity(error);
+      }
+    });
   },
 
   onLoadDataset: function(e) {
@@ -21,12 +48,8 @@ my.Load = Backbone.View.extend({
     });
     // try to set name
     if (data.url) {
- 
-      if (data.url.match(/^https?:\/\/github.com/)) {
-        data.backend = "github";
-      } else if (data.url.match(/^https?:\/\/docs.google.com/)) {
-        data.backend = "gdocs";
-      }
+
+      data.backend = this._guessBackend(data.url);
 
       if (data.backend !== 'gdocs') {
         data.name = data.url.split('/')
@@ -62,6 +85,16 @@ my.Load = Backbone.View.extend({
     return this;
   },
 
+  _guessBackend: function (url) {
+    var backend = 'csv';
+    if (url.match(/^https?:\/\/github.com/)) {
+      backend = "github";
+    } else if (url.match(/^https?:\/\/docs.google.com/)) {
+      backend = "gdocs";
+    }
+    return backend;
+  },
+
   _onImportTabClick: function(e) {
     e.preventDefault();
     $(e.target).tab('show');
@@ -83,7 +116,7 @@ my.Load = Backbone.View.extend({
       if (data[google.picker.Response.ACTION] === google.picker.Action.PICKED) {
         var doc = data[google.picker.Response.DOCUMENTS][0];
         url = doc[google.picker.Document.URL];
-        self.$el.find('input[name="url"]').val(url);
+        self.$el.find('input[name="url"]').val(url).trigger("change");
       }
     }
 
