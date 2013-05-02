@@ -91,14 +91,14 @@ my.Load = Backbone.View.extend({
       <hr /> \
       <div class="tabbable tabs-left tab-import"> \
         <ul class="nav nav-tabs"> \
-          <li class="active"><a href="#gdocs">Google Docs Spreadsheet</a></li>  \
-          <li><a href="#csv-disk">This computer</a></li>  \
-          <li><a href="#csv-online">CSV online</a></li>  \
-          <li><a href="#paste">Copy &amp; Paste</a></li>  \
+          <li class="active"><a href="#csv-online">CSV online</a></li>  \
+          <li><a href="#gdocs">Google Docs Spreadsheet</a></li>  \
           <li><a href="#github">Github (JSON or CSV)</a></li>  \
+          <li><a href="#csv-disk">Upload</a></li>  \
+          <li><a href="#paste">Paste</a></li>  \
         </ul> \
         <div class="tab-content"> \
-          <div id="gdocs" class="tab-pane active"> \
+          <div id="gdocs" class="tab-pane"> \
             <div class="alert alert-warning"> \
               <strong>Note:</strong> To load a spreadsheet it must have been <strong>"published"</strong> (to do this go to: File Menu -> Publish to the Web) \
             </div> \
@@ -113,7 +113,7 @@ my.Load = Backbone.View.extend({
               </fieldset> \
             </form> \
           </div> \
-          <div id="csv-disk" class="tab-pane fade"> \
+          <div id="csv-disk" class="tab-pane"> \
             <form class="form-horizontal"> \
               <input type="hidden" name="backend" value="csv" /> \
               <div class="control-group"> \
@@ -150,7 +150,7 @@ my.Load = Backbone.View.extend({
               </div> \
             </form> \
           </div> \
-          <div id="csv-online" class="tab-pane fade"> \
+          <div id="csv-online" class="tab-pane active"> \
             <form class="form-horizontal"> \
               <input type="hidden" name="backend" value="csv" /> \
               <fieldset> \
@@ -169,7 +169,7 @@ my.Load = Backbone.View.extend({
               </div> \
             </form> \
           </div> \
-          <div id="paste" class="tab-pane fade"> \
+          <div id="paste" class="tab-pane"> \
             <form class="form-horizontal"> \
               <input type="hidden" name="backend" value="csv" /> \
               <fieldset> \
@@ -202,7 +202,7 @@ my.Load = Backbone.View.extend({
               </div> \
             </form> \
           </div> \
-          <div id="github" class="tab-pane fade"> \
+          <div id="github" class="tab-pane"> \
             <form class="form-horizontal"> \
               <input type="hidden" name="backend" value="github" /> \
               <fieldset> \
