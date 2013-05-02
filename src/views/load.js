@@ -8,7 +8,6 @@ my.Load = Backbone.View.extend({
   events: {
     'click .load-dataset': 'onLoadDataset',
     'submit form': 'onLoadDataset',
-    'click .search-gdocs': '_onSearchGdocs',
     'click .tab-import .nav a': '_onImportTabClick'
   },
 
@@ -16,15 +15,20 @@ my.Load = Backbone.View.extend({
     var self = this;
     e.preventDefault();
     var $form = $(e.target).closest('form');
-    // var url = $form.find("input[name=source]").first().val();
-    var data = {
-    };
+    var data = {};
     _.each($form.serializeArray(), function(item) {
       data[item.name] = item.value;
     });
     // try to set name
     if (data.url) {
-      if (data.backend != 'gdocs') {
+ 
+      if (data.url.match(/^https?:\/\/github.com/)) {
+        data.backend = "github";
+      } else if (data.url.match(/^https?:\/\/docs.google.com/)) {
+        data.backend = "gdocs";
+      }
+
+      if (data.backend !== 'gdocs') {
         data.name = data.url.split('/')
           .pop()
           .split('.')[0];
@@ -62,28 +66,6 @@ my.Load = Backbone.View.extend({
     e.preventDefault();
     $(e.target).tab('show');
   },
-
-  _onSearchGdocs: function(e) {
-    var self = this;
-    e.preventDefault();
-    // Create and render a Picker object for searching images.
-    var picker = new google.picker.PickerBuilder()
-      .disableFeature(google.picker.Feature.MULTISELECT_ENABLED)
-      .addView(google.picker.ViewId.SPREADSHEETS )
-      .setCallback(pickerCallback)
-      .build();
-    picker.setVisible(true);
-
-    function pickerCallback(data) {
-      var url = 'nothing';
-      if (data[google.picker.Response.ACTION] == google.picker.Action.PICKED) {
-        var doc = data[google.picker.Response.DOCUMENTS][0];
-        url = doc[google.picker.Document.URL];
-        self.$el.find('#gdocs input[name="url"]').val(url);
-        self.$el.find('#gdocs form').submit();
-      }
-    }
-  },
   
   template: ' \
     <div class="view load"> \
@@ -91,28 +73,11 @@ my.Load = Backbone.View.extend({
       <hr /> \
       <div class="tabbable tabs-left tab-import"> \
         <ul class="nav nav-tabs"> \
-          <li class="active"><a href="#csv-online">CSV online</a></li>  \
-          <li><a href="#gdocs">Google Docs Spreadsheet</a></li>  \
-          <li><a href="#github">Github (JSON or CSV)</a></li>  \
+          <li class="active"><a href="#csv-online">Online</a></li>  \
           <li><a href="#csv-disk">Upload</a></li>  \
           <li><a href="#paste">Paste</a></li>  \
         </ul> \
         <div class="tab-content"> \
-          <div id="gdocs" class="tab-pane"> \
-            <div class="alert alert-warning"> \
-              <strong>Note:</strong> To load a spreadsheet it must have been <strong>"published"</strong> (to do this go to: File Menu -> Publish to the Web) \
-            </div> \
-            <p><a href="#" class="search-gdocs btn btn-primary">Select Spreadsheet in Google Docs &raquo;<br />(Opens file picker)</a></p> \
-            <p><strong>Or paste the url directly</strong></p> \
-            <form class="form"> \
-              <input type="hidden" name="backend" value="gdocs" /> \
-              <fieldset> \
-                <input type="text" name="url" class="input span6" placeholder="URL to sheet" /> \
-                <br /> \
-                <button type="submit" class="btn btn-success load-dataset">Load</button> \
-              </fieldset> \
-            </form> \
-          </div> \
           <div id="csv-disk" class="tab-pane"> \
             <form class="form-horizontal"> \
               <input type="hidden" name="backend" value="csv" /> \
@@ -157,10 +122,7 @@ my.Load = Backbone.View.extend({
                 <div class="control-group"> \
                   <label for="url" class="control-label">URL</label> \
                   <div class="controls"> \
-                    <input type="text" name="url" class="input span6" placeholder="URL to CSV" /> \
-                    <p class="help-block"> \
-                      The CSV must either be on the same server or on a domain that supports cross domain requests (via CORS) \
-                    </p> \
+                    <input type="url" name="url" class="input span6" placeholder="URL to CSV or a published Google Spreadsheet" /> \
                   </div> \
                 </div> \
               </fieldset> \
@@ -194,22 +156,6 @@ my.Load = Backbone.View.extend({
                   <label class="control-label">Text delimiter</label> \
                   <div class="controls"> \
                     <input type="text" name="quotechar" value=\'"\' class="input-mini" /> \
-                  </div> \
-                </div> \
-              </fieldset> \
-              <div class="form-actions"> \
-                <button type="submit" class="btn btn-primary load-dataset">Load</button> \
-              </div> \
-            </form> \
-          </div> \
-          <div id="github" class="tab-pane"> \
-            <form class="form-horizontal"> \
-              <input type="hidden" name="backend" value="github" /> \
-              <fieldset> \
-                <div class="control-group"> \
-                  <label for="url" class="control-label">URL</label> \
-                  <div class="controls"> \
-                    <input type="text" name="url" class="input span6" placeholder="URL to CSV on GitHub" value="https://github.com/datasets/transformer-test/blob/master/data/data.csv" /> \
                   </div> \
                 </div> \
               </fieldset> \
