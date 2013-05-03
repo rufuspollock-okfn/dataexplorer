@@ -198,7 +198,11 @@ my.Project = Backbone.Model.extend({
   save: function() {
     // TODO: do not want to save *all* the time so should probably check and only save every 5m or something
     if (window.authenticated && this.currentUserIsOwner) {
-      this.saveToGist();
+      var self = this;
+      var saving = this.saveDatasetsToGist().pipe(function () {
+        return self.saveToGist();
+      });
+      return saving;
     }
   },
 

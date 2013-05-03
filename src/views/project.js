@@ -275,7 +275,8 @@ my.ProjectPreview = Backbone.View.extend({
   ',
   events: {
     'change select': 'updateDelimiter',
-    'change input': 'updateTitle'
+    'change input': 'updateTitle',
+    'submit form': 'save'
   },
   render: function () {
     this.$el.html(this.template);
@@ -292,6 +293,12 @@ my.ProjectPreview = Backbone.View.extend({
   },
   updateTitle: function (e) {
     this.model.set("name", e.target.value);
+  },
+  save: function (e) {
+    e.preventDefault();
+    this.model.save().done(function () {
+      console.log("Updating project UI post-save");
+    })
   }
 });
 
