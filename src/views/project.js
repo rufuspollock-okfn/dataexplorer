@@ -274,10 +274,12 @@ my.ProjectPreview = Backbone.View.extend({
   </form> \
   ',
   events: {
-    'change select': 'updateDelimiter'
+    'change select': 'updateDelimiter',
+    'change input': 'updateTitle'
   },
   render: function () {
     this.$el.html(this.template);
+    this.$el.find("input[name=title]").val(this.model.get("name"));
     return this;
   },
   updateDelimiter: function (e) {
@@ -286,6 +288,9 @@ my.ProjectPreview = Backbone.View.extend({
       ds.set("delimiter", delimiter);
       ds.fetch();
     });
+  },
+  updateTitle: function (e) {
+    this.model.set("name", e.target.value);
   }
 });
 
