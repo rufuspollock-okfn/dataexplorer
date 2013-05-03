@@ -98,6 +98,8 @@ my.Project = Backbone.Model.extend({
     var gistJSON = my.serializeProject(this);
     var gist;
 
+    var deferred = new $.Deferred();
+
     if (this.gist_id) {
       gist = gh.getGist(this.gist_id);
       gist.update(gistJSON, function(err, gist) {
@@ -105,8 +107,10 @@ my.Project = Backbone.Model.extend({
           alert('Failed to save project to gist');
           console.log(err);
           console.log(gistJSON);
+          deferred.reject();
         } else {
           console.log('Saved to gist successfully');
+          deferred.resolve();
         }
       });
     } else {
@@ -118,14 +122,18 @@ my.Project = Backbone.Model.extend({
           alert('Initial save of project to gist failed');
           console.log(err);
           console.log(gistJSON);
+          deferred.reject();
         } else {
           self.gist_id = gist.id;
           self.gist_url = gist.url;
           self.last_modified = new Date();
           self.pending = false;
+          deferred.resolve();
         }
       });
     }
+
+    return deferred;
   },
 
   saveDatasetsToGist: function () {
@@ -167,6 +175,7 @@ my.Project = Backbone.Model.extend({
 
     });
 
+    var deferred = new $.Deferred();
 
     if (self.gist_id) {
       gist = gh.getGist(self.gist_id);
@@ -175,8 +184,10 @@ my.Project = Backbone.Model.extend({
           alert('Failed to save project to gist');
           console.log(err);
           console.log(gistJSON);
+          deferred.reject();
         } else {
           console.log('Saved to gist successfully');
+          deferred.resolve();
         }
       });
     } else {
@@ -188,15 +199,18 @@ my.Project = Backbone.Model.extend({
           alert('Initial save of project to gist failed');
           console.log(err);
           console.log(gistJSON);
+          deferred.reject();
         } else {
           self.gist_id = gist.id;
           self.gist_url = gist.url;
           self.last_modified = new Date();
           self.pending = false;
+          deferred.resolve();
         }
       });
     }
 
+    return deferred;
   },
 
   save: function() {
