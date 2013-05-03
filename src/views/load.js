@@ -6,7 +6,6 @@ this.DataExplorer.View = this.DataExplorer.View || {};
 
 my.Load = Backbone.View.extend({
   events: {
-    'click .load-dataset': 'onLoadDataset',
     'submit form': 'onLoadDataset',
     'click .tab-import .nav a': '_onImportTabClick'
   },
