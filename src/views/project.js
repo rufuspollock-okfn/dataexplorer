@@ -280,6 +280,7 @@ my.ProjectPreview = Backbone.View.extend({
   render: function () {
     this.$el.html(this.template);
     this.$el.find("input[name=title]").val(this.model.get("name"));
+    this.$el.find("select[name=delimiter]").val(this.model.datasets.at(0).get("delimiter"));
     return this;
   },
   updateDelimiter: function (e) {
