@@ -51,7 +51,7 @@ my.Load = Backbone.View.extend({
       name: projectName,
       datasets: [data]
     });
-    this.project.save();
+    // this.project.save();
     self.trigger('load', this.project);
     return false;
   },

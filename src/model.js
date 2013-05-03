@@ -82,7 +82,7 @@ my.Project = Backbone.Model.extend({
     this.datasets.bind('change', function() {
       self.set({datasets: self.datasets.toJSON()});
     });
-    this.bind('change', this.save);
+    // this.bind('change', this.save);
   },
 
   saveToGist: function() {
@@ -213,14 +213,14 @@ my.Project = Backbone.Model.extend({
     if (datasetInfo.backend == 'github') {
       self.loadGithubDataset(datasetInfo.url, function(err, whocares) {
         self.datasets.at(0).fetch().done(function() {
-          self.saveDatasetsToGist();
+          // self.saveDatasetsToGist();
           cb(null, self);
         });
       });
     } else {
       self.datasets.at(0).fetch().done(function() {
         // TODO: should we set dataset metadata onto project source?
-        self.saveDatasetsToGist();
+        // self.saveDatasetsToGist();
         cb(null, self);
       });
     }
