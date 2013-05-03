@@ -56,7 +56,6 @@ my.Project = Backbone.Model.extend({
     var self = this;
     this.currentUserIsOwner = true;
     this.last_modified = new Date();
-    this.pending = false;
     this.scripts = new Backbone.Collection();
     this.datasets = new Backbone.Collection();
     if (!this.id) {
@@ -87,12 +86,6 @@ my.Project = Backbone.Model.extend({
 
   saveToGist: function() {
 
-    if (this.pending) {
-      console.log("Pending initial gist creation. Will try again in 1s.");
-      setTimeout(_.bind(this.saveToGist, this), 1000);
-      return;
-    }
-
     var self = this;
     var gh = my.github();
     var gistJSON = my.serializeProject(this);
@@ -114,7 +107,6 @@ my.Project = Backbone.Model.extend({
         }
       });
     } else {
-      this.pending = true;
       gistJSON.public = false;
       gist = gh.getGist();
       gist.create(gistJSON, function(err, gist) {
@@ -127,7 +119,6 @@ my.Project = Backbone.Model.extend({
           self.gist_id = gist.id;
           self.gist_url = gist.url;
           self.last_modified = new Date();
-          self.pending = false;
           deferred.resolve();
         }
       });
@@ -140,12 +131,6 @@ my.Project = Backbone.Model.extend({
     var self = this;
 
     if (!window.authenticated || !this.currentUserIsOwner) return;
-
-    if (this.pending) {
-      console.log("Pending initial gist creation. Will try again in 1s.");
-      setTimeout(_.bind(this.saveDatasetsToGist, this), 1000);
-      return;
-    }
 
     var gh = my.github();
     var gist;
@@ -165,7 +150,6 @@ my.Project = Backbone.Model.extend({
         ds_meta.path = (ds_meta.name || "data") + ".csv";
         // Third, force the backend to csv
         ds_meta.backend = "csv";
-        self.trigger("change");
       }
 
       var ds = self.datasets.at(idx);
@@ -191,7 +175,6 @@ my.Project = Backbone.Model.extend({
         }
       });
     } else {
-      self.pending = true;
       gistJSON.public = false;
       gist = gh.getGist();
       gist.create(gistJSON, function(err, gist) {
@@ -204,7 +187,6 @@ my.Project = Backbone.Model.extend({
           self.gist_id = gist.id;
           self.gist_url = gist.url;
           self.last_modified = new Date();
-          self.pending = false;
           deferred.resolve();
         }
       });
