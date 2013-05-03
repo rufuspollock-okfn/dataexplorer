@@ -296,8 +296,10 @@ my.ProjectPreview = Backbone.View.extend({
   },
   save: function (e) {
     e.preventDefault();
+    var self = this;
     this.model.save().done(function () {
-      console.log("Updating project UI post-save");
+      var newpath = "#" + DataExplorer.app.instance.username + "/" + self.model.gist_id;
+      DataExplorer.app.instance.router.navigate(newpath, {trigger: true});
     })
   }
 });
