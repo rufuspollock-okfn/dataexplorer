@@ -163,6 +163,14 @@ my.Project = Backbone.View.extend({
       resizeToWidth: true
     }).hide();
 
+    if (!this.model.gist_id) {
+      // Hasn't been saved yet, show ProjectPreview
+      var preview = new DataExplorer.View.ProjectPreview({
+        model: this.model
+      });
+      this.$el.prepend(preview.render().el);
+    }
+
     return this;
   },
 
@@ -238,6 +246,45 @@ my.Project = Backbone.View.extend({
     gh.getGist(this.model.gist_id).fork(function (err, gist) {
       var newpath = "#" + gist.user.login + "/" + gist.id;
       DataExplorer.app.instance.router.navigate(newpath, {trigger: true});
+    });
+  }
+});
+
+my.ProjectPreview = Backbone.View.extend({
+  className: 'project-preview',
+  template: '\
+  <h3>Preview your project before saving</h3> \
+  <form> \
+    <div class="control-group"> \
+      <label>Title</label> \
+      <input type="text" name="title" placeholder="Title" required /> \
+    </div> \
+    <div class="control-group"> \
+      <label>Delimiter</label> \
+      <select name="delimiter" class="input-small"> \
+        <option value="," selected>Comma</option> \
+        <option value="&#09;">Tab</option> \
+        <option value=" ">Space</option> \
+        <option value=";">Semicolon</option> \
+      </select> \
+    </div> \
+    <div class="control-group"> \
+      <button type="submit" class="btn btn-success">Save</button> \
+    </div> \
+  </form> \
+  ',
+  events: {
+    'change select': 'updateDelimiter'
+  },
+  render: function () {
+    this.$el.html(this.template);
+    return this;
+  },
+  updateDelimiter: function (e) {
+    var delimiter = e.target.value;
+    this.model.datasets.each(function (ds) {
+      ds.set("delimiter", delimiter);
+      ds.fetch();
     });
   }
 });

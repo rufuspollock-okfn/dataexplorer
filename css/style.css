@@ -291,6 +291,28 @@ a {
   float: left;
 }
 
+.project-preview {
+  background: #fcf8e3;
+  padding: 10px 20px;
+}
+
+.project-preview h3 {
+  margin-top: 0;
+}
+
+.project-preview form {
+  margin: 0;
+}
+
+.project-preview input, .project-preview select {
+  margin-bottom: 0;
+}
+
+.project-preview .control-group {
+  display: inline-block;
+  margin-right: 10px;
+}
+
 /**********************************************************
   * Query Editor
   *********************************************************/
