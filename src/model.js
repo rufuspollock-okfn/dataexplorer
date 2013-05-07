@@ -81,10 +81,14 @@ my.Project = Backbone.Model.extend({
     this.datasets.bind('change', function() {
       self.set({datasets: self.datasets.toJSON()});
     });
-    // this.bind('change', this.save);
+
+    this.bind('change:readme', this.saveToGist, this);
+    this.scripts.bind('change', this.saveToGist, this);
   },
 
   saveToGist: function() {
+
+    if (!window.authenticated || !this.currentUserIsOwner) return;
 
     var self = this;
     var gh = my.github();
