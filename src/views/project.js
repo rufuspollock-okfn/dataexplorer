@@ -4,6 +4,7 @@
 my.Project = Backbone.View.extend({
   className: 'view project',
   template: ' \
+    <button id="top-row-toggle" class="btn btn-mini">Toggle Description &amp; Code Editor</button> \
     <div id="fork"> \
       {{#fork_of}} \
       <p class="muted"><small>Forked from <a href="{{fork_of}}">{{fork_of}}</a></small></p> \
@@ -16,7 +17,7 @@ my.Project = Backbone.View.extend({
       <div class="top-panel"> \
         <h4>Description</h4> \
         <div class="meta"> \
-          <button class="btn btn-small editreadme">Edit</button> \
+          <button class="btn btn-mini editreadme">Edit</button> \
           <div class="readme"></div> \
         </div> \
       </div><div class="top-panel"> \
@@ -24,7 +25,6 @@ my.Project = Backbone.View.extend({
         <div class="script-editor"></div> \
       </div> \
     </div> \
-    <hr /> \
     <div id="data-app" class="data-app"> \
       <div class="header"> \
         <div class="navigation"> \
@@ -48,7 +48,8 @@ my.Project = Backbone.View.extend({
     'click .menu-right a': '_onMenuClick',
     'click .navigation a': '_onSwitchView',
     'click .js-go-to-data': '_onGoToData',
-    'click .forkme': 'forkProject'
+    'click .forkme': 'forkProject',
+    'click #top-row-toggle': '_toggleTopRow'
   },
 
   initialize: function(options) {
@@ -160,7 +161,7 @@ my.Project = Backbone.View.extend({
       minLeft: 250,
       minRight: 250,
       resizeToWidth: true
-    });
+    }).hide();
 
     return this;
   },
@@ -226,6 +227,10 @@ my.Project = Backbone.View.extend({
         scrollTop: $('#data-app').offset().top - 60
       }
     );
+  },
+
+  _toggleTopRow: function (e) {
+    $(".top-row").slideToggle();
   },
 
   forkProject: function () {
