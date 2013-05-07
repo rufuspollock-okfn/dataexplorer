@@ -10,14 +10,14 @@ my.Project = Backbone.View.extend({
       <p class="muted"><small>Forked from <a href="{{fork_of}}">{{fork_of}}</a></small></p> \
       {{/fork_of}} \
       {{^currentUserIsOwner}} \
-      <button class="btn btn-small forkme">Fork</button> \
+      <button class="btn btn-mini forkme">Fork</button> \
       {{/currentUserIsOwner}} \
     </div> \
     <div class="top-row"> \
       <div class="top-panel"> \
         <h4>Description</h4> \
         <div class="meta"> \
-          <button class="btn btn-mini editreadme">Edit</button> \
+          <button class="btn btn-small editreadme">Edit</button> \
           <div class="readme"></div> \
         </div> \
       </div><div class="top-panel"> \
