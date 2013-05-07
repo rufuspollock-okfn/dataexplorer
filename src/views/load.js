@@ -86,12 +86,6 @@ my.Load = Backbone.View.extend({
                   <input type="file" name="file" /> \
                 </div> \
               </div> \
-              <div class="control-group"> \
-                <label class="control-label">Text delimiter</label> \
-                <div class="controls"> \
-                  <input type="text" name="quotechar" value=\'"\' class="input-mini" /> \
-                </div> \
-              </div> \
               <div class="form-actions"> \
                 <button type="submit" class="btn btn-primary load-dataset">Load</button> \
               </div> \
@@ -121,12 +115,6 @@ my.Load = Backbone.View.extend({
                   <label for="data" class="control-label">Data</label> \
                   <div class="controls"> \
                     <textarea name="data" class="input-block-level" rows="10" placeholder="Paste CSV data into here" /> \
-                  </div> \
-                </div> \
-                <div class="control-group"> \
-                  <label class="control-label">Text delimiter</label> \
-                  <div class="controls"> \
-                    <input type="text" name="quotechar" value=\'"\' class="input-mini" /> \
                   </div> \
                 </div> \
               </fieldset> \

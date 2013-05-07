@@ -269,13 +269,20 @@ my.ProjectPreview = Backbone.View.extend({
       </select> \
     </div> \
     <div class="control-group"> \
+      <label class="control-label">Text delimiter</label> \
+      <div class="controls"> \
+        <input type="text" name="quotechar" value=\'"\' class="input-mini" /> \
+      </div> \
+    </div> \
+    <div class="control-group"> \
       <button type="submit" class="btn btn-success">Save</button> \
     </div> \
   </form> \
   ',
   events: {
     'change select': 'updateDelimiter',
-    'change input': 'updateTitle',
+    'change input[name=title]': 'updateTitle',
+    'change input[name=quotechar]': 'updateQuoteChar',
     'submit form': 'save'
   },
   render: function () {
@@ -293,6 +300,13 @@ my.ProjectPreview = Backbone.View.extend({
   },
   updateTitle: function (e) {
     this.model.set("name", e.target.value);
+  },
+  updateQuoteChar: function (e) {
+    var quotechar = e.target.value;
+    this.model.datasets.each(function (ds) {
+      ds.set("quotechar", quotechar);
+      ds.fetch();
+    });
   },
   save: function (e) {
     e.preventDefault();
