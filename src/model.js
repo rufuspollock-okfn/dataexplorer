@@ -244,6 +244,19 @@ my.Project = Backbone.Model.extend({
       self.datasets.reset([new recline.Model.Dataset({data: raw_csv, backend: 'csv'})]);
       cb(err, self.dataset);
     });
+  },
+
+  toJSON: function() {
+    var out = Backbone.Model.prototype.toJSON.apply(this, arguments);
+    // make sure we serialize fields
+    // would like to do happen on model itself (i.e. change events on dataset objects trigger change in datasets attribute)
+    // but not sure how to ensure it has happened reliably
+    out.datasets = this.datasets.map(function(ds) {
+      var dsjson = ds.toJSON();
+      dsjson.fields = ds.fields.toJSON();
+      return dsjson;
+    });
+    return out;
   }
 });
 

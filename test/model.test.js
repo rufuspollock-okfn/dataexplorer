@@ -30,13 +30,16 @@ test('Project: loadSourceDataset', function () {
     equal(project.datasets.at(0).get('backend'), 'csv')  
     equal(project.datasets.at(0)._store.records.length, 1);
     equal(project.datasets.at(0).fields.length, 2);
-    deepEqual(project.datasets.at(0).fields.at(0).toJSON(), {
+    var field = {
       id: 'Date',
       type: 'string',
       label: 'Date',
       is_derived: false,
       format: null
-    });
+    };
+    deepEqual(project.datasets.at(0).fields.at(0).toJSON(), field);
+    // check we get fields (does not work atm!)
+    deepEqual(project.toJSON().datasets[0].fields[0], field);
   });
 });
 
