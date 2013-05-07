@@ -289,6 +289,9 @@ my.ProjectPreview = Backbone.View.extend({
     this.$el.html(this.template);
     this.$el.find("input[name=title]").val(this.model.get("name"));
     this.$el.find("select[name=delimiter]").val(this.model.datasets.at(0).get("delimiter"));
+    if (!window.authenticated) {
+      this.$el.find("button[type=submit]").addClass("disabled").after('<span class="help-inline">Save disabled. Please sign in.</span>');
+    }
     return this;
   },
   updateDelimiter: function (e) {
@@ -311,6 +314,7 @@ my.ProjectPreview = Backbone.View.extend({
   save: function (e) {
     e.preventDefault();
     var self = this;
+    if (!window.authenticated) return;
     this.model.save().done(function () {
       var newpath = "#" + DataExplorer.app.instance.username + "/" + self.model.gist_id;
       DataExplorer.app.instance.router.navigate(newpath, {trigger: true});
