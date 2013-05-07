@@ -7,7 +7,8 @@ this.DataExplorer.View = this.DataExplorer.View || {};
 my.Load = Backbone.View.extend({
   events: {
     'submit form': 'onLoadDataset',
-    'click .tab-import .nav a': '_onImportTabClick'
+    'click .tab-import .nav a': '_onImportTabClick',
+    'click .gdrive-import': '_onSearchGdocs'
   },
 
   onLoadDataset: function(e) {
@@ -65,6 +66,28 @@ my.Load = Backbone.View.extend({
     e.preventDefault();
     $(e.target).tab('show');
   },
+
+  _onSearchGdocs: function(e) {
+    e.preventDefault();
+    var self = this;
+    
+    var picker = new google.picker.PickerBuilder()
+      .disableFeature(google.picker.Feature.MULTISELECT_ENABLED)
+      .addView(google.picker.ViewId.SPREADSHEETS)
+      .setCallback(pickerCallback)
+      .build();
+    picker.setVisible(true);
+
+    function pickerCallback(data) {
+      var url = 'nothing';
+      if (data[google.picker.Response.ACTION] === google.picker.Action.PICKED) {
+        var doc = data[google.picker.Response.DOCUMENTS][0];
+        url = doc[google.picker.Document.URL];
+        self.$el.find('input[name="url"]').val(url);
+      }
+    }
+
+  },
   
   template: ' \
     <div class="view load"> \
@@ -99,6 +122,7 @@ my.Load = Backbone.View.extend({
                   <label for="url" class="control-label">URL</label> \
                   <div class="controls"> \
                     <input type="url" name="url" class="input span6" placeholder="URL to CSV or a published Google Spreadsheet" /> \
+                    <button title="Select from Google Drive" class="gdrive-import btn"><i class="gdrive"></i></button> \
                   </div> \
                 </div> \
               </fieldset> \
