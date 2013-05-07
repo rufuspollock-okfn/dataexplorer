@@ -42,7 +42,7 @@ my.Application = Backbone.View.extend({
       var state = recline.View.parseQueryString(decodeURIComponent(window.location.search));
       if (state.backend) {
         var project = new DataExplorer.Model.Project({datasets: [state]});
-        project.save();
+        // project.save();
         self.onLoadProject(project);
         return;
       }

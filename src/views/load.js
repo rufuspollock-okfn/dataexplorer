@@ -6,7 +6,6 @@ this.DataExplorer.View = this.DataExplorer.View || {};
 
 my.Load = Backbone.View.extend({
   events: {
-    'click .load-dataset': 'onLoadDataset',
     'submit form': 'onLoadDataset',
     'click .tab-import .nav a': '_onImportTabClick'
   },
@@ -51,7 +50,7 @@ my.Load = Backbone.View.extend({
       name: projectName,
       datasets: [data]
     });
-    this.project.save();
+    // this.project.save();
     self.trigger('load', this.project);
     return false;
   },
@@ -87,29 +86,6 @@ my.Load = Backbone.View.extend({
                   <input type="file" name="file" /> \
                 </div> \
               </div> \
-              <div class="control-group"> \
-                <label class="control-label">Separator</label> \
-                <div class="controls"> \
-                  <select name="delimiter" class="input-small"> \
-                    <option value="," selected>Comma</option> \
-                    <option value="&#09;">Tab</option> \
-                    <option value=" ">Space</option> \
-                    <option value=";">Semicolon</option> \
-                  </select> \
-                </div> \
-              </div> \
-              <div class="control-group"> \
-                <label class="control-label">Text delimiter</label> \
-                <div class="controls"> \
-                  <input type="text" name="quotechar" value=\'"\' class="input-mini" /> \
-                </div> \
-              </div> \
-              <div class="control-group"> \
-                <label class="control-label">Encoding</label> \
-                <div class="controls"> \
-                  <input type="text" name="encoding" value="UTF-8" class="input-mini" /> \
-                </div> \
-              </div> \
               <div class="form-actions"> \
                 <button type="submit" class="btn btn-primary load-dataset">Load</button> \
               </div> \
@@ -139,23 +115,6 @@ my.Load = Backbone.View.extend({
                   <label for="data" class="control-label">Data</label> \
                   <div class="controls"> \
                     <textarea name="data" class="input-block-level" rows="10" placeholder="Paste CSV data into here" /> \
-                  </div> \
-                </div> \
-                <div class="control-group"> \
-                  <label class="control-label">Separator</label> \
-                  <div class="controls"> \
-                    <select name="delimiter" class="input-small"> \
-                      <option value="," selected>Comma</option> \
-                      <option value="&#09;">Tab</option> \
-                      <option value=" ">Space</option> \
-                      <option value=";">Semicolon</option> \
-                    </select> \
-                  </div> \
-                </div> \
-                <div class="control-group"> \
-                  <label class="control-label">Text delimiter</label> \
-                  <div class="controls"> \
-                    <input type="text" name="quotechar" value=\'"\' class="input-mini" /> \
                   </div> \
                 </div> \
               </fieldset> \

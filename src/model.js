@@ -56,7 +56,6 @@ my.Project = Backbone.Model.extend({
     var self = this;
     this.currentUserIsOwner = true;
     this.last_modified = new Date();
-    this.pending = false;
     this.scripts = new Backbone.Collection();
     this.datasets = new Backbone.Collection();
     if (!this.id) {
@@ -82,21 +81,21 @@ my.Project = Backbone.Model.extend({
     this.datasets.bind('change', function() {
       self.set({datasets: self.datasets.toJSON()});
     });
-    this.bind('change', this.save);
+
+    this.bind('change:readme', this.saveToGist, this);
+    this.scripts.bind('change', this.saveToGist, this);
   },
 
   saveToGist: function() {
 
-    if (this.pending) {
-      console.log("Pending initial gist creation. Will try again in 1s.");
-      setTimeout(_.bind(this.saveToGist, this), 1000);
-      return;
-    }
+    if (!window.authenticated || !this.currentUserIsOwner) return;
 
     var self = this;
     var gh = my.github();
     var gistJSON = my.serializeProject(this);
     var gist;
+
+    var deferred = new $.Deferred();
 
     if (this.gist_id) {
       gist = gh.getGist(this.gist_id);
@@ -105,12 +104,13 @@ my.Project = Backbone.Model.extend({
           alert('Failed to save project to gist');
           console.log(err);
           console.log(gistJSON);
+          deferred.reject();
         } else {
           console.log('Saved to gist successfully');
+          deferred.resolve();
         }
       });
     } else {
-      this.pending = true;
       gistJSON.public = false;
       gist = gh.getGist();
       gist.create(gistJSON, function(err, gist) {
@@ -118,26 +118,23 @@ my.Project = Backbone.Model.extend({
           alert('Initial save of project to gist failed');
           console.log(err);
           console.log(gistJSON);
+          deferred.reject();
         } else {
           self.gist_id = gist.id;
           self.gist_url = gist.url;
           self.last_modified = new Date();
-          self.pending = false;
+          deferred.resolve();
         }
       });
     }
+
+    return deferred;
   },
 
   saveDatasetsToGist: function () {
     var self = this;
 
     if (!window.authenticated || !this.currentUserIsOwner) return;
-
-    if (this.pending) {
-      console.log("Pending initial gist creation. Will try again in 1s.");
-      setTimeout(_.bind(this.saveDatasetsToGist, this), 1000);
-      return;
-    }
 
     var gh = my.github();
     var gist;
@@ -157,7 +154,6 @@ my.Project = Backbone.Model.extend({
         ds_meta.path = (ds_meta.name || "data") + ".csv";
         // Third, force the backend to csv
         ds_meta.backend = "csv";
-        self.trigger("change");
       }
 
       var ds = self.datasets.at(idx);
@@ -167,6 +163,7 @@ my.Project = Backbone.Model.extend({
 
     });
 
+    var deferred = new $.Deferred();
 
     if (self.gist_id) {
       gist = gh.getGist(self.gist_id);
@@ -175,12 +172,13 @@ my.Project = Backbone.Model.extend({
           alert('Failed to save project to gist');
           console.log(err);
           console.log(gistJSON);
+          deferred.reject();
         } else {
           console.log('Saved to gist successfully');
+          deferred.resolve();
         }
       });
     } else {
-      self.pending = true;
       gistJSON.public = false;
       gist = gh.getGist();
       gist.create(gistJSON, function(err, gist) {
@@ -188,21 +186,27 @@ my.Project = Backbone.Model.extend({
           alert('Initial save of project to gist failed');
           console.log(err);
           console.log(gistJSON);
+          deferred.reject();
         } else {
           self.gist_id = gist.id;
           self.gist_url = gist.url;
           self.last_modified = new Date();
-          self.pending = false;
+          deferred.resolve();
         }
       });
     }
 
+    return deferred;
   },
 
   save: function() {
     // TODO: do not want to save *all* the time so should probably check and only save every 5m or something
     if (window.authenticated && this.currentUserIsOwner) {
-      this.saveToGist();
+      var self = this;
+      var saving = this.saveDatasetsToGist().pipe(function () {
+        return self.saveToGist();
+      });
+      return saving;
     }
   },
 
@@ -213,14 +217,14 @@ my.Project = Backbone.Model.extend({
     if (datasetInfo.backend == 'github') {
       self.loadGithubDataset(datasetInfo.url, function(err, whocares) {
         self.datasets.at(0).fetch().done(function() {
-          self.saveDatasetsToGist();
+          // self.saveDatasetsToGist();
           cb(null, self);
         });
       });
     } else {
       self.datasets.at(0).fetch().done(function() {
         // TODO: should we set dataset metadata onto project source?
-        self.saveDatasetsToGist();
+        // self.saveDatasetsToGist();
         cb(null, self);
       });
     }
