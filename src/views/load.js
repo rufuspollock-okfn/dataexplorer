@@ -122,7 +122,7 @@ my.Load = Backbone.View.extend({
                   <label for="url" class="control-label">URL</label> \
                   <div class="controls"> \
                     <input type="url" name="url" class="input span6" placeholder="URL to CSV or a published Google Spreadsheet" /> \
-                    <button class="gdrive-import btn"><i class="gdrive"></i></button> \
+                    <button title="Select from Google Drive" class="gdrive-import btn"><i class="gdrive"></i></button> \
                   </div> \
                 </div> \
               </fieldset> \
