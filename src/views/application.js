@@ -35,7 +35,6 @@ my.Application = Backbone.View.extend({
     _.bindAll(this);
     this.router = new Backbone.Router();
     this.projectList = new DataExplorer.Model.ProjectList();
-    this.projectList.load();
     this.authenticated = false;
 
     this.router.route('', 'home', function() {
@@ -130,6 +129,7 @@ my.Application = Backbone.View.extend({
     self.$el.find('.user-status .username').text(self.username);
     self.authenticated = true;
     window.authenticated = true;
+    this.projectList.load();
   },
 
   onLoadProject: function(project) {
