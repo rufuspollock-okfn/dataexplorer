@@ -230,7 +230,8 @@ a {
 }
 
 #fork {
-  text-align: right;
+  display: inline-block;
+  float: right;
 }
 
 #fork p {
@@ -242,7 +243,7 @@ a {
 }
 
 .view.project .data-app {
-  margin-bottom: 15px;
+  margin: 15px 0;
 }
 
 .view.project .recline-slickgrid {
@@ -288,6 +289,29 @@ a {
   line-height: 28px;
   margin-left: 20px;
   float: left;
+}
+
+.project-preview {
+  background: #fcf8e3;
+  padding: 10px 20px;
+  margin: 10px 0;
+}
+
+.project-preview h3 {
+  margin-top: 0;
+}
+
+.project-preview form {
+  margin: 0;
+}
+
+.project-preview input, .project-preview select {
+  margin-bottom: 0;
+}
+
+.project-preview .control-group {
+  display: inline-block;
+  margin-right: 10px;
 }
 
 /**********************************************************

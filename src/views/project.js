@@ -4,12 +4,13 @@
 my.Project = Backbone.View.extend({
   className: 'view project',
   template: ' \
+    <button id="top-row-toggle" class="btn btn-mini">Toggle Description &amp; Code Editor</button> \
     <div id="fork"> \
       {{#fork_of}} \
       <p class="muted"><small>Forked from <a href="{{fork_of}}">{{fork_of}}</a></small></p> \
       {{/fork_of}} \
       {{^currentUserIsOwner}} \
-      <button class="btn btn-small forkme">Fork</button> \
+      <button class="btn btn-mini forkme">Fork</button> \
       {{/currentUserIsOwner}} \
     </div> \
     <div class="top-row"> \
@@ -24,7 +25,6 @@ my.Project = Backbone.View.extend({
         <div class="script-editor"></div> \
       </div> \
     </div> \
-    <hr /> \
     <div id="data-app" class="data-app"> \
       <div class="header"> \
         <div class="navigation"> \
@@ -48,7 +48,8 @@ my.Project = Backbone.View.extend({
     'click .menu-right a': '_onMenuClick',
     'click .navigation a': '_onSwitchView',
     'click .js-go-to-data': '_onGoToData',
-    'click .forkme': 'forkProject'
+    'click .forkme': 'forkProject',
+    'click #top-row-toggle': '_toggleTopRow'
   },
 
   initialize: function(options) {
@@ -160,7 +161,15 @@ my.Project = Backbone.View.extend({
       minLeft: 250,
       minRight: 250,
       resizeToWidth: true
-    });
+    }).hide();
+
+    if (!this.model.gist_id) {
+      // Hasn't been saved yet, show ProjectPreview
+      var preview = new DataExplorer.View.ProjectPreview({
+        model: this.model
+      });
+      this.$el.prepend(preview.render().el);
+    }
 
     return this;
   },
@@ -228,12 +237,88 @@ my.Project = Backbone.View.extend({
     );
   },
 
+  _toggleTopRow: function (e) {
+    $(".top-row").slideToggle();
+  },
+
   forkProject: function () {
     var gh = DataExplorer.Model.github();
     gh.getGist(this.model.gist_id).fork(function (err, gist) {
       var newpath = "#" + gist.user.login + "/" + gist.id;
       DataExplorer.app.instance.router.navigate(newpath, {trigger: true});
     });
+  }
+});
+
+my.ProjectPreview = Backbone.View.extend({
+  className: 'project-preview',
+  template: '\
+  <h3>Preview your project before saving</h3> \
+  <form> \
+    <div class="control-group"> \
+      <label>Title</label> \
+      <input type="text" name="title" placeholder="Title" required /> \
+    </div> \
+    <div class="control-group"> \
+      <label>Delimiter</label> \
+      <select name="delimiter" class="input-small"> \
+        <option value="," selected>Comma</option> \
+        <option value="&#09;">Tab</option> \
+        <option value=" ">Space</option> \
+        <option value=";">Semicolon</option> \
+      </select> \
+    </div> \
+    <div class="control-group"> \
+      <label class="control-label">Text delimiter</label> \
+      <div class="controls"> \
+        <input type="text" name="quotechar" value=\'"\' class="input-mini" /> \
+      </div> \
+    </div> \
+    <div class="control-group"> \
+      <button type="submit" class="btn btn-success">Save</button> \
+    </div> \
+  </form> \
+  ',
+  events: {
+    'change select': 'updateDelimiter',
+    'change input[name=title]': 'updateTitle',
+    'change input[name=quotechar]': 'updateQuoteChar',
+    'submit form': 'save'
+  },
+  render: function () {
+    this.$el.html(this.template);
+    this.$el.find("input[name=title]").val(this.model.get("name"));
+    this.$el.find("select[name=delimiter]").val(this.model.datasets.at(0).get("delimiter"));
+    if (!window.authenticated) {
+      this.$el.find("button[type=submit]").addClass("disabled").after('<span class="help-inline">Save disabled. Please sign in.</span>');
+    }
+    return this;
+  },
+  updateDelimiter: function (e) {
+    var delimiter = e.target.value;
+    this.model.datasets.each(function (ds) {
+      ds.set("delimiter", delimiter);
+      ds.fetch();
+    });
+  },
+  updateTitle: function (e) {
+    this.model.set("name", e.target.value);
+  },
+  updateQuoteChar: function (e) {
+    var quotechar = e.target.value;
+    this.model.datasets.each(function (ds) {
+      ds.set("quotechar", quotechar);
+      ds.fetch();
+    });
+  },
+  save: function (e) {
+    e.preventDefault();
+    var self = this;
+    if (!window.authenticated) return;
+    this.model.save().done(function () {
+      var newpath = "#" + DataExplorer.app.instance.username + "/" + self.model.gist_id;
+      DataExplorer.app.instance.router.navigate(newpath, {trigger: true});
+    })
   }
 });
 
