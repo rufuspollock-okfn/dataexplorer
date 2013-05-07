@@ -90,6 +90,7 @@ test('serializeProject', function () {
   equal(dp.files, undefined, 'on datapackage.json datasets is named resources');
   equal(dp.resources[0].backend, 'csv');
   equal(dp.resources[0].data, undefined, 'We removed data attribute from the dataset');
+  equal(dp.resources[0].schema.fields[0].id, 'Date');
 
   // check the content
   deepEqual(out.files['main.js'].content, 'xyz');
@@ -110,6 +111,7 @@ test('serializeProject', function () {
   // no longer including data in basic serialization
   // equal(newProject.datasets.at(0).get('data'), csvData);
   equal(newProject.get('readme'), newReadme, 'readme attribute correct');
+  equal(newProject.get('datasets')[0].fields[0].id, 'Date');
 });
 
 })();
