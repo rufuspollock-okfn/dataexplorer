@@ -244,6 +244,19 @@ my.Project = Backbone.Model.extend({
       self.datasets.reset([new recline.Model.Dataset({data: raw_csv, backend: 'csv'})]);
       cb(err, self.dataset);
     });
+  },
+
+  toJSON: function() {
+    var out = Backbone.Model.prototype.toJSON.apply(this, arguments);
+    // make sure we serialize fields
+    // would like to do happen on model itself (i.e. change events on dataset objects trigger change in datasets attribute)
+    // but not sure how to ensure it has happened reliably
+    out.datasets = this.datasets.map(function(ds) {
+      var dsjson = ds.toJSON();
+      dsjson.fields = ds.fields.toJSON();
+      return dsjson;
+    });
+    return out;
   }
 });
 
@@ -320,6 +333,13 @@ my.serializeProject = function(project) {
   _.each(data.resources, function(dsInfo, idx) {
     // Make sure we don't persist inline data
     delete dsInfo.data;
+    // conform to datapackage spec which has fields inside schema
+    if (dsInfo.fields && dsInfo.fields.length > 0) {
+      dsInfo.schema = {
+        fields: dsInfo.fields
+      };
+      delete dsInfo.fields;
+    }
   });
 
   gistJSON.files['datapackage.json'].content = JSON.stringify(data, null, 2);
@@ -357,6 +377,9 @@ my.unserializeProject = function(serialized) {
       } else {
         ds.data = '';
       }
+    }
+    if (ds.schema) {
+      ds.fields = ds.schema.fields;
     }
   });
 
