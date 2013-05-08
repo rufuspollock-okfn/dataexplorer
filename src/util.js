@@ -45,7 +45,4 @@ my.loadGithubFile = function(url, cb) {
   });
 };
 
-var types = {
-};
-
 })(DataExplorer.Util);

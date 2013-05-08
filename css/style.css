@@ -562,8 +562,3 @@ body.about .page-header {
 .splitter-bar {
   width: 10px;
 }
-
-/* This is in Bootstap 2.3, so we can remove this once we upgrade */
-.text-right {
-  text-align: right;
-}
