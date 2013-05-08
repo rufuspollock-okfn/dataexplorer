@@ -13,6 +13,8 @@ my.Load = Backbone.View.extend({
   },
 
   _checkUrl: function (e) {
+    // NB: setCustomValidity primes the error messages ready for form submission,
+    //     it doesn't show them immediately.
     var url = e.target.value;
     var backend = this._guessBackend(url);
 
