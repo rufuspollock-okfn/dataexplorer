@@ -14,11 +14,14 @@ my.Load = Backbone.View.extend({
 
   _checkUrl: function (e) {
     var url = e.target.value;
+    var backend = this._guessBackend(url);
 
-    if (this._guessBackend(url) !== "csv") {
-      // We dont access these URLs directly, so we won't bother checking them
+    if (backend === "github") {
+      // We arent't testing these just now
       e.target.setCustomValidity("");
       return;
+    } else if (backend === "gdocs") {
+      url = recline.Backend.GDocs.getGDocsAPIUrls(url).spreadsheet;
     }
 
     $.ajax(url, {
@@ -32,6 +35,9 @@ my.Load = Backbone.View.extend({
           error = "That URL doesn't exist";
         } else {
           error = "We could not retrieve this URL";
+          if (backend === "gdocs") {
+            error += ". Have you published this spreadsheet?";
+          }
         }
         e.target.setCustomValidity(error);
       }
