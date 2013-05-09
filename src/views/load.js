@@ -6,10 +6,11 @@ this.DataExplorer.View = this.DataExplorer.View || {};
 
 my.Load = Backbone.View.extend({
   events: {
-    'submit form': 'onLoadDataset',
+    'submit form.load': 'onLoadDataset',
     'click .tab-import .nav a': '_onImportTabClick',
     'click .gdrive-import': '_onSearchGdocs',
-    'change input[type=url]': '_checkUrl'
+    'change input[type=url]': '_checkUrl',
+    'submit #preview-pane form': 'saveProject'
   },
 
   _checkUrl: function (e) {
@@ -60,9 +61,7 @@ my.Load = Backbone.View.extend({
       data.backend = this._guessBackend(data.url);
 
       if (data.backend !== 'gdocs') {
-        data.id= data.url.split('/')
-          .pop()
-          .split('.')[0];
+        data.id = data.url.split('/').pop().split('.')[0];
       }
     }
     // special case for file form
@@ -72,22 +71,15 @@ my.Load = Backbone.View.extend({
       // TODO: size, type, lastModified etc - https://developer.mozilla.org/en-US/docs/DOM/File
       data.id = data.file.name.split('.')[0];
     }
-    // TODO: gdocs spreadsheet (could get this from picker but prefer to wait
-    // for preview code when we can do this properly)
-    var projectName = '';
-    if (data.id) {
-      projectName = data.id;
-      data.id= data.id.replace(/_/g, ' ').replace(/-/g, ' ');
-    } else {
-      data.id = 'data';
-      projectName = 'No name';
-    }
-    this.project = new DataExplorer.Model.Project({
-      name: projectName,
-      datasets: [data]
+
+    $('.nav-tabs li:last').removeClass("disabled").find("a").tab('show');
+
+    this.previewPane = new my.Preview({
+      model: new recline.Model.Dataset(data),
+      metadata: data
     });
-    // this.project.save();
-    self.trigger('load', this.project);
+    this.$el.find("#preview").append(this.previewPane.render().el);
+
     return false;
   },
 
@@ -131,22 +123,39 @@ my.Load = Backbone.View.extend({
         self.$el.find('input[name="url"]').val(url).trigger("change");
       }
     }
+  },
 
+  saveProject: function (e) {
+    e.preventDefault();
+    var self = this;
+
+    // To avoid what happens in the initialiser, we'll add the dataset later
+    var project = new DataExplorer.Model.Project({
+      name: this.previewPane.getProjectName()
+    });
+
+    project.datasets.add(this.previewPane.getModel());
+
+    project.save().done(function () {
+      self.trigger('load', project);
+    });
+
+    return false;
   },
   
   template: ' \
     <div class="view load"> \
       <h3>Create a project by importing data</h3> \
-      <hr /> \
-      <div class="tabbable tabs-left tab-import"> \
+      <div class="tabbable tab-import"> \
         <ul class="nav nav-tabs"> \
           <li class="active"><a href="#csv-online">Online</a></li>  \
           <li><a href="#csv-disk">Upload</a></li>  \
           <li><a href="#paste">Paste</a></li>  \
+          <li class="disabled"><a href="#preview">Preview &amp; Save</a></li> \
         </ul> \
         <div class="tab-content"> \
           <div id="csv-disk" class="tab-pane"> \
-            <form class="form-horizontal"> \
+            <form class="form-horizontal load"> \
               <input type="hidden" name="backend" value="csv" /> \
               <div class="control-group"> \
                 <label class="control-label">File</label> \
@@ -160,7 +169,7 @@ my.Load = Backbone.View.extend({
             </form> \
           </div> \
           <div id="csv-online" class="tab-pane active"> \
-            <form class="form-horizontal"> \
+            <form class="form-horizontal load"> \
               <input type="hidden" name="backend" value="csv" /> \
               <fieldset> \
                 <div class="control-group"> \
@@ -177,7 +186,7 @@ my.Load = Backbone.View.extend({
             </form> \
           </div> \
           <div id="paste" class="tab-pane"> \
-            <form class="form-horizontal"> \
+            <form class="form-horizontal load"> \
               <input type="hidden" name="backend" value="csv" /> \
               <fieldset> \
                 <div class="control-group"> \
@@ -192,10 +201,96 @@ my.Load = Backbone.View.extend({
               </div> \
             </form> \
           </div> \
+          <div id="preview" class="tab-pane"> \
+          </div> \
         </div><!-- /tab-content -->  \
       </div><!-- /tabbable -->  \
     </div> \
   '
 });
+
+my.Preview = Backbone.View.extend({
+  id: 'preview-pane',
+  className: 'row-fluid',
+  template: '\
+  <div id="grid" class="span7"></div> \
+  <form class="span4"> \
+    <div class="control-group"> \
+      <label>Title</label> \
+      <input type="text" name="title" placeholder="Title" required /> \
+    </div> \
+    <div class="control-group"> \
+      <label>Delimiter</label> \
+      <select name="delimiter" class="input-small"> \
+        <option value="," selected>Comma</option> \
+        <option value="&#09;">Tab</option> \
+        <option value=" ">Space</option> \
+        <option value=";">Semicolon</option> \
+      </select> \
+    </div> \
+    <div class="control-group"> \
+      <label class="control-label">Text delimiter</label> \
+      <div class="controls"> \
+        <input type="text" name="quotechar" value=\'"\' class="input-mini" /> \
+      </div> \
+    </div> \
+    <div class="control-group"> \
+      <button type="submit" class="btn btn-success">Save</button> \
+    </div> \
+  </form> \
+  ',
+  events: {
+    'change select': 'updateDelimiter',
+    'change input[name=title]': 'updateTitle',
+    'change input[name=quotechar]': 'updateQuoteChar'
+  },
+  initialize: function () {
+    // TODO: gdocs spreadsheet (could get this from picker but prefer to wait
+    // for preview code when we can do this properly)
+    this.projectName = 'No name';
+    if (this.options.metadata.id) {
+      this.projectName = this.options.metadata.id.replace('_', ' ').replace('-', ' ');
+    }
+  },
+  render: function () {
+    var self = this;
+    this.$el.html(this.template);
+    this.model.fetch().done(function () {
+      var grid = new recline.View.SlickGrid({
+        model: self.model
+      });
+
+      grid.render();
+      self.$el.find("#grid").append(grid.el);
+      grid.show();
+    });
+
+    this.$el.find("input[name=title]").val(this.projectName);
+    this.$el.find("select[name=delimiter]").val(this.model.get("delimiter"));
+    this.$el.find("select[name=quotechar]").val(this.model.get("quotechar"));
+
+    return this;
+  },
+  updateDelimiter: function (e) {
+    var delimiter = e.target.value;
+    this.model.set("delimiter", delimiter);
+    this.model.fetch();
+  },
+  updateTitle: function (e) {
+    this.projectName = e.target.value;
+  },
+  updateQuoteChar: function (e) {
+    var quotechar = e.target.value;
+    this.model.set("quotechar", quotechar);
+    this.model.fetch();
+  },
+  getModel: function () {
+    return this.model;
+  },
+  getProjectName: function () {
+    return this.projectName;
+  }
+});
+
 
 }(this.DataExplorer.View));

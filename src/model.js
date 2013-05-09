@@ -78,7 +78,7 @@ my.Project = Backbone.Model.extend({
     this.scripts.bind('change', function() {
       self.set({scripts: self.scripts.toJSON()});
     });
-    this.datasets.bind('change', function() {
+    this.datasets.bind('change add', function() {
       self.set({datasets: self.datasets.toJSON()});
     });
 
