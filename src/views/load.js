@@ -60,7 +60,7 @@ my.Load = Backbone.View.extend({
       data.backend = this._guessBackend(data.url);
 
       if (data.backend !== 'gdocs') {
-        data.name = data.url.split('/')
+        data.id= data.url.split('/')
           .pop()
           .split('.')[0];
       }
@@ -70,13 +70,17 @@ my.Load = Backbone.View.extend({
     if ($files.length > 0) {
       data.file = $files[0].files[0];
       // TODO: size, type, lastModified etc - https://developer.mozilla.org/en-US/docs/DOM/File
-      data.name = data.file.name.split('.')[0];
+      data.id = data.file.name.split('.')[0];
     }
     // TODO: gdocs spreadsheet (could get this from picker but prefer to wait
     // for preview code when we can do this properly)
-    var projectName = 'No name';
-    if (data.name) {
-      projectName = data.name.replace('_', ' ').replace('-', ' ');
+    var projectName = '';
+    if (data.id) {
+      projectName = data.id;
+      data.id= data.id.replace(/_/g, ' ').replace(/-/g, ' ');
+    } else {
+      data.id = 'data';
+      projectName = 'No name';
     }
     this.project = new DataExplorer.Model.Project({
       name: projectName,
