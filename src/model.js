@@ -145,17 +145,6 @@ my.Project = Backbone.Model.extend({
     // Do serialize stuff from below
     _.each(this.get("datasets"), function (ds_meta, idx) {
 
-      if (!ds_meta.path) {
-        // We're going to change the data source to be a local copy.
-        // First, move the URL to the sources array
-        self.get("sources").push({"web": ds_meta.url}); // we dont use the setter so this wont emit an event
-        delete ds_meta.url;
-        // Second, add a path based on its name.
-        ds_meta.path = (ds_meta.name || "data") + ".csv";
-        // Third, force the backend to csv
-        ds_meta.backend = "csv";
-      }
-
       var ds = self.datasets.at(idx);
       var content = my.serializeDatasetToCSV(ds._store);
 
