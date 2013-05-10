@@ -148,13 +148,13 @@ my.Load = Backbone.View.extend({
       <h3>Create a project by importing data</h3> \
       <div class="tabbable tab-import"> \
         <ul class="nav nav-tabs"> \
-          <li class="active"><a href="#csv-online">Online</a></li>  \
-          <li><a href="#csv-disk">Upload</a></li>  \
+          <li class="active"><a href="#csv-disk">Upload</a></li>  \
           <li><a href="#paste">Paste</a></li>  \
+          <li><a href="#csv-online">Online</a></li>  \
           <li class="disabled"><a href="#preview">Preview &amp; Save</a></li> \
         </ul> \
         <div class="tab-content"> \
-          <div id="csv-disk" class="tab-pane"> \
+          <div id="csv-disk" class="tab-pane active"> \
             <form class="form-horizontal load"> \
               <input type="hidden" name="backend" value="csv" /> \
               <div class="control-group"> \
@@ -168,7 +168,7 @@ my.Load = Backbone.View.extend({
               </div> \
             </form> \
           </div> \
-          <div id="csv-online" class="tab-pane active"> \
+          <div id="csv-online" class="tab-pane"> \
             <form class="form-horizontal load"> \
               <input type="hidden" name="backend" value="csv" /> \
               <fieldset> \
