@@ -408,7 +408,7 @@ my.serializeDatasetToCSV = function(dataset) {
 my.ProjectList = Backbone.Collection.extend({
   model: my.Project,
   comparator: function (a, b) {
-    return a.last_modified < b.last_modified;
+    return b.last_modified - a.last_modified;
   },
   load: function() {
     var self = this;
