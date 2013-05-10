@@ -254,7 +254,7 @@ i.gdrive {
   margin: 15px 0;
 }
 
-.view.project .recline-slickgrid {
+.view .recline-slickgrid {
   height: 500px;
 }
 
@@ -297,29 +297,6 @@ i.gdrive {
   line-height: 28px;
   margin-left: 20px;
   float: left;
-}
-
-.project-preview {
-  background: #fcf8e3;
-  padding: 10px 20px;
-  margin: 10px 0;
-}
-
-.project-preview h3 {
-  margin-top: 0;
-}
-
-.project-preview form {
-  margin: 0;
-}
-
-.project-preview input, .project-preview select {
-  margin-bottom: 0;
-}
-
-.project-preview .control-group {
-  display: inline-block;
-  margin-right: 10px;
 }
 
 /**********************************************************
@@ -561,9 +538,4 @@ body.about .page-header {
 
 .splitter-bar {
   width: 10px;
-}
-
-/* This is in Bootstap 2.3, so we can remove this once we upgrade */
-.text-right {
-  text-align: right;
 }

@@ -6,9 +6,45 @@ this.DataExplorer.View = this.DataExplorer.View || {};
 
 my.Load = Backbone.View.extend({
   events: {
-    'submit form': 'onLoadDataset',
+    'submit form.load': 'onLoadDataset',
     'click .tab-import .nav a': '_onImportTabClick',
-    'click .gdrive-import': '_onSearchGdocs'
+    'click .gdrive-import': '_onSearchGdocs',
+    'change input[type=url]': '_checkUrl',
+    'submit #preview-pane form': 'saveProject'
+  },
+
+  _checkUrl: function (e) {
+    // NB: setCustomValidity primes the error messages ready for form submission,
+    //     it doesn't show them immediately.
+    var url = e.target.value;
+    var backend = this._guessBackend(url);
+
+    if (backend === "github") {
+      // We arent't testing these just now
+      e.target.setCustomValidity("");
+      return;
+    } else if (backend === "gdocs") {
+      url = recline.Backend.GDocs.getGDocsAPIUrls(url).spreadsheet;
+    }
+
+    $.ajax(url, {
+      type: "HEAD",
+      success: function (jqXHR) {
+        e.target.setCustomValidity("");
+      },
+      error: function (jqXHR, textStatus) {
+        var error;
+        if (jqXHR.status === 404) {
+          error = "That URL doesn't exist";
+        } else {
+          error = "We could not retrieve this URL";
+          if (backend === "gdocs") {
+            error += ". Have you published this spreadsheet?";
+          }
+        }
+        e.target.setCustomValidity(error);
+      }
+    });
   },
 
   onLoadDataset: function(e) {
@@ -21,17 +57,11 @@ my.Load = Backbone.View.extend({
     });
     // try to set name
     if (data.url) {
- 
-      if (data.url.match(/^https?:\/\/github.com/)) {
-        data.backend = "github";
-      } else if (data.url.match(/^https?:\/\/docs.google.com/)) {
-        data.backend = "gdocs";
-      }
+
+      data.backend = this._guessBackend(data.url);
 
       if (data.backend !== 'gdocs') {
-        data.name = data.url.split('/')
-          .pop()
-          .split('.')[0];
+        data.id = data.url.split('/').pop().split('.')[0];
       }
     }
     // special case for file form
@@ -39,20 +69,23 @@ my.Load = Backbone.View.extend({
     if ($files.length > 0) {
       data.file = $files[0].files[0];
       // TODO: size, type, lastModified etc - https://developer.mozilla.org/en-US/docs/DOM/File
-      data.name = data.file.name.split('.')[0];
+      data.id = data.file.name.split('.')[0];
     }
-    // TODO: gdocs spreadsheet (could get this from picker but prefer to wait
-    // for preview code when we can do this properly)
-    var projectName = 'No name';
-    if (data.name) {
-      projectName = data.name.replace('_', ' ').replace('-', ' ');
+
+    $('.nav-tabs li:last').removeClass("disabled").find("a").tab('show');
+
+    if (this.previewPane) {
+      this.previewPane.remove();
     }
-    this.project = new DataExplorer.Model.Project({
-      name: projectName,
-      datasets: [data]
+
+    this.previewPane = new my.Preview({
+      model: new recline.Model.Dataset(data),
+      metadata: data
     });
-    // this.project.save();
-    self.trigger('load', this.project);
+
+    this.$el.find("#preview").empty().append(this.previewPane.el);
+    this.previewPane.render();
+
     return false;
   },
 
@@ -60,6 +93,16 @@ my.Load = Backbone.View.extend({
     var rendered = _.template(this.template, {});
     this.$el.html(rendered);
     return this;
+  },
+
+  _guessBackend: function (url) {
+    var backend = 'csv';
+    if (url.match(/^https?:\/\/github.com/)) {
+      backend = "github";
+    } else if (url.match(/^https?:\/\/docs.google.com/)) {
+      backend = "gdocs";
+    }
+    return backend;
   },
 
   _onImportTabClick: function(e) {
@@ -83,25 +126,42 @@ my.Load = Backbone.View.extend({
       if (data[google.picker.Response.ACTION] === google.picker.Action.PICKED) {
         var doc = data[google.picker.Response.DOCUMENTS][0];
         url = doc[google.picker.Document.URL];
-        self.$el.find('input[name="url"]').val(url);
+        self.$el.find('input[name="url"]').val(url).trigger("change");
       }
     }
+  },
 
+  saveProject: function (e) {
+    e.preventDefault();
+    var self = this;
+
+    // To avoid what happens in the initialiser, we'll add the dataset later
+    var project = new DataExplorer.Model.Project({
+      name: this.previewPane.getProjectName()
+    });
+
+    project.datasets.add(this.previewPane.getModel());
+
+    project.save().done(function () {
+      self.trigger('load', project);
+    });
+
+    return false;
   },
   
   template: ' \
     <div class="view load"> \
       <h3>Create a project by importing data</h3> \
-      <hr /> \
-      <div class="tabbable tabs-left tab-import"> \
+      <div class="tabbable tab-import"> \
         <ul class="nav nav-tabs"> \
-          <li class="active"><a href="#csv-online">Online</a></li>  \
-          <li><a href="#csv-disk">Upload</a></li>  \
+          <li class="active"><a href="#csv-disk">Upload</a></li>  \
           <li><a href="#paste">Paste</a></li>  \
+          <li><a href="#csv-online">Online</a></li>  \
+          <li class="disabled"><a href="#preview">Preview &amp; Save</a></li> \
         </ul> \
         <div class="tab-content"> \
-          <div id="csv-disk" class="tab-pane"> \
-            <form class="form-horizontal"> \
+          <div id="csv-disk" class="tab-pane active"> \
+            <form class="form-horizontal load"> \
               <input type="hidden" name="backend" value="csv" /> \
               <div class="control-group"> \
                 <label class="control-label">File</label> \
@@ -114,8 +174,8 @@ my.Load = Backbone.View.extend({
               </div> \
             </form> \
           </div> \
-          <div id="csv-online" class="tab-pane active"> \
-            <form class="form-horizontal"> \
+          <div id="csv-online" class="tab-pane"> \
+            <form class="form-horizontal load"> \
               <input type="hidden" name="backend" value="csv" /> \
               <fieldset> \
                 <div class="control-group"> \
@@ -132,7 +192,7 @@ my.Load = Backbone.View.extend({
             </form> \
           </div> \
           <div id="paste" class="tab-pane"> \
-            <form class="form-horizontal"> \
+            <form class="form-horizontal load"> \
               <input type="hidden" name="backend" value="csv" /> \
               <fieldset> \
                 <div class="control-group"> \
@@ -147,10 +207,97 @@ my.Load = Backbone.View.extend({
               </div> \
             </form> \
           </div> \
+          <div id="preview" class="tab-pane"> \
+            <p class="muted">Please import your data first</p> \
+          </div> \
         </div><!-- /tab-content -->  \
       </div><!-- /tabbable -->  \
     </div> \
   '
 });
+
+my.Preview = Backbone.View.extend({
+  id: 'preview-pane',
+  className: 'row-fluid',
+  template: '\
+  <div id="grid" class="span7"></div> \
+  <form class="span4"> \
+    <div class="control-group"> \
+      <label>Title</label> \
+      <input type="text" name="title" placeholder="Title" required /> \
+    </div> \
+    <div class="control-group"> \
+      <label>Delimiter</label> \
+      <select name="delimiter" class="input-small"> \
+        <option value="," selected>Comma</option> \
+        <option value="&#09;">Tab</option> \
+        <option value=" ">Space</option> \
+        <option value=";">Semicolon</option> \
+      </select> \
+    </div> \
+    <div class="control-group"> \
+      <label class="control-label">Text delimiter</label> \
+      <div class="controls"> \
+        <input type="text" name="quotechar" value=\'"\' class="input-mini" /> \
+      </div> \
+    </div> \
+    <div class="control-group"> \
+      <button type="submit" class="btn btn-success">Save</button> \
+    </div> \
+  </form> \
+  ',
+  events: {
+    'change select': 'updateDelimiter',
+    'change input[name=title]': 'updateTitle',
+    'change input[name=quotechar]': 'updateQuoteChar'
+  },
+  initialize: function () {
+    // TODO: gdocs spreadsheet (could get this from picker but prefer to wait
+    // for preview code when we can do this properly)
+    this.projectName = 'No name';
+    if (this.options.metadata.id) {
+      this.projectName = this.options.metadata.id.replace('_', ' ').replace('-', ' ');
+    }
+  },
+  render: function () {
+    var self = this;
+    this.$el.html(this.template);
+    this.model.fetch().done(function () {
+      var grid = new recline.View.SlickGrid({
+        model: self.model
+      });
+
+      grid.render();
+      self.$el.find("#grid").append(grid.el);
+      grid.show();
+    });
+
+    this.$el.find("input[name=title]").val(this.projectName);
+    this.$el.find("select[name=delimiter]").val(this.model.get("delimiter"));
+    this.$el.find("select[name=quotechar]").val(this.model.get("quotechar"));
+
+    return this;
+  },
+  updateDelimiter: function (e) {
+    var delimiter = e.target.value;
+    this.model.set("delimiter", delimiter);
+    this.model.fetch();
+  },
+  updateTitle: function (e) {
+    this.projectName = e.target.value;
+  },
+  updateQuoteChar: function (e) {
+    var quotechar = e.target.value;
+    this.model.set("quotechar", quotechar);
+    this.model.fetch();
+  },
+  getModel: function () {
+    return this.model;
+  },
+  getProjectName: function () {
+    return this.projectName;
+  }
+});
+
 
 }(this.DataExplorer.View));

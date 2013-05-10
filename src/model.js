@@ -78,7 +78,7 @@ my.Project = Backbone.Model.extend({
     this.scripts.bind('change', function() {
       self.set({scripts: self.scripts.toJSON()});
     });
-    this.datasets.bind('change', function() {
+    this.datasets.bind('change add', function() {
       self.set({datasets: self.datasets.toJSON()});
     });
 
@@ -197,6 +197,11 @@ my.Project = Backbone.Model.extend({
     }
 
     return deferred;
+  },
+
+  trash: function () {
+    this.set("state", "trash");
+    this.saveToGist();
   },
 
   save: function() {
@@ -408,7 +413,7 @@ my.serializeDatasetToCSV = function(dataset) {
 my.ProjectList = Backbone.Collection.extend({
   model: my.Project,
   comparator: function (a, b) {
-    return a.last_modified < b.last_modified;
+    return b.last_modified - a.last_modified;
   },
   load: function() {
     var self = this;
