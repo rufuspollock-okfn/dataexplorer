@@ -74,6 +74,10 @@ my.Load = Backbone.View.extend({
 
     $('.nav-tabs li:last').removeClass("disabled").find("a").tab('show');
 
+    if (this.previewPane) {
+      this.previewPane.remove();
+    }
+
     this.previewPane = new my.Preview({
       model: new recline.Model.Dataset(data),
       metadata: data
