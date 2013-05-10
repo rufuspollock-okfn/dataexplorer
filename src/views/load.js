@@ -82,7 +82,9 @@ my.Load = Backbone.View.extend({
       model: new recline.Model.Dataset(data),
       metadata: data
     });
-    this.$el.find("#preview").append(this.previewPane.render().el);
+
+    this.$el.find("#preview").append(this.previewPane.el);
+    this.previewPane.render();
 
     return false;
   },
