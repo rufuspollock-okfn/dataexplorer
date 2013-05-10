@@ -83,7 +83,7 @@ my.Load = Backbone.View.extend({
       metadata: data
     });
 
-    this.$el.find("#preview").append(this.previewPane.el);
+    this.$el.find("#preview").empty().append(this.previewPane.el);
     this.previewPane.render();
 
     return false;
@@ -208,6 +208,7 @@ my.Load = Backbone.View.extend({
             </form> \
           </div> \
           <div id="preview" class="tab-pane"> \
+            <p class="muted">Please import your data first</p> \
           </div> \
         </div><!-- /tab-content -->  \
       </div><!-- /tabbable -->  \
