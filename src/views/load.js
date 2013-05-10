@@ -140,7 +140,22 @@ my.Load = Backbone.View.extend({
       name: this.previewPane.getProjectName()
     });
 
-    project.datasets.add(this.previewPane.getModel());
+    var dataset = this.previewPane.getModel();
+
+    // Now we'll tweak the dataset before saving it.
+    if (!dataset.get("path")) {
+      // Move any URL to the project sources
+      project.get("sources").push({"web": dataset.get("url")}); // we dont use the setter so this wont emit an event
+      dataset.unset("url");
+      // Then add a path based on its name and force the backend to csv.
+      dataset.set({
+        "path": (dataset.get("id") || "data") + ".csv",
+        "backend": "csv"
+      });
+    }
+
+    // Now add to the project. This will trigger an update to the metadata too.
+    project.datasets.add(dataset);
 
     project.save().done(function () {
       self.trigger('load', project);
