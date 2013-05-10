@@ -199,6 +199,11 @@ my.Project = Backbone.Model.extend({
     return deferred;
   },
 
+  trash: function () {
+    this.set("state", "trash");
+    this.saveToGist();
+  },
+
   save: function() {
     // TODO: do not want to save *all* the time so should probably check and only save every 5m or something
     if (window.authenticated && this.currentUserIsOwner) {

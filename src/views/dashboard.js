@@ -78,7 +78,7 @@ my.Dashboard = Backbone.View.extend({
   onTrashProject: function(e) {
     e.preventDefault(); 
     var id = $(e.target).attr('data-project-id');
-    this.collection.get(id).set({state: 'trash'});
+    this.collection.get(id).trash();
   }
 });
 
