@@ -314,7 +314,7 @@ my.ScriptEditor = Backbone.View.extend({
       this.dataset._store.fields = e.data.fields;
       this.dataset.fields.reset(this.dataset._store.fields);
       this.dataset.query({size: this.dataset._store.records.length});
-      this.model.saveDatasetsToGist();
+      this.model.saveToGist(true);
     }
   },
 
