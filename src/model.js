@@ -27,7 +27,7 @@ my.Project = Backbone.Model.extend({
       scripts: [
         {
           id: 'main.js',
-          content: 'print("hello world")'
+          content: '// You can interact with your data here using the "dataset" variable,\n// which is a Recline memory store (http://reclinejs.com//docs/src/backend.memory.html).\n\nconsole.log(dataset);'
         }
       ],
       datasets: [],
