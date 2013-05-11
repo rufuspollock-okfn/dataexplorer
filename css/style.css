@@ -401,6 +401,10 @@ i.gdrive {
   height: 100%;
 }
 
+.script-editor .CodeMirror {
+  font-size: 12px;
+}
+
 .script-editor > div {
   position: relative;
   height: 100%;
