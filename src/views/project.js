@@ -56,12 +56,12 @@ my.Project = Backbone.View.extend({
     var self = this;
     this.state = _.extend({currentView: 'grid'}, options.state);
 
-    this.model.datasets.at(0).bind('query:done', function() {
+    this.listenTo(this.model.datasets.at(0), 'query:done', function() {
       self.$el.find('.doc-count').text(self.model.datasets.at(0).recordCount || 'Unknown');
     });
 
     // update view queryState on the current view
-    this.model.datasets.at(0).bind('query:done', function() {
+    this.listenTo(this.model.datasets.at(0), 'query:done', function() {
       var curr = self.model.get('views');
       _.each(curr, function(viewModel, idx) {
         if (viewModel.id == self.state.currentView) {
@@ -108,7 +108,7 @@ my.Project = Backbone.View.extend({
       }
 
       // now bind state changes so they get saved ...
-      out.view.state.bind('change', function() {
+      self.listenTo(out.view.state, 'change', function() {
         var curr = self.model.get('views');
         // update the view info on the model corresponding to the one being changed
         _.each(curr, function(viewModel) {
@@ -125,11 +125,11 @@ my.Project = Backbone.View.extend({
       return out;
     });
 
-    var readme = new DataExplorer.View.ReadmeView({
+    this.readme = new DataExplorer.View.ReadmeView({
       el: this.$el.find(".meta")[0],
       model: this.model
     });
-    readme.render();
+    this.readme.render();
 
     var pager = new recline.View.Pager({
       model: this.model.datasets.at(0).queryState
@@ -164,6 +164,17 @@ my.Project = Backbone.View.extend({
     }).hide();
 
     return this;
+  },
+
+  remove: function () {
+    _.each(this.views, function (view) {
+      // This wont do much until Recline switches to listenTo()
+      if (view.view.elSidebar) view.view.elSidebar.remove();
+      view.view.remove();
+    });
+    this.editor.remove();
+    this.readme.remove();
+    Backbone.View.prototype.remove.apply(this, arguments);
   },
 
   _onMenuClick: function(e) {

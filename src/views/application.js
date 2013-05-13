@@ -184,7 +184,6 @@ my.Application = Backbone.View.extend({
     this._loadProject(username, projectId, displayIt);
     function displayIt(err, project) {
       // housekeeping
-      self.currentProject = project;
       self.saveView.project = project;
       self._setTitle(project.get('name'));
 
@@ -206,11 +205,13 @@ my.Application = Backbone.View.extend({
         model: project,
         state: projectViewState
       });
+
       // let's remove all previous instances of this view ...
-      // TODO: probably should do this to the Backbone view element
-      $('#main .view.project').remove();
+      if (self.currentProject) self.currentProject.remove();
+
       $('#main').append(ds.el);
       ds.render();
+      self.currentProject = ds;
       self.hideProcessing();
     }
   },
