@@ -4,7 +4,7 @@
 my.Project = Backbone.View.extend({
   className: 'view project',
   template: ' \
-    <h2>{{name}}</h2> \
+    <h2 id="project-name">{{name}}</h2> \
     <button id="top-row-toggle" class="btn btn-mini">Toggle Description &amp; Code Editor</button> \
     <div id="fork"> \
       {{#fork_of}} \
@@ -89,6 +89,15 @@ my.Project = Backbone.View.extend({
 
     // Alter UI if user isn't the owner
     this.$el.find(".editreadme").toggle(this.model.currentUserIsOwner);
+
+    if (this.model.currentUserIsOwner) {
+      $("#project-name").editable({
+        placement:'right',
+        success: function (resp, newValue) {
+          self.model.set("name", newValue);
+        }
+      });
+    }
 
     var $dataViewContainer = this.$el.find('.data-view-container');
     var $dataSidebar = this.$el.find('.data-view-sidebar');

@@ -217,6 +217,10 @@ i.gdrive {
   width: 100%;
 }
 
+#project-name {
+  display: inline-block;
+}
+
 .top-panel {
   display: inline-block;
   width: 50%;

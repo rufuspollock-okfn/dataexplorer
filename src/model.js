@@ -83,7 +83,7 @@ my.Project = Backbone.Model.extend({
     });
 
     var saveMetadata = _.partial(this.saveToGist, false);
-    this.bind('change:readme', saveMetadata, this);
+    this.bind('change:readme change:name', saveMetadata, this);
     this.scripts.bind('change', saveMetadata, this);
   },
 
