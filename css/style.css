@@ -146,6 +146,14 @@ i.gdrive {
   * Splash page at start
   *********************************************************/
 
+.instructions .well {
+  height: 180px;
+}
+
+.instructions h3 {
+  margin-top: 0;
+}
+
 .view.login .splash {
   text-align: center;
   background: white;
@@ -195,6 +203,7 @@ i.gdrive {
 
 .view.project {
   margin-top: -8px;
+  position: relative;
 }
 
 .view.project .meta {
@@ -206,6 +215,10 @@ i.gdrive {
 .top-row {
   height: 300px;
   width: 100%;
+}
+
+#project-name {
+  display: inline-block;
 }
 
 .top-panel {
@@ -237,17 +250,15 @@ i.gdrive {
   width: 120px;
 }
 
-#fork {
-  display: inline-block;
-  float: right;
-}
-
 #fork p {
   display: inline-block;
+  margin-right: 5px;
 }
 
-.forkme {
-  margin-left: 5px;
+#top-row-toggle {
+  position: absolute;
+  top: 0;
+  right: 0;
 }
 
 .view.project .data-app {
