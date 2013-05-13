@@ -118,7 +118,6 @@ my.Application = Backbone.View.extend({
 
   _setTitle: function(title) {
     title = title[0].toUpperCase() + title.slice(1);
-    $('.subtitle').text(title).attr('title', title);
     document.title = title + ' - Recline Data Explorer';
   },
 

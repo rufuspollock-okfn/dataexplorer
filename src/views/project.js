@@ -4,6 +4,7 @@
 my.Project = Backbone.View.extend({
   className: 'view project',
   template: ' \
+    <h2>{{name}}</h2> \
     <button id="top-row-toggle" class="btn btn-mini">Toggle Description &amp; Code Editor</button> \
     <div id="fork"> \
       {{#fork_of}} \
