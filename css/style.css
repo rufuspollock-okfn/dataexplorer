@@ -146,6 +146,14 @@ i.gdrive {
   * Splash page at start
   *********************************************************/
 
+.instructions .well {
+  height: 180px;
+}
+
+.instructions h3 {
+  margin-top: 0;
+}
+
 .view.login .splash {
   text-align: center;
   background: white;
