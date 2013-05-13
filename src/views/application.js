@@ -145,6 +145,18 @@ my.Application = Backbone.View.extend({
       var project = this.projectList.get(projectId);
       checkDatasetLoaded(project);
     } else {
+
+      // First check if it's in our projectList
+      var project = this.projectList.find(function (project) {
+        return project.gist_id === projectId;
+      });
+
+      if (project) {
+        checkDatasetLoaded(project);
+        return;
+      }
+
+      // If not, read from gist
       var gist = DataExplorer.Model.github().getGist(projectId);
       gist.read(function(err, gist) {
         var project = DataExplorer.Model.unserializeProject(gist);
