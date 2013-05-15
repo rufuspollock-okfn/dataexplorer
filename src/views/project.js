@@ -355,8 +355,9 @@ my.ReadmeView = Backbone.View.extend({
     "click .savereadme": "save"
   },
   initialize: function () {
+    _.bindAll(this, "render");
     this.showdown = new Showdown.converter();
-    this.model.on("change:readme", this.render, this);
+    this.listenTo(this.model, "change:readme", this.render);
   },
   render: function () {
     var readme = this.showdown.makeHtml(this.model.get("readme"));
