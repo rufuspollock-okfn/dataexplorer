@@ -108,6 +108,10 @@ my.Application = Backbone.View.extend({
     $('body').removeClass().addClass('current-view '+name);
     $('#main .view').hide();
     $('#main .view.' + name).show();
+    if (this.currentProject) {
+      this.currentProject.remove();
+      this.currentProject = undefined;
+    }
     if (path) {
       this.router.navigate(path);
     } else {
@@ -216,9 +220,6 @@ my.Application = Backbone.View.extend({
         model: project,
         state: projectViewState
       });
-
-      // let's remove all previous instances of this view ...
-      if (self.currentProject) self.currentProject.remove();
 
       $('#main').append(ds.el);
       ds.render();

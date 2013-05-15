@@ -178,7 +178,6 @@ my.Project = Backbone.View.extend({
 
   remove: function () {
     _.each(this.views, function (view) {
-      // This wont do much until Recline switches to listenTo()
       if (view.view.elSidebar) view.view.elSidebar.remove();
       view.view.remove();
     });
@@ -212,7 +211,7 @@ my.Project = Backbone.View.extend({
     // show the specific page
     _.each(this.views, function(view, idx) {
       if (view.id === pageName) {
-        view.view.el.show();
+        view.view.$el.show();
         if (view.view.elSidebar) {
           view.view.elSidebar.show();
         }
@@ -230,7 +229,7 @@ my.Project = Backbone.View.extend({
           DataExplorer.app.instance.router.navigate(newpath, {replace: true});
         }
       } else {
-        view.view.el.hide();
+        view.view.$el.hide();
         if (view.view.elSidebar) {
           view.view.elSidebar.hide();
         }
@@ -356,8 +355,9 @@ my.ReadmeView = Backbone.View.extend({
     "click .savereadme": "save"
   },
   initialize: function () {
+    _.bindAll(this, "render");
     this.showdown = new Showdown.converter();
-    this.model.on("change:readme", this.render, this);
+    this.listenTo(this.model, "change:readme", this.render);
   },
   render: function () {
     var readme = this.showdown.makeHtml(this.model.get("readme"));
