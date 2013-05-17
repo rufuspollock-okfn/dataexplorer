@@ -242,6 +242,7 @@ my.Preview = Backbone.View.extend({
       <label>Title</label> \
       <input type="text" name="title" placeholder="Title" required /> \
     </div> \
+    {{^gdocs}} \
     <div class="control-group"> \
       <label>Delimiter</label> \
       <select name="delimiter" class="input-small"> \
@@ -258,6 +259,13 @@ my.Preview = Backbone.View.extend({
       </div> \
     </div> \
     <div class="control-group"> \
+      <label class="control-label">Skip initial rows</label> \
+      <div class="controls"> \
+        <input type="number" name="skiprows" value="0" min="0" class="input-mini" /> \
+      </div> \
+    </div> \
+    {{/gdocs}} \
+    <div class="control-group"> \
       <button type="submit" class="btn btn-success">Save</button> \
     </div> \
   </form> \
@@ -265,7 +273,8 @@ my.Preview = Backbone.View.extend({
   events: {
     'change select': 'updateDelimiter',
     'change input[name=title]': 'updateTitle',
-    'change input[name=quotechar]': 'updateQuoteChar'
+    'change input[name=quotechar]': 'updateQuoteChar',
+    'change input[name=skiprows]': 'skipRows'
   },
   initialize: function () {
     // TODO: gdocs spreadsheet (could get this from picker but prefer to wait
@@ -277,7 +286,11 @@ my.Preview = Backbone.View.extend({
   },
   render: function () {
     var self = this;
-    this.$el.html(this.template);
+
+    this.$el.html(Mustache.render(this.template, {
+      gdocs: this.model.get("backend") === "gdocs"
+    }));
+
     this.model.fetch().done(function () {
       var grid = new recline.View.SlickGrid({
         model: self.model
@@ -305,6 +318,11 @@ my.Preview = Backbone.View.extend({
   updateQuoteChar: function (e) {
     var quotechar = e.target.value;
     this.model.set("quotechar", quotechar);
+    this.model.fetch();
+  },
+  skipRows: function (e) {
+    var num = e.target.value;
+    this.model.set("skipInitialRows", num);
     this.model.fetch();
   },
   getModel: function () {
