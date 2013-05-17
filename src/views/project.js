@@ -5,14 +5,16 @@ my.Project = Backbone.View.extend({
   className: 'view project',
   template: ' \
     <h2 id="project-name">{{name}}</h2> \
-    <button id="top-row-toggle" class="btn btn-mini">Toggle Description &amp; Code Editor</button> \
+    <div id="top-row-buttons"> \
+      {{^currentUserIsOwner}} \
+      <button class="btn btn-small forkme" {{^authenticated}}disabled title="Sign in to fork"{{/authenticated}}>Fork</button> \
+      {{/currentUserIsOwner}} \
+      <button id="top-row-toggle" class="btn btn-small">Description &amp; Code</button> \
+    </div> \
     <div id="fork"> \
       {{#fork_of}} \
       <p class="muted"><small>Forked from <a href="{{fork_of}}">{{fork_of}}</a></small></p> \
       {{/fork_of}} \
-      {{^currentUserIsOwner}} \
-      <button class="btn btn-mini forkme">Fork</button> \
-      {{/currentUserIsOwner}} \
     </div> \
     <div class="top-row"> \
       <div class="top-panel"> \
@@ -84,6 +86,7 @@ my.Project = Backbone.View.extend({
       tmplData.fork_of = "#" + this.model.fork_of.owner + "/" + this.model.fork_of.id;
     }
     tmplData.currentUserIsOwner = this.model.currentUserIsOwner;
+    tmplData.authenticated = window.authenticated;
     var tmpl = Mustache.render(this.template, tmplData);
     this.$el.html(tmpl);
 
