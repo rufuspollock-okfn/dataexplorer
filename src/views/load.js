@@ -258,6 +258,12 @@ my.Preview = Backbone.View.extend({
         <input type="text" name="quotechar" value=\'"\' class="input-mini" /> \
       </div> \
     </div> \
+    <div class="control-group"> \
+      <label class="control-label">Skip initial rows</label> \
+      <div class="controls"> \
+        <input type="number" name="skiprows" value="0" min="0" class="input-mini" /> \
+      </div> \
+    </div> \
     {{/gdocs}} \
     <div class="control-group"> \
       <button type="submit" class="btn btn-success">Save</button> \
@@ -267,7 +273,8 @@ my.Preview = Backbone.View.extend({
   events: {
     'change select': 'updateDelimiter',
     'change input[name=title]': 'updateTitle',
-    'change input[name=quotechar]': 'updateQuoteChar'
+    'change input[name=quotechar]': 'updateQuoteChar',
+    'change input[name=skiprows]': 'skipRows'
   },
   initialize: function () {
     // TODO: gdocs spreadsheet (could get this from picker but prefer to wait
@@ -311,6 +318,11 @@ my.Preview = Backbone.View.extend({
   updateQuoteChar: function (e) {
     var quotechar = e.target.value;
     this.model.set("quotechar", quotechar);
+    this.model.fetch();
+  },
+  skipRows: function (e) {
+    var num = e.target.value;
+    this.model.set("skipInitialRows", num);
     this.model.fetch();
   },
   getModel: function () {
