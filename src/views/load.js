@@ -242,6 +242,7 @@ my.Preview = Backbone.View.extend({
       <label>Title</label> \
       <input type="text" name="title" placeholder="Title" required /> \
     </div> \
+    {{^gdocs}} \
     <div class="control-group"> \
       <label>Delimiter</label> \
       <select name="delimiter" class="input-small"> \
@@ -257,6 +258,7 @@ my.Preview = Backbone.View.extend({
         <input type="text" name="quotechar" value=\'"\' class="input-mini" /> \
       </div> \
     </div> \
+    {{/gdocs}} \
     <div class="control-group"> \
       <button type="submit" class="btn btn-success">Save</button> \
     </div> \
@@ -277,7 +279,11 @@ my.Preview = Backbone.View.extend({
   },
   render: function () {
     var self = this;
-    this.$el.html(this.template);
+
+    this.$el.html(Mustache.render(this.template, {
+      gdocs: this.model.get("backend") === "gdocs"
+    }));
+
     this.model.fetch().done(function () {
       var grid = new recline.View.SlickGrid({
         model: self.model
