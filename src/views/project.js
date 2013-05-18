@@ -5,8 +5,11 @@ my.Project = Backbone.View.extend({
   className: 'view project',
   template: ' \
     <div class="header-nav"> \
-      <h2 id="project-name"> \
-        <span href="#" class="js-edit-name">{{name}}</span> \
+      <h2 class="project-name"> \
+        {{#currentUserIsOwner}} \
+        <a href="#" class="js-edit-name-pencil" style="float: left;"><i class="icon-pencil"></i></a> \
+        {{/currentUserIsOwner}} \
+        <span class="js-edit-name">{{name}}</span> \
         <small>read more &hellip;</small> \
       </h2> \
       <div id="top-row-buttons"> \
@@ -102,11 +105,19 @@ my.Project = Backbone.View.extend({
     this.$el.find(".editreadme").toggle(this.model.currentUserIsOwner);
 
     if (this.model.currentUserIsOwner) {
-      $(".js-edit-name").editable({
-        placement:'right',
+      $('.js-edit-name').editable({
+        placement:'bottom',
+        mode: 'inline',
+        toggle: 'manual',
+        inputclass: 'span5',
         success: function (resp, newValue) {
           self.model.set("name", newValue);
         }
+      });
+      $('.js-edit-name-pencil').click(function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        $('.js-edit-name').editable('toggle');
       });
     }
 
