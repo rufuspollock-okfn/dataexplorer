@@ -146,6 +146,14 @@ i.gdrive {
   * Splash page at start
   *********************************************************/
 
+.instructions .well {
+  height: 180px;
+}
+
+.instructions h3 {
+  margin-top: 0;
+}
+
 .view.login .splash {
   text-align: center;
   background: white;
@@ -195,6 +203,7 @@ i.gdrive {
 
 .view.project {
   margin-top: -8px;
+  position: relative;
 }
 
 .view.project .meta {
@@ -206,6 +215,11 @@ i.gdrive {
 .top-row {
   height: 300px;
   width: 100%;
+}
+
+.view.project .project-name {
+  margin-top: 0;
+  display: inline-block;
 }
 
 .top-panel {
@@ -220,6 +234,7 @@ i.gdrive {
   font-size: 14px;
   height: 100%;
   overflow: auto;
+  margin-top: -36px;
 }
 
 .view.project .readme .controls {
@@ -228,33 +243,26 @@ i.gdrive {
   left: 550px;
 }
 
-.readme > h1 {
-  margin-top: 0px;
-  margin-bottom: 15px;
-}
-
 .readme .controls a {
   width: 120px;
 }
 
-#fork {
-  display: inline-block;
-  float: right;
-}
-
 #fork p {
   display: inline-block;
+  margin-right: 5px;
 }
 
-.forkme {
-  margin-left: 5px;
+#top-row-buttons {
+  float: right;
+  margin-top: 5px;
+  font-weight: bold;
 }
 
 .view.project .data-app {
   margin: 15px 0;
 }
 
-.view.project .recline-slickgrid {
+.view .recline-slickgrid {
   height: 500px;
 }
 
@@ -297,29 +305,6 @@ i.gdrive {
   line-height: 28px;
   margin-left: 20px;
   float: left;
-}
-
-.project-preview {
-  background: #fcf8e3;
-  padding: 10px 20px;
-  margin: 10px 0;
-}
-
-.project-preview h3 {
-  margin-top: 0;
-}
-
-.project-preview form {
-  margin: 0;
-}
-
-.project-preview input, .project-preview select {
-  margin-bottom: 0;
-}
-
-.project-preview .control-group {
-  display: inline-block;
-  margin-right: 10px;
 }
 
 /**********************************************************
@@ -422,6 +407,10 @@ i.gdrive {
 
 .meta .CodeMirror {
   height: 100%;
+}
+
+.script-editor .CodeMirror {
+  font-size: 12px;
 }
 
 .script-editor > div {
@@ -561,9 +550,4 @@ body.about .page-header {
 
 .splitter-bar {
   width: 10px;
-}
-
-/* This is in Bootstap 2.3, so we can remove this once we upgrade */
-.text-right {
-  text-align: right;
 }

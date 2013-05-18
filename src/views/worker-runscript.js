@@ -1,5 +1,5 @@
 // Convert all arguments to Strings (Objects will be JSONified).
-importScripts('../../vendor/recline/vendor/underscore/1.4.2/underscore.js');
+importScripts('../../vendor/recline/vendor/underscore/1.4.4/underscore.js');
 importScripts('../../vendor/recline/vendor/underscore.deferred/0.4.0/underscore.deferred.js');
 importScripts('../../vendor/browser-request/request.js');
 importScripts('../../vendor/github.js');

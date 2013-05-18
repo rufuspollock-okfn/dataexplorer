@@ -4,23 +4,37 @@
 my.Project = Backbone.View.extend({
   className: 'view project',
   template: ' \
-    <button id="top-row-toggle" class="btn btn-mini">Toggle Description &amp; Code Editor</button> \
-    <div id="fork"> \
-      {{#fork_of}} \
-      <p class="muted"><small>Forked from <a href="{{fork_of}}">{{fork_of}}</a></small></p> \
-      {{/fork_of}} \
-      {{^currentUserIsOwner}} \
-      <button class="btn btn-mini forkme">Fork</button> \
-      {{/currentUserIsOwner}} \
+    <div class="header-nav"> \
+      <h2 class="project-name"> \
+        {{#currentUserIsOwner}} \
+        <a href="#" class="js-edit-name-pencil" style="float: left;"><i class="icon-pencil"></i></a> \
+        {{/currentUserIsOwner}} \
+        <span class="js-edit-name">{{name}}</span> \
+        <small><a href="#" class="js-read-more">read more &hellip;</a></small> \
+      </h2> \
+      <div id="top-row-buttons"> \
+        <div class="btn-group"> \
+          <a class="top-row-toggle btn">Description</a> \
+          <a class="top-row-toggle btn">Code</a> \
+          {{^currentUserIsOwner}} \
+          <button class="btn forkme" {{^authenticated}}disabled title="Sign in to fork"{{/authenticated}}>Fork</button> \
+          {{/currentUserIsOwner}} \
+        </div> \
+      </div> \
+      <div id="fork"> \
+        {{#fork_of}} \
+        <p class="muted"><small>Forked from <a href="{{fork_of}}">{{fork_of}}</a></small></p> \
+        {{/fork_of}} \
+      </div> \
     </div> \
     <div class="top-row"> \
       <div class="top-panel"> \
-        <h4>Description</h4> \
         <div class="meta"> \
-          <button class="btn btn-small editreadme">Edit</button> \
           <div class="readme"></div> \
+          <button class="btn btn-small editreadme">Edit</button> \
         </div> \
-      </div><div class="top-panel"> \
+      </div> \
+      <div class="top-panel"> \
         <h4>Code</h4> \
         <div class="script-editor"></div> \
       </div> \
@@ -49,19 +63,20 @@ my.Project = Backbone.View.extend({
     'click .navigation a': '_onSwitchView',
     'click .js-go-to-data': '_onGoToData',
     'click .forkme': 'forkProject',
-    'click #top-row-toggle': '_toggleTopRow'
+    'click .top-row-toggle': '_toggleTopRow',
+    'click .js-read-more': '_toggleTopRow'
   },
 
   initialize: function(options) {
     var self = this;
     this.state = _.extend({currentView: 'grid'}, options.state);
 
-    this.model.datasets.at(0).bind('query:done', function() {
+    this.listenTo(this.model.datasets.at(0), 'query:done', function() {
       self.$el.find('.doc-count').text(self.model.datasets.at(0).recordCount || 'Unknown');
     });
 
     // update view queryState on the current view
-    this.model.datasets.at(0).bind('query:done', function() {
+    this.listenTo(this.model.datasets.at(0), 'query:done', function() {
       var curr = self.model.get('views');
       _.each(curr, function(viewModel, idx) {
         if (viewModel.id == self.state.currentView) {
@@ -83,11 +98,29 @@ my.Project = Backbone.View.extend({
       tmplData.fork_of = "#" + this.model.fork_of.owner + "/" + this.model.fork_of.id;
     }
     tmplData.currentUserIsOwner = this.model.currentUserIsOwner;
+    tmplData.authenticated = window.authenticated;
     var tmpl = Mustache.render(this.template, tmplData);
     this.$el.html(tmpl);
 
     // Alter UI if user isn't the owner
     this.$el.find(".editreadme").toggle(this.model.currentUserIsOwner);
+
+    if (this.model.currentUserIsOwner) {
+      $('.js-edit-name').editable({
+        placement:'bottom',
+        mode: 'inline',
+        toggle: 'manual',
+        inputclass: 'span5',
+        success: function (resp, newValue) {
+          self.model.set("name", newValue);
+        }
+      });
+      $('.js-edit-name-pencil').click(function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        $('.js-edit-name').editable('toggle');
+      });
+    }
 
     var $dataViewContainer = this.$el.find('.data-view-container');
     var $dataSidebar = this.$el.find('.data-view-sidebar');
@@ -108,7 +141,7 @@ my.Project = Backbone.View.extend({
       }
 
       // now bind state changes so they get saved ...
-      out.view.state.bind('change', function() {
+      self.listenTo(out.view.state, 'change', function() {
         var curr = self.model.get('views');
         // update the view info on the model corresponding to the one being changed
         _.each(curr, function(viewModel) {
@@ -125,11 +158,11 @@ my.Project = Backbone.View.extend({
       return out;
     });
 
-    var readme = new DataExplorer.View.ReadmeView({
+    this.readme = new DataExplorer.View.ReadmeView({
       el: this.$el.find(".meta")[0],
       model: this.model
     });
-    readme.render();
+    this.readme.render();
 
     var pager = new recline.View.Pager({
       model: this.model.datasets.at(0).queryState
@@ -163,15 +196,17 @@ my.Project = Backbone.View.extend({
       resizeToWidth: true
     }).hide();
 
-    if (!this.model.gist_id) {
-      // Hasn't been saved yet, show ProjectPreview
-      var preview = new DataExplorer.View.ProjectPreview({
-        model: this.model
-      });
-      this.$el.prepend(preview.render().el);
-    }
-
     return this;
+  },
+
+  remove: function () {
+    _.each(this.views, function (view) {
+      if (view.view.elSidebar) view.view.elSidebar.remove();
+      view.view.remove();
+    });
+    this.editor.remove();
+    this.readme.remove();
+    Backbone.View.prototype.remove.apply(this, arguments);
   },
 
   _onMenuClick: function(e) {
@@ -199,7 +234,7 @@ my.Project = Backbone.View.extend({
     // show the specific page
     _.each(this.views, function(view, idx) {
       if (view.id === pageName) {
-        view.view.el.show();
+        view.view.$el.show();
         if (view.view.elSidebar) {
           view.view.elSidebar.show();
         }
@@ -217,7 +252,7 @@ my.Project = Backbone.View.extend({
           DataExplorer.app.instance.router.navigate(newpath, {replace: true});
         }
       } else {
-        view.view.el.hide();
+        view.view.$el.hide();
         if (view.view.elSidebar) {
           view.view.elSidebar.hide();
         }
@@ -238,6 +273,7 @@ my.Project = Backbone.View.extend({
   },
 
   _toggleTopRow: function (e) {
+    e.preventDefault();
     $(".top-row").slideToggle();
   },
 
@@ -249,79 +285,6 @@ my.Project = Backbone.View.extend({
     });
   }
 });
-
-my.ProjectPreview = Backbone.View.extend({
-  className: 'project-preview',
-  template: '\
-  <h3>Preview your project before saving</h3> \
-  <form> \
-    <div class="control-group"> \
-      <label>Title</label> \
-      <input type="text" name="title" placeholder="Title" required /> \
-    </div> \
-    <div class="control-group"> \
-      <label>Delimiter</label> \
-      <select name="delimiter" class="input-small"> \
-        <option value="," selected>Comma</option> \
-        <option value="&#09;">Tab</option> \
-        <option value=" ">Space</option> \
-        <option value=";">Semicolon</option> \
-      </select> \
-    </div> \
-    <div class="control-group"> \
-      <label class="control-label">Text delimiter</label> \
-      <div class="controls"> \
-        <input type="text" name="quotechar" value=\'"\' class="input-mini" /> \
-      </div> \
-    </div> \
-    <div class="control-group"> \
-      <button type="submit" class="btn btn-success">Save</button> \
-    </div> \
-  </form> \
-  ',
-  events: {
-    'change select': 'updateDelimiter',
-    'change input[name=title]': 'updateTitle',
-    'change input[name=quotechar]': 'updateQuoteChar',
-    'submit form': 'save'
-  },
-  render: function () {
-    this.$el.html(this.template);
-    this.$el.find("input[name=title]").val(this.model.get("name"));
-    this.$el.find("select[name=delimiter]").val(this.model.datasets.at(0).get("delimiter"));
-    if (!window.authenticated) {
-      this.$el.find("button[type=submit]").addClass("disabled").after('<span class="help-inline">Save disabled. Please sign in.</span>');
-    }
-    return this;
-  },
-  updateDelimiter: function (e) {
-    var delimiter = e.target.value;
-    this.model.datasets.each(function (ds) {
-      ds.set("delimiter", delimiter);
-      ds.fetch();
-    });
-  },
-  updateTitle: function (e) {
-    this.model.set("name", e.target.value);
-  },
-  updateQuoteChar: function (e) {
-    var quotechar = e.target.value;
-    this.model.datasets.each(function (ds) {
-      ds.set("quotechar", quotechar);
-      ds.fetch();
-    });
-  },
-  save: function (e) {
-    e.preventDefault();
-    var self = this;
-    if (!window.authenticated) return;
-    this.model.save().done(function () {
-      var newpath = "#" + DataExplorer.app.instance.username + "/" + self.model.gist_id;
-      DataExplorer.app.instance.router.navigate(newpath, {trigger: true});
-    })
-  }
-});
-
 
 my.ScriptEditor = Backbone.View.extend({
   template: ' \
@@ -395,7 +358,7 @@ my.ScriptEditor = Backbone.View.extend({
       this.dataset._store.fields = e.data.fields;
       this.dataset.fields.reset(this.dataset._store.fields);
       this.dataset.query({size: this.dataset._store.records.length});
-      this.model.saveDatasetsToGist();
+      this.model.saveToGist(true);
     }
   },
 
@@ -416,8 +379,9 @@ my.ReadmeView = Backbone.View.extend({
     "click .savereadme": "save"
   },
   initialize: function () {
+    _.bindAll(this, "render");
     this.showdown = new Showdown.converter();
-    this.model.on("change:readme", this.render, this);
+    this.listenTo(this.model, "change:readme", this.render);
   },
   render: function () {
     var readme = this.showdown.makeHtml(this.model.get("readme"));

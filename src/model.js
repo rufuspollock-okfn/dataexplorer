@@ -27,7 +27,7 @@ my.Project = Backbone.Model.extend({
       scripts: [
         {
           id: 'main.js',
-          content: 'print("hello world")'
+          content: '// You can interact with your data here using the "dataset" variable,\n// which is a Recline memory store (http://reclinejs.com//docs/src/backend.memory.html).\n\nconsole.log(dataset);'
         }
       ],
       datasets: [],
@@ -78,15 +78,19 @@ my.Project = Backbone.Model.extend({
     this.scripts.bind('change', function() {
       self.set({scripts: self.scripts.toJSON()});
     });
-    this.datasets.bind('change', function() {
+    this.datasets.bind('change add', function() {
       self.set({datasets: self.datasets.toJSON()});
     });
 
-    this.bind('change:readme', this.saveToGist, this);
-    this.scripts.bind('change', this.saveToGist, this);
+    var saveMetadata = _.partial(this.saveToGist, false);
+    this.bind('change:readme change:name change:views', saveMetadata, this);
+    this.scripts.bind('change', saveMetadata, this);
   },
 
-  saveToGist: function() {
+  saveToGist: function(saveDatasets) {
+    // Persists the dataset to a gist, with the option to exclude the raw data.
+
+    if (saveDatasets === undefined) saveDatasets = true;
 
     if (!window.authenticated || !this.currentUserIsOwner) return;
 
@@ -94,6 +98,14 @@ my.Project = Backbone.Model.extend({
     var gh = my.github();
     var gistJSON = my.serializeProject(this);
     var gist;
+
+    if (saveDatasets) {
+      _.each(this.get("datasets"), function (ds_meta, idx) {
+        var ds = self.datasets.at(idx);
+        var content = my.serializeDatasetToCSV(ds._store);
+        gistJSON.files[ds_meta.path] = {"content": content || "# No data"};
+      });
+    }
 
     var deferred = new $.Deferred();
 
@@ -127,86 +139,18 @@ my.Project = Backbone.Model.extend({
         }
       });
     }
-
     return deferred;
   },
 
-  saveDatasetsToGist: function () {
-    var self = this;
-
-    if (!window.authenticated || !this.currentUserIsOwner) return;
-
-    var gh = my.github();
-    var gist;
-    var gistJSON = {
-      files: {}
-    };
-
-    // Do serialize stuff from below
-    _.each(this.get("datasets"), function (ds_meta, idx) {
-
-      if (!ds_meta.path) {
-        // We're going to change the data source to be a local copy.
-        // First, move the URL to the sources array
-        self.get("sources").push({"web": ds_meta.url}); // we dont use the setter so this wont emit an event
-        delete ds_meta.url;
-        // Second, add a path based on its name.
-        ds_meta.path = (ds_meta.name || "data") + ".csv";
-        // Third, force the backend to csv
-        ds_meta.backend = "csv";
-      }
-
-      var ds = self.datasets.at(idx);
-      var content = my.serializeDatasetToCSV(ds._store);
-
-      gistJSON.files[ds_meta.path] = {"content": content || "# No data"};
-
-    });
-
-    var deferred = new $.Deferred();
-
-    if (self.gist_id) {
-      gist = gh.getGist(self.gist_id);
-      gist.update(gistJSON, function(err, gist) {
-        if (err) {
-          alert('Failed to save project to gist');
-          console.log(err);
-          console.log(gistJSON);
-          deferred.reject();
-        } else {
-          console.log('Saved to gist successfully');
-          deferred.resolve();
-        }
-      });
-    } else {
-      gistJSON.public = false;
-      gist = gh.getGist();
-      gist.create(gistJSON, function(err, gist) {
-        if (err) {
-          alert('Initial save of project to gist failed');
-          console.log(err);
-          console.log(gistJSON);
-          deferred.reject();
-        } else {
-          self.gist_id = gist.id;
-          self.gist_url = gist.url;
-          self.last_modified = new Date();
-          deferred.resolve();
-        }
-      });
-    }
-
-    return deferred;
+  trash: function () {
+    this.set("state", "trash");
+    this.saveToGist(false);
   },
 
   save: function() {
     // TODO: do not want to save *all* the time so should probably check and only save every 5m or something
     if (window.authenticated && this.currentUserIsOwner) {
-      var self = this;
-      var saving = this.saveDatasetsToGist().pipe(function () {
-        return self.saveToGist();
-      });
-      return saving;
+      return this.saveToGist(true);
     }
   },
 
@@ -217,14 +161,12 @@ my.Project = Backbone.Model.extend({
     if (datasetInfo.backend == 'github') {
       self.loadGithubDataset(datasetInfo.url, function(err, whocares) {
         self.datasets.at(0).fetch().done(function() {
-          // self.saveDatasetsToGist();
           cb(null, self);
         });
       });
     } else {
       self.datasets.at(0).fetch().done(function() {
         // TODO: should we set dataset metadata onto project source?
-        // self.saveDatasetsToGist();
         cb(null, self);
       });
     }
@@ -408,7 +350,7 @@ my.serializeDatasetToCSV = function(dataset) {
 my.ProjectList = Backbone.Collection.extend({
   model: my.Project,
   comparator: function (a, b) {
-    return a.last_modified < b.last_modified;
+    return b.last_modified - a.last_modified;
   },
   load: function() {
     var self = this;

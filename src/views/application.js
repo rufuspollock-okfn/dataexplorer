@@ -108,6 +108,10 @@ my.Application = Backbone.View.extend({
     $('body').removeClass().addClass('current-view '+name);
     $('#main .view').hide();
     $('#main .view.' + name).show();
+    if (this.currentProject) {
+      this.currentProject.remove();
+      this.currentProject = undefined;
+    }
     if (path) {
       this.router.navigate(path);
     } else {
@@ -118,7 +122,6 @@ my.Application = Backbone.View.extend({
 
   _setTitle: function(title) {
     title = title[0].toUpperCase() + title.slice(1);
-    $('.subtitle').text(title).attr('title', title);
     document.title = title + ' - Recline Data Explorer';
   },
 
@@ -146,6 +149,18 @@ my.Application = Backbone.View.extend({
       var project = this.projectList.get(projectId);
       checkDatasetLoaded(project);
     } else {
+
+      // First check if it's in our projectList
+      var project = this.projectList.find(function (project) {
+        return project.gist_id === projectId;
+      });
+
+      if (project) {
+        checkDatasetLoaded(project);
+        return;
+      }
+
+      // If not, read from gist
       var gist = DataExplorer.Model.github().getGist(projectId);
       gist.read(function(err, gist) {
         var project = DataExplorer.Model.unserializeProject(gist);
@@ -184,7 +199,6 @@ my.Application = Backbone.View.extend({
     this._loadProject(username, projectId, displayIt);
     function displayIt(err, project) {
       // housekeeping
-      self.currentProject = project;
       self.saveView.project = project;
       self._setTitle(project.get('name'));
 
@@ -206,11 +220,10 @@ my.Application = Backbone.View.extend({
         model: project,
         state: projectViewState
       });
-      // let's remove all previous instances of this view ...
-      // TODO: probably should do this to the Backbone view element
-      $('#main .view.project').remove();
+
       $('#main').append(ds.el);
       ds.render();
+      self.currentProject = ds;
       self.hideProcessing();
     }
   },
