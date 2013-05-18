@@ -4,26 +4,34 @@
 my.Project = Backbone.View.extend({
   className: 'view project',
   template: ' \
-    <h2 id="project-name">{{name}}</h2> \
-    <div id="top-row-buttons"> \
-      {{^currentUserIsOwner}} \
-      <button class="btn btn-small forkme" {{^authenticated}}disabled title="Sign in to fork"{{/authenticated}}>Fork</button> \
-      {{/currentUserIsOwner}} \
-      <button id="top-row-toggle" class="btn btn-small">Description &amp; Code</button> \
-    </div> \
-    <div id="fork"> \
-      {{#fork_of}} \
-      <p class="muted"><small>Forked from <a href="{{fork_of}}">{{fork_of}}</a></small></p> \
-      {{/fork_of}} \
+    <div class="header-nav"> \
+      <h2 id="project-name"> \
+        <span href="#" class="js-edit-name">{{name}}</span> \
+        <small>read more &hellip;</small> \
+      </h2> \
+      <div id="top-row-buttons"> \
+        <div class="btn-group"> \
+          <a class="top-row-toggle btn">Description</a> \
+          <a class="top-row-toggle btn">Code</a> \
+          {{^currentUserIsOwner}} \
+          <button class="btn forkme" {{^authenticated}}disabled title="Sign in to fork"{{/authenticated}}>Fork</button> \
+          {{/currentUserIsOwner}} \
+        </div> \
+      </div> \
+      <div id="fork"> \
+        {{#fork_of}} \
+        <p class="muted"><small>Forked from <a href="{{fork_of}}">{{fork_of}}</a></small></p> \
+        {{/fork_of}} \
+      </div> \
     </div> \
     <div class="top-row"> \
       <div class="top-panel"> \
-        <h4>Description</h4> \
         <div class="meta"> \
-          <button class="btn btn-small editreadme">Edit</button> \
           <div class="readme"></div> \
+          <button class="btn btn-small editreadme">Edit</button> \
         </div> \
-      </div><div class="top-panel"> \
+      </div> \
+      <div class="top-panel"> \
         <h4>Code</h4> \
         <div class="script-editor"></div> \
       </div> \
@@ -52,7 +60,7 @@ my.Project = Backbone.View.extend({
     'click .navigation a': '_onSwitchView',
     'click .js-go-to-data': '_onGoToData',
     'click .forkme': 'forkProject',
-    'click #top-row-toggle': '_toggleTopRow'
+    'click .top-row-toggle': '_toggleTopRow'
   },
 
   initialize: function(options) {
@@ -94,7 +102,7 @@ my.Project = Backbone.View.extend({
     this.$el.find(".editreadme").toggle(this.model.currentUserIsOwner);
 
     if (this.model.currentUserIsOwner) {
-      $("#project-name").editable({
+      $(".js-edit-name").editable({
         placement:'right',
         success: function (resp, newValue) {
           self.model.set("name", newValue);

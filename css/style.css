@@ -217,7 +217,8 @@ i.gdrive {
   width: 100%;
 }
 
-#project-name {
+.view.project .project-name {
+  margin-top: 0;
   display: inline-block;
 }
 
@@ -233,17 +234,13 @@ i.gdrive {
   font-size: 14px;
   height: 100%;
   overflow: auto;
+  margin-top: -36px;
 }
 
 .view.project .readme .controls {
   position: absolute;
   top: 0px;
   left: 550px;
-}
-
-.readme > h1 {
-  margin-top: 0px;
-  margin-bottom: 15px;
 }
 
 .readme .controls a {
@@ -256,9 +253,9 @@ i.gdrive {
 }
 
 #top-row-buttons {
-  position: absolute;
-  top: 10px;
-  right: 0;
+  float: right;
+  margin-top: 5px;
+  font-weight: bold;
 }
 
 .view.project .data-app {
