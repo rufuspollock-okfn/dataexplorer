@@ -10,7 +10,7 @@ my.Project = Backbone.View.extend({
         <a href="#" class="js-edit-name-pencil" style="float: left;"><i class="icon-pencil"></i></a> \
         {{/currentUserIsOwner}} \
         <span class="js-edit-name">{{name}}</span> \
-        <small>read more &hellip;</small> \
+        <small><a href="#" class="js-read-more">read more &hellip;</a></small> \
       </h2> \
       <div id="top-row-buttons"> \
         <div class="btn-group"> \
@@ -63,7 +63,8 @@ my.Project = Backbone.View.extend({
     'click .navigation a': '_onSwitchView',
     'click .js-go-to-data': '_onGoToData',
     'click .forkme': 'forkProject',
-    'click .top-row-toggle': '_toggleTopRow'
+    'click .top-row-toggle': '_toggleTopRow',
+    'click .js-read-more': '_toggleTopRow'
   },
 
   initialize: function(options) {
@@ -272,6 +273,7 @@ my.Project = Backbone.View.extend({
   },
 
   _toggleTopRow: function (e) {
+    e.preventDefault();
     $(".top-row").slideToggle();
   },
 
