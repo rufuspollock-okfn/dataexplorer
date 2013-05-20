@@ -273,6 +273,7 @@ my.Project = Backbone.View.extend({
   },
 
   _toggleTopRow: function (e) {
+    e.preventDefault();
     $(".top-row").slideToggle();
   },
 
