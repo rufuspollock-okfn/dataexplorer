@@ -78,16 +78,18 @@ my.Project = Backbone.View.extend({
     // update view queryState on the current view
     this.listenTo(this.model.datasets.at(0), 'query:done', function() {
       var curr = self.model.get('views');
+      var dirty = false;
+      var newQS = self.model.datasets.at(0).queryState.toJSON();
       _.each(curr, function(viewModel, idx) {
-        if (viewModel.id == self.state.currentView) {
-          viewModel.queryState = self.model.datasets.at(0).queryState.toJSON();
-          curr[idx] = viewModel;
+        if (viewModel.id === self.state.currentView && !_.isEqual(viewModel.queryState, newQS)) {
+          viewModel.queryState = newQS;
+          dirty = true;
         }
       });
-      self.model.set('views', curr);
-      // change is not being triggered for some reason ...
-      self.model.trigger('change');
-      self.model.trigger('change:views');
+      if (dirty) {
+        self.model.trigger('change:views');
+        self.model.trigger('change');
+      }
     });
   },
 
@@ -145,14 +147,12 @@ my.Project = Backbone.View.extend({
         var curr = self.model.get('views');
         // update the view info on the model corresponding to the one being changed
         _.each(curr, function(viewModel) {
-          if (viewModel.id == out.id) {
+          if (viewModel.id === out.id) {
             viewModel.state = out.view.state.toJSON();
           }
         });
-        self.model.set('views', curr);
-        // change is not being triggered for some reason ...
-        self.model.trigger('change');
         self.model.trigger('change:views');
+        self.model.trigger('change');
       });
 
       return out;
@@ -273,6 +273,7 @@ my.Project = Backbone.View.extend({
   },
 
   _toggleTopRow: function (e) {
+    e.preventDefault();
     $(".top-row").slideToggle();
   },
 
