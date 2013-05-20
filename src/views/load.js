@@ -148,6 +148,7 @@ my.Load = Backbone.View.extend({
       project.get("sources").push({"web": dataset.get("url")}); // we dont use the setter so this wont emit an event
       dataset.unset("url");
       dataset.unset("file");
+      dataset.unset("skipInitialRows");
       // Then add a path based on its name and force the backend to csv.
       dataset.set({
         "path": (dataset.get("id") || "data") + ".csv",

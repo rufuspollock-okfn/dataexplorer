@@ -14,8 +14,8 @@ my.Project = Backbone.View.extend({
       </h2> \
       <div id="top-row-buttons"> \
         <div class="btn-group"> \
-          <a class="top-row-toggle btn">Description</a> \
-          <a class="top-row-toggle btn">Code</a> \
+          <button class="top-row-toggle btn">Description</button> \
+          <button class="top-row-toggle btn">Code</button> \
           {{^currentUserIsOwner}} \
           <button class="btn forkme" {{^authenticated}}disabled title="Sign in to fork"{{/authenticated}}>Fork</button> \
           {{/currentUserIsOwner}} \
@@ -273,7 +273,6 @@ my.Project = Backbone.View.extend({
   },
 
   _toggleTopRow: function (e) {
-    e.preventDefault();
     $(".top-row").slideToggle();
   },
 
