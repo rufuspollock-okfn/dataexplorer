@@ -78,13 +78,18 @@ my.Project = Backbone.View.extend({
     // update view queryState on the current view
     this.listenTo(this.model.datasets.at(0), 'query:done', function() {
       var curr = self.model.get('views');
+      var dirty = false;
+      var newQS = self.model.datasets.at(0).queryState.toJSON();
       _.each(curr, function(viewModel, idx) {
-        if (viewModel.id === self.state.currentView) {
-          viewModel.queryState = self.model.datasets.at(0).queryState.toJSON();
+        if (viewModel.id === self.state.currentView && !_.isEqual(viewModel.queryState, newQS)) {
+          viewModel.queryState = newQS;
+          dirty = true;
         }
       });
-      self.model.trigger('change:views');
-      self.model.trigger('change');
+      if (dirty) {
+        self.model.trigger('change:views');
+        self.model.trigger('change');
+      }
     });
   },
 
