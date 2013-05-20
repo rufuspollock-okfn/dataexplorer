@@ -100,11 +100,13 @@ my.Project = Backbone.Model.extend({
     var gist;
 
     if (saveDatasets) {
-      _.each(this.get("datasets"), function (ds_meta, idx) {
-        var ds = self.datasets.at(idx);
-        var content = my.serializeDatasetToCSV(ds._store);
-        gistJSON.files[ds_meta.path] = {"content": content || "# No data"};
-      });
+      var ds_meta = this.get("datasets")[0];
+      var ds = this.datasets.at(0);
+      var content = my.serializeDatasetToCSV(ds._store);
+      gistJSON.files[ds_meta.path] = {"content": content || "# No data"};
+      if (!this.gist_id) {
+        gistJSON.files["original.csv"] = {"content": content || "# No data"};
+      }
     }
 
     var deferred = new $.Deferred();

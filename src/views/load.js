@@ -151,7 +151,7 @@ my.Load = Backbone.View.extend({
       dataset.unset("skipInitialRows");
       // Then add a path based on its name and force the backend to csv.
       dataset.set({
-        "path": (dataset.get("id") || "data") + ".csv",
+        "path": "current.csv",
         "backend": "csv"
       });
     }
