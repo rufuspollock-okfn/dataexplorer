@@ -490,6 +490,18 @@ button.runsandbox {
   top: 35px; 
 }
 
+.lint-error {
+  font-size: 10px;
+  line-height: 10px;
+  background: #f00;
+  color: white;
+  padding: 0 2px 1px;
+}
+
+.lint-error i {
+  margin-right: 3px;
+}
+
 /**********************************************************
   * About page
   *********************************************************/
