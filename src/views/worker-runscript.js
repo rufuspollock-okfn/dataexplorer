@@ -18,7 +18,7 @@ var print = function() {
     } catch(e) {}
   }
   var msg = items.join(" ");
-  self.postMessage({msg: 'print', data: msg})
+  self.postMessage({msg: 'print', data: msg});
 };
 
 console = {};
@@ -41,25 +41,25 @@ function runScript(ev) {
     ;
 
   try {
-    self.postMessage({inputId: inputId, msg: 'eval::start'})
+    self.postMessage({inputId: inputId, msg: 'eval::start'});
 
     var result = eval(src);
     if (!result) {
-      result = '-'
+      result = '-';
     }
 
     // we do not generally want to print the result of a function
     if (_.isFunction(result)) {
-      result = '-'
+      result = '-';
     }
 
-    self.postMessage({inputId: inputId, msg: 'result', data: result.toString()})
+    self.postMessage({inputId: inputId, msg: 'result', data: result.toString()});
   }
   catch (error) {
-    self.postMessage({inputId: inputId, msg: 'error', data: error.toString()})
+    self.postMessage({inputId: inputId, msg: 'error', data: error.toString()});
     // console.log(error);
   } finally {
-    self.postMessage({inputId: inputId, msg: 'eval::end'})
+    self.postMessage({inputId: inputId, msg: 'eval::end'});
   }
 }
 
