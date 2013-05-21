@@ -156,8 +156,17 @@ my.Load = Backbone.View.extend({
       });
     }
 
+    // We create an almost-identical dataset which should be considered read-only.
+    var origDS = dataset.toJSON();
+    origDS.id =  dataset.get("id") + "-original";
+    origDS.path = "original.csv";
+
+    origDS =  new recline.Model.Dataset(origDS);
+    origDS.fields.reset(dataset.fields.toJSON());
+    origDS._store = $.extend({}, dataset._store, true);
+
     // Now add to the project. This will trigger an update to the metadata too.
-    project.datasets.add(dataset);
+    project.datasets.add([dataset, origDS]);
 
     project.save().done(function () {
       self.trigger('load', project);
