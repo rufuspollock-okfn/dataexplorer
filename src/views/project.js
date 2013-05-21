@@ -305,6 +305,8 @@ my.ScriptEditor = Backbone.View.extend({
     this.$output = null;
     this.script = this.model.scripts.get('main.js');
     this.dataset = this.model.datasets.at(0);
+    this.widgets = [];
+    _.bindAll(this, "_updateHints");
   },
 
   render: function() {
@@ -323,6 +325,41 @@ my.ScriptEditor = Backbone.View.extend({
     };
     this.editor = CodeMirror.fromTextArea($textarea[0], options);
     this.$output = $('.output');
+
+    var waiting;
+    var updateHints = this._updateHints;
+    this.editor.on("change", function() {
+      clearTimeout(waiting);
+      waiting = setTimeout(updateHints, 1000);
+    });
+
+    setTimeout(updateHints, 100);
+  },
+
+  _updateHints: function () {
+    var editor = this.editor;
+    var widgets = this.widgets;
+    editor.operation(function(){
+      for (var i = 0; i < widgets.length; ++i)
+        editor.removeLineWidget(widgets[i]);
+      widgets.length = 0;
+
+      JSHINT(editor.getValue(), {asi: true});
+      for (var i = 0; i < JSHINT.errors.length; ++i) {
+        var err = JSHINT.errors[i];
+        if (!err) continue;
+        var msg = document.createElement("div");
+        var icon = msg.appendChild(document.createElement("i"));
+        icon.className = "icon-info-sign icon-white";
+        msg.appendChild(document.createTextNode(err.reason));
+        msg.className = "lint-error";
+        widgets.push(editor.addLineWidget(err.line - 1, msg, {coverGutter: false, noHScroll: true}));
+      }
+    });
+    var info = editor.getScrollInfo();
+    var after = editor.charCoords({line: editor.getCursor().line + 1, ch: 0}, "local").top;
+    if (info.top + info.clientHeight < after)
+      editor.scrollTo(null, after - info.clientHeight + 3);
   },
 
   _onClear: function(e) {

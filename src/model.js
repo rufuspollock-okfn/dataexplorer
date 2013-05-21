@@ -100,8 +100,8 @@ my.Project = Backbone.Model.extend({
     var gist;
 
     if (saveDatasets) {
-      _.each(this.get("datasets"), function (ds_meta, idx) {
-        var ds = self.datasets.at(idx);
+      this.datasets.each(function (ds, idx) {
+        var ds_meta = self.get("datasets")[idx];
         var content = my.serializeDatasetToCSV(ds._store);
         gistJSON.files[ds_meta.path] = {"content": content || "# No data"};
       });

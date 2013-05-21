@@ -151,13 +151,22 @@ my.Load = Backbone.View.extend({
       dataset.unset("skipInitialRows");
       // Then add a path based on its name and force the backend to csv.
       dataset.set({
-        "path": (dataset.get("id") || "data") + ".csv",
+        "path": "current.csv",
         "backend": "csv"
       });
     }
 
+    // We create an almost-identical dataset which should be considered read-only.
+    var origDS = dataset.toJSON();
+    origDS.id =  dataset.get("id") + "-original";
+    origDS.path = "original.csv";
+
+    origDS =  new recline.Model.Dataset(origDS);
+    origDS.fields.reset(dataset.fields.toJSON());
+    origDS._store = $.extend({}, dataset._store, true);
+
     // Now add to the project. This will trigger an update to the metadata too.
-    project.datasets.add(dataset);
+    project.datasets.add([dataset, origDS]);
 
     project.save().done(function () {
       self.trigger('load', project);
@@ -171,14 +180,12 @@ my.Load = Backbone.View.extend({
       <h3>Create a project by importing data</h3> \
       <div class="tabbable tab-import"> \
         <ul class="nav nav-tabs"> \
-          <li class="active"><a href="#csv-disk">Upload</a></li>  \
-          <li><a href="#paste">Paste</a></li>  \
-          <li><a href="#csv-online">Online</a></li>  \
+          <li class="active"><a href="#import">Import</a></li>  \
           <li class="disabled"><a href="#preview">Preview &amp; Save</a></li> \
         </ul> \
         <div class="tab-content"> \
-          <div id="csv-disk" class="tab-pane active"> \
-            <form class="form-horizontal load"> \
+          <div id="import" class="tab-pane active"> \
+            <form class="form-horizontal load well"> \
               <input type="hidden" name="backend" value="csv" /> \
               <div class="control-group"> \
                 <label class="control-label">File</label> \
@@ -186,13 +193,11 @@ my.Load = Backbone.View.extend({
                   <input type="file" name="file" /> \
                 </div> \
               </div> \
-              <div class="form-actions"> \
-                <button type="submit" class="btn btn-primary load-dataset">Load</button> \
+              <div class="controls"> \
+                <button type="submit" class="btn btn-primary load-dataset">Load From File</button> \
               </div> \
             </form> \
-          </div> \
-          <div id="csv-online" class="tab-pane"> \
-            <form class="form-horizontal load"> \
+            <form class="form-horizontal load well"> \
               <input type="hidden" name="backend" value="csv" /> \
               <fieldset> \
                 <div class="control-group"> \
@@ -203,13 +208,11 @@ my.Load = Backbone.View.extend({
                   </div> \
                 </div> \
               </fieldset> \
-              <div class="form-actions"> \
-                <button type="submit" class="btn btn-primary load-dataset">Load</button> \
+              <div class="controls"> \
+                <button type="submit" class="btn btn-primary load-dataset">Load from URL</button> \
               </div> \
             </form> \
-          </div> \
-          <div id="paste" class="tab-pane"> \
-            <form class="form-horizontal load"> \
+            <form class="form-horizontal load well"> \
               <input type="hidden" name="backend" value="csv" /> \
               <fieldset> \
                 <div class="control-group"> \
@@ -219,8 +222,8 @@ my.Load = Backbone.View.extend({
                   </div> \
                 </div> \
               </fieldset> \
-              <div class="form-actions"> \
-                <button type="submit" class="btn btn-primary load-dataset">Load</button> \
+              <div class="controls"> \
+                <button type="submit" class="btn btn-primary load-dataset">Load Pasted Data</button> \
               </div> \
             </form> \
           </div> \
