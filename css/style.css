@@ -89,6 +89,14 @@ i.gdrive {
   * Navigation
   *********************************************************/
 
+.brand.logo img {
+  margin-top: -3px;
+}
+
+.brand.logo {
+  padding-right: 8px;
+}
+
 .navbar-inner {
   background: #e0e7eb;
   padding-top: 0px;
@@ -97,6 +105,7 @@ i.gdrive {
 .navbar-inner .brand {
   color: #434C50;
   padding-top: 7px;
+  padding-bottom: 6px;
 }
 
 .navbar-inner .brand .subtitle {
@@ -135,7 +144,8 @@ i.gdrive {
 }
 
 .user-status .logout {
-  margin-top: 1px;
+  margin-top: 4px;
+  margin-bottom: -5px;
 }
 
 .navbar .nav .okf-logo a {
