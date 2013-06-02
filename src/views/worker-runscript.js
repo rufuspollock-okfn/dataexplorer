@@ -36,11 +36,8 @@ function runScript(ev) {
     src = ev.data.src;
 
   function loadDataset(name, callback) {
-    // ignoring name for now
-    callback(new recline.Backend.Memory.Store(
-      ev.data.dataset.records,
-      ev.data.dataset.fields
-    ));
+    var ds = ev.data.datasets[name];
+    callback(new recline.Backend.Memory.Store(ds.records, ds.fields));
   };
 
   try {

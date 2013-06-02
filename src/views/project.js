@@ -377,9 +377,11 @@ my.ScriptEditor = Backbone.View.extend({
     var codeToRun = this.editor.getValue();
     worker.postMessage({
       src: codeToRun,
-      dataset: {
-        records: this.dataset._store.records,
-        fields: this.dataset._store.fields
+      datasets: {
+        current: {
+          records: this.dataset._store.records,
+          fields: this.dataset._store.fields
+        }
       }
     });
   },
