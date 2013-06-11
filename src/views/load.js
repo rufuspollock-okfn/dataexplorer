@@ -164,6 +164,7 @@ my.Load = Backbone.View.extend({
     origDS =  new recline.Model.Dataset(origDS);
     origDS.fields.reset(dataset.fields.toJSON());
     origDS._store = $.extend({}, dataset._store, true);
+    origDS.query();
 
     // Now add to the project. This will trigger an update to the metadata too.
     project.datasets.add([dataset, origDS]);
