@@ -34,11 +34,11 @@ self.onmessage = runScript;
 function runScript(ev) {
   var inputId = ev.data.id,
     src = ev.data.src;
-    dataset = new recline.Backend.Memory.Store(
-      ev.data.dataset.records,
-      ev.data.dataset.fields
-      )
-    ;
+
+  function loadDataset(name, callback) {
+    var ds = ev.data.datasets[name];
+    callback(new recline.Backend.Memory.Store(ds.records, ds.fields));
+  };
 
   try {
     self.postMessage({inputId: inputId, msg: 'eval::start'});
