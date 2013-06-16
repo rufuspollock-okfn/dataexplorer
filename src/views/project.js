@@ -305,6 +305,7 @@ my.ScriptEditor = Backbone.View.extend({
     this.$output = null;
     this.script = this.model.scripts.get('main.js');
     this.dataset = this.model.datasets.at(0);
+    this.original_dataset = this.model.datasets.at(1);
     this.widgets = [];
     _.bindAll(this, "_updateHints");
   },
@@ -375,15 +376,29 @@ my.ScriptEditor = Backbone.View.extend({
         function(e) { self._handleWorkerCommunication(e); },
         false);
     var codeToRun = this.editor.getValue();
-    worker.postMessage({
-      src: codeToRun,
-      datasets: {
-        current: {
-          records: this.dataset._store.records,
-          fields: this.dataset._store.fields
+
+    var post = function () {
+      worker.postMessage({
+        src: codeToRun,
+        datasets: {
+          current: {
+            records: self.dataset._store.records,
+            fields: self.dataset._store.fields
+          },
+          original: {
+            records: self.original_dataset._store.records,
+            fields: self.original_dataset._store.fields
+          }
         }
-      }
-    });
+      });
+    };
+
+    if (this.original_dataset.recordCount === null) {
+      this.original_dataset.fetch().done(post);
+    } else {
+      post();
+    }
+
   },
 
   _handleWorkerCommunication: function(e) {
