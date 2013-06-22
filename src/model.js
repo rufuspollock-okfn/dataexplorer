@@ -27,7 +27,7 @@ my.Project = Backbone.Model.extend({
       scripts: [
         {
           id: 'main.js',
-          content: 'loadDataset("current", function (dataset) {\n  // dataset is a Recline memory store (http://reclinejs.com//docs/src/backend.memory.html).\n  console.log(dataset);\n});'
+          content: 'loadDataset("current", function (error, dataset) {\n  // error will be null unless there is an error\n  // dataset is a Recline memory store (http://reclinejs.com//docs/src/backend.memory.html).\n  console.log(dataset);\n});'
         }
       ],
       datasets: [],
