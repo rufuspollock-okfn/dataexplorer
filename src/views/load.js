@@ -92,6 +92,8 @@ my.Load = Backbone.View.extend({
   render: function() {
     var rendered = _.template(this.template, {});
     this.$el.html(rendered);
+    // enable bootstrap button niceness
+    $('.btn').button();
     return this;
   },
 
@@ -271,7 +273,7 @@ my.Preview = Backbone.View.extend({
     </div> \
     {{/gdocs}} \
     <div class="control-group"> \
-      <button type="submit" class="btn btn-success">Save</button> \
+      <button type="submit" class="btn btn-success" autocomplete="off" data-loading-text="<i class=\'icon-spinner icon-spin\'></i> Saving ...">Save</button> \
     </div> \
   </form> \
   ',
