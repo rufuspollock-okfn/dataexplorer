@@ -26,6 +26,11 @@ my.Load = Backbone.View.extend({
     } else if (backend === "gdocs") {
       url = recline.Backend.GDocs.getGDocsAPIUrls(url).spreadsheet;
     }
+      // TODO: we could be fancy and first check we can get load from original
+      // URL first (this might matter because of performance and not overloading datapipes)
+      else if (backend === 'csv') {
+      url = 'http://datapipes.okfnlabs.org/csv/raw/?url=' + encodeURIComponent(url);
+    }
 
     $.ajax(url, {
       type: "HEAD",
@@ -57,7 +62,6 @@ my.Load = Backbone.View.extend({
     });
     // try to set name
     if (data.url) {
-
       data.backend = this._guessBackend(data.url);
 
       if (data.backend !== 'gdocs') {
@@ -92,6 +96,8 @@ my.Load = Backbone.View.extend({
   render: function() {
     var rendered = _.template(this.template, {});
     this.$el.html(rendered);
+    // enable bootstrap button niceness
+    $('.btn').button();
     return this;
   },
 
@@ -271,7 +277,7 @@ my.Preview = Backbone.View.extend({
     </div> \
     {{/gdocs}} \
     <div class="control-group"> \
-      <button type="submit" class="btn btn-success">Save</button> \
+      <button type="submit" class="btn btn-success" autocomplete="off" data-loading-text="<i class=\'icon-spinner icon-spin\'></i> Saving ...">Save</button> \
     </div> \
   </form> \
   ',
@@ -296,15 +302,30 @@ my.Preview = Backbone.View.extend({
       gdocs: this.model.get("backend") === "gdocs"
     }));
 
-    this.model.fetch().done(function () {
-      var grid = new recline.View.SlickGrid({
-        model: self.model
-      });
+    function fetchIt() {
+      self.model.fetch().done(function () {
+        var grid = new recline.View.SlickGrid({
+          model: self.model
+        });
 
-      grid.render();
-      self.$el.find("#grid").append(grid.el);
-      grid.show();
-    });
+        grid.render();
+        self.$el.find("#grid").append(grid.el);
+        grid.show();
+      });
+    }
+    
+    // HACK: this is kind of hacky
+    // TODO: we should fix up this whole system properly (we probably want to
+    // cache raw data somewhere so as we change config we can reload)
+    if (this.model.get('backend') === 'csv') {
+      var tmpurl = 'http://datapipes.okfnlabs.org/csv/raw/?url=' + encodeURIComponent(this.model.get('url'));
+      $.get(tmpurl, function(data) {
+        self.model.set('data', data);
+        fetchIt();
+      });
+    } else {
+      fetchIt();
+    }
 
     this.$el.find("input[name=title]").val(this.projectName);
     this.$el.find("select[name=delimiter]").val(this.model.get("delimiter"));

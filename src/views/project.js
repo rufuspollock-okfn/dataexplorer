@@ -447,6 +447,7 @@ my.ReadmeView = Backbone.View.extend({
     this.$el.find(".readme").hide();
 
     var options = {
+      lineNumbers: true,
       lineWrapping: true,
       theme : "default",
       mode : "markdown",
