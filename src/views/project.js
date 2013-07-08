@@ -6,16 +6,13 @@ my.Project = Backbone.View.extend({
   template: ' \
     <div class="header-nav"> \
       <h2 class="project-name"> \
-        {{#currentUserIsOwner}} \
-        <a href="#" class="js-edit-name-pencil" style="float: left;"><i class="icon-pencil"></i></a> \
-        {{/currentUserIsOwner}} \
         <span class="js-edit-name">{{name}}</span> \
-        <small><a href="#" class="js-read-more">read more &hellip;</a></small> \
+        {{#currentUserIsOwner}} \
+        <sup><a href="#" class="js-edit-name-pencil" style="font-size: 14px;"><i class="icon-edit"></i></a></sup> \
+        {{/currentUserIsOwner}} \
       </h2> \
       <div id="top-row-buttons"> \
         <div class="btn-group"> \
-          <button class="top-row-toggle btn">Description</button> \
-          <button class="top-row-toggle btn">Code</button> \
           {{^currentUserIsOwner}} \
           <button class="btn forkme" {{^authenticated}}disabled title="Sign in to fork"{{/authenticated}}>Fork</button> \
           {{/currentUserIsOwner}} \
@@ -63,8 +60,7 @@ my.Project = Backbone.View.extend({
     'click .navigation a': '_onSwitchView',
     'click .js-go-to-data': '_onGoToData',
     'click .forkme': 'forkProject',
-    'click .top-row-toggle': '_toggleTopRow',
-    'click .js-read-more': '_toggleTopRow'
+    'click .top-row-toggle': '_toggleTopRow'
   },
 
   initialize: function(options) {
@@ -194,7 +190,7 @@ my.Project = Backbone.View.extend({
       minLeft: 250,
       minRight: 250,
       resizeToWidth: true
-    }).hide();
+    });
 
     return this;
   },
