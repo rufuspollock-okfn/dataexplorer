@@ -143,13 +143,13 @@ i.gdrive {
   display: none;
 }
 
-.user-status .logout {
-  margin-top: 4px;
-  margin-bottom: -5px;
-}
-
 .navbar .nav .okf-logo a {
   padding: 5px;
+}
+
+.user-status a.logout {
+  padding-left: 0;
+  margin-bottom: -1px;
 }
 
 /**********************************************************
