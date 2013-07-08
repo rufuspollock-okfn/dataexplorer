@@ -14,8 +14,6 @@ my.Project = Backbone.View.extend({
       </h2> \
       <div id="top-row-buttons"> \
         <div class="btn-group"> \
-          <button class="top-row-toggle btn">Description</button> \
-          <button class="top-row-toggle btn">Code</button> \
           {{^currentUserIsOwner}} \
           <button class="btn forkme" {{^authenticated}}disabled title="Sign in to fork"{{/authenticated}}>Fork</button> \
           {{/currentUserIsOwner}} \
@@ -194,7 +192,7 @@ my.Project = Backbone.View.extend({
       minLeft: 250,
       minRight: 250,
       resizeToWidth: true
-    }).hide();
+    });
 
     return this;
   },
