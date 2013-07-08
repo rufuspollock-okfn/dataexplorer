@@ -317,7 +317,8 @@ my.Preview = Backbone.View.extend({
     // HACK: this is kind of hacky
     // TODO: we should fix up this whole system properly (we probably want to
     // cache raw data somewhere so as we change config we can reload)
-    if (this.model.get('backend') === 'csv') {
+    if (this.model.get('backend') === 'csv' && this.model.get('url')) {
+      console.log(this.model.get('url'));
       var tmpurl = 'http://datapipes.okfnlabs.org/csv/raw/?url=' + encodeURIComponent(this.model.get('url'));
       $.get(tmpurl, function(data) {
         self.model.set('data', data);
