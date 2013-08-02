@@ -133,7 +133,7 @@ my.Project = Backbone.Model.extend({
           deferred.reject();
         } else {
           self.gist_id = gist.id;
-          self.gist_url = gist.url;
+          // TODO: should we update the project with all the gist stuff (see unserializeProject below)
           self.last_modified = new Date();
           deferred.resolve();
         }
@@ -247,6 +247,9 @@ my.serializeProject = function(project) {
   // we alter the data object below and toJSON in backbone is a shallow copy
   var data = $.extend(true, {}, project.toJSON());
 
+  // delete gist stuff
+  delete data.gist;
+
   var description = data.name;
   if (data.readme) {
     description += ' - ' + data.readme.split('.')[0];
@@ -329,11 +332,31 @@ my.unserializeProject = function(serialized) {
     }
   });
 
-  // We don't want these anymore
-  delete dp.gist_id;
-  delete dp.gist_url;
+  // add in all the gist stuff (if this is a gist)
+  // note we remove this again when we save
+  dp.gist = {
+    id: serialized.id,
+    user: serialized.user,
+    forks: serialized.forks,
+    history: serialized.history,
+    apiUrl: serialized.url,
+    public: serialized.public,
+  }
+  // need to check this really is a gist to avoid erroring ...
+  if (serialized.git_push_url) {
+    // unfortunately html_url attribute does not include username for some reason so we have to construct ourselves
+    dp.gist.url = 'https://gist.github.com/' + serialized.user.login + '/' + serialized.id;
+    dp.username = serialized.user.login;
+  }
 
   var project = new my.Project(dp);
+  project.gist_id = serialized.id;
+  project.last_modified = new Date(serialized.updated_at);
+  if (serialized.fork_of) {
+    project.fork_of = {id: serialized.fork_of.id, owner: serialized.fork_of.user.login};
+  }
+  // project.currentUserIsOwner (set elsewhere)
+
   return project;
 };
 
@@ -376,12 +399,6 @@ my.ProjectList = Backbone.Collection.extend({
         // We could do lazy loading, but for now lets get the datapackage immediately
         gh.getGist(gist.id).read(function (err, gist) {
           var dp = my.unserializeProject(gist);
-          dp.gist_id = gist.id;
-          dp.gist_url = gist.url;
-          dp.last_modified = new Date(gist.updated_at);
-          if (gist.fork_of) {
-            dp.fork_of = {id: gist.fork_of.id, owner: gist.fork_of.user.login};
-          }
           self.add(dp);
         });
       });
