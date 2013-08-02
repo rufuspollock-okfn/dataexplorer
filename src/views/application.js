@@ -165,12 +165,6 @@ my.Application = Backbone.View.extend({
       gist.read(function(err, gist) {
         var project = DataExplorer.Model.unserializeProject(gist);
         project.currentUserIsOwner = (self.username === gist.user.login);
-        project.gist_id = gist.id;
-        project.gist_url = gist.url;
-        project.last_modified = new Date(gist.updated_at);
-        if (gist.fork_of) {
-          project.fork_of = {id: gist.fork_of.id, owner: gist.fork_of.user.login};
-        }
         checkDatasetLoaded(project);
       });
     }
