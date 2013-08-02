@@ -13,8 +13,11 @@ my.Project = Backbone.View.extend({
       </h2> \
       <div id="top-row-buttons"> \
         <div class="btn-group"> \
+          <a class="btn" target="_blank" href="{{gist.url}}/raw//current.csv"><i class="icon-download-alt"></i> Data</a> \
+          <a class="btn" target="_blank" href="{{gist.url}}/raw//datapackage.json"><i class="icon-download"></i> Metadata</a> \
+          <a class="btn" target="_blank" href="{{gist.url}}"><i class="icon-github-alt"></i> Gist</a> \
           {{^currentUserIsOwner}} \
-          <button class="btn forkme" {{^authenticated}}disabled title="Sign in to fork"{{/authenticated}}>Fork</button> \
+          <a class="btn forkme" {{^authenticated}}disabled title="Sign in to fork"{{/authenticated}}><i class="icon-code-fork"></i> Fork</a> \
           {{/currentUserIsOwner}} \
         </div> \
       </div> \
@@ -27,8 +30,9 @@ my.Project = Backbone.View.extend({
     <div class="top-row"> \
       <div class="top-panel"> \
         <div class="meta"> \
-          <div class="readme"></div> \
           <button class="btn btn-small editreadme">Edit</button> \
+          <div class="readme"></div> \
+          <div class="info"></div> \
         </div> \
       </div> \
       <div class="top-panel"> \
