@@ -411,7 +411,6 @@ my.Script = Backbone.Model.extend({
   defaults: function() {
     return {
       created: new Date().toISOString(),
-      last_modified: new Date().toISOString(),
       language: 'javascript',
       content: ''
     };
