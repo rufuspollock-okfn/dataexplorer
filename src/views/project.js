@@ -9,6 +9,7 @@ my.Project = Backbone.View.extend({
         <span class="js-edit-name">{{name}}</span> \
         {{#currentUserIsOwner}} \
         <sup><a href="#" class="js-edit-name-pencil" style="font-size: 14px;"><i class="icon-edit"></i></a></sup> \
+        <a class="btn btn-success disabled js-save-button">All Saved</a> \
         {{/currentUserIsOwner}} \
       </h2> \
       <div id="top-row-buttons"> \
@@ -64,7 +65,8 @@ my.Project = Backbone.View.extend({
     'click .navigation a': '_onSwitchView',
     'click .js-go-to-data': '_onGoToData',
     'click .forkme': 'forkProject',
-    'click .top-row-toggle': '_toggleTopRow'
+    'click .top-row-toggle': '_toggleTopRow',
+    'click .js-save-button': '_onSaveProject'
   },
 
   initialize: function(options) {
@@ -73,6 +75,21 @@ my.Project = Backbone.View.extend({
 
     this.listenTo(this.model.datasets.at(0), 'query:done', function() {
       self.$el.find('.doc-count').text(self.model.datasets.at(0).recordCount || 'Unknown');
+    });
+    this.listenTo(this.model.unsavedChanges, 'change', function(changes) {
+      var $saveButton = self.$el.find('.js-save-button');
+      // reset text which may have got set to 'Saving ...'
+      if (changes.attributes.any) {
+        $saveButton.text('Save Changes');
+        $saveButton.removeClass('disabled');
+        window.onbeforeunload = function(e) {
+          return 'You have UNSAVED changes to your project';
+        }
+      } else {
+        $saveButton.text('All Saved');
+        $saveButton.addClass('disabled');
+        window.onbeforeunload = null;
+      }
     });
 
     // update view queryState on the current view
@@ -272,6 +289,17 @@ my.Project = Backbone.View.extend({
     );
   },
 
+  _onSaveProject: function(e) {
+    this.$el.find('.js-save-button').text('Saving ...');
+    this.model.save()
+      .done(function(e) {
+      })
+      .fail(function(e) {
+        alert('There was an error'); 
+      })
+      ;
+  },
+
   _toggleTopRow: function (e) {
     e.preventDefault();
     $(".top-row").slideToggle();
@@ -412,7 +440,6 @@ my.ScriptEditor = Backbone.View.extend({
       this.dataset._store.fields = e.data.fields;
       this.dataset.fields.reset(this.dataset._store.fields);
       this.dataset.query({size: this.dataset._store.records.length});
-      this.model.saveToGist(true);
     }
   },
 

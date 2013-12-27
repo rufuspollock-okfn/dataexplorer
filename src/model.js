@@ -56,6 +56,12 @@ my.Project = Backbone.Model.extend({
     var self = this;
     this.currentUserIsOwner = true;
     this.last_modified = new Date();
+    this.unsavedChanges = new Backbone.Model({
+      any: false,
+      scripts: false,
+      datasets: false,
+      metadata: false
+    });
     this.scripts = new Backbone.Collection();
     this.datasets = new Backbone.Collection();
     if (!this.id) {
@@ -75,22 +81,32 @@ my.Project = Backbone.Model.extend({
       self.get('datasets'),
       function(datasetData) { return new recline.Model.Dataset(datasetData); }
     ));
-    this.scripts.bind('change', function() {
-      self.set({scripts: self.scripts.toJSON()});
-    });
     this.datasets.bind('change add', function() {
       self.set({datasets: self.datasets.toJSON()});
+      self.unsavedChanges.set({
+        any: true,
+        datasets: true
+      });
     });
-
-    var saveMetadata = _.partial(this.saveToGist, false);
-    this.bind('change:readme change:name change:views', saveMetadata, this);
-    this.scripts.bind('change', saveMetadata, this);
+    this.bind('change:readme change:name change:views', function(e) {
+      console.log('triggered');
+      self.unsavedChanges.set({
+        any: true,
+        metadata: true
+      });
+    });
+    this.scripts.bind('change', function(e) {
+      self.set({scripts: self.scripts.toJSON()});
+      self.unsavedChanges.set({
+        any: true,
+        scripts: true
+      });
+    });
   },
 
-  saveToGist: function(saveDatasets) {
-    // Persists the dataset to a gist, with the option to exclude the raw data.
-
-    if (saveDatasets === undefined) saveDatasets = true;
+  // Persists the dataset to a gist
+  saveToGist: function() {
+    var saveDatasets = this.unsavedChanges.get('datasets');
 
     if (!window.authenticated || !this.currentUserIsOwner) return;
 
@@ -119,6 +135,7 @@ my.Project = Backbone.Model.extend({
           deferred.reject();
         } else {
           console.log('Saved to gist successfully');
+          self._resetUnsaved();
           deferred.resolve();
         }
       });
@@ -135,11 +152,21 @@ my.Project = Backbone.Model.extend({
           self.gist_id = gist.id;
           // TODO: should we update the project with all the gist stuff (see unserializeProject below)
           self.last_modified = new Date();
+          self._resetUnsaved();
           deferred.resolve();
         }
       });
     }
     return deferred;
+  },
+
+  _resetUnsaved: function() {
+    this.unsavedChanges.set({
+      any: false,
+      scripts: false,
+      datasets: false,
+      metadata: false
+    });
   },
 
   trash: function () {
@@ -148,9 +175,8 @@ my.Project = Backbone.Model.extend({
   },
 
   save: function() {
-    // TODO: do not want to save *all* the time so should probably check and only save every 5m or something
     if (window.authenticated && this.currentUserIsOwner) {
-      return this.saveToGist(true);
+      return this.saveToGist();
     } else {
       var deferred = new $.Deferred();
       deferred.resolve();
@@ -411,7 +437,6 @@ my.Script = Backbone.Model.extend({
   defaults: function() {
     return {
       created: new Date().toISOString(),
-      last_modified: new Date().toISOString(),
       language: 'javascript',
       content: ''
     };
