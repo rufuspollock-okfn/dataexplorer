@@ -106,24 +106,14 @@ my.Project = Backbone.Model.extend({
 
   // Persists the dataset to a gist
   saveToGist: function() {
-    var saveDatasets = this.unsavedChanges.get('datasets');
-
+    var self = this;
     if (!window.authenticated || !this.currentUserIsOwner) return;
 
-    var self = this;
-    var gh = my.github();
-    var gistJSON = my.serializeProject(this);
-    var gist;
-
-    if (saveDatasets) {
-      this.datasets.each(function (ds, idx) {
-        var ds_meta = self.get("datasets")[idx];
-        var content = my.serializeDatasetToCSV(ds._store);
-        gistJSON.files[ds_meta.path] = {"content": content || "# No data"};
-      });
-    }
-
-    var deferred = new $.Deferred();
+    var gh = my.github()
+      , gistJSON = my.serializeProject(this)
+      , gist
+      , deferred = new $.Deferred()
+      ;
 
     if (this.gist_id) {
       gist = gh.getGist(this.gist_id);
@@ -317,6 +307,17 @@ my.serializeProject = function(project) {
     }
   });
 
+  // we try to be efficient and only serialize data into gist json if we
+  // really need to (i.e. it has changed)
+  var saveDatasets = project.unsavedChanges.get('datasets')
+  if (saveDatasets) {
+    project.datasets.each(function (ds, idx) {
+      var ds_meta = project.get("datasets")[idx];
+      var content = CSV.serialize(ds._store);
+      gistJSON.files[ds_meta.path] = {"content": content || "# No data"};
+    });
+  }
+
   gistJSON.files['datapackage.json'].content = JSON.stringify(data, null, 2);
   return gistJSON;
 };
@@ -385,20 +386,6 @@ my.unserializeProject = function(serialized) {
 
   return project;
 };
-
-// TODO: move to util?
-my.serializeDatasetToCSV = function(dataset) {
-  var records = [];
-  records.push(_.pluck(dataset.fields, 'id'));
-  _.each(dataset.records, function(record, index) {
-    var tmp = _.map(dataset.fields, function(field) {
-      return record[field.id];
-    });
-    records.push(tmp);
-  });
-  return recline.Backend.CSV.serializeCSV(records);
-};
-
 
 my.ProjectList = Backbone.Collection.extend({
   model: my.Project,
