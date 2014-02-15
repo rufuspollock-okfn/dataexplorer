@@ -219,7 +219,7 @@ my.Load = Backbone.View.extend({
                 <button type="submit" class="btn btn-primary load-dataset">Load from URL</button> \
               </div> \
             </form> \
-            <form class="form-horizontal load well"> \
+            <form class="form-horizontal load well paste"> \
               <input type="hidden" name="backend" value="csv" /> \
               <fieldset> \
                 <div class="control-group"> \
