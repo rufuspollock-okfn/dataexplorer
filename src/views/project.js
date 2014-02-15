@@ -182,7 +182,7 @@ my.Project = Backbone.View.extend({
     this.readme.render();
 
     var pager = new recline.View.Pager({
-      model: this.model.datasets.at(0).queryState
+      model: this.model.datasets.at(0)
     });
     this.$el.find('.recline-results-info').after(pager.el);
 
