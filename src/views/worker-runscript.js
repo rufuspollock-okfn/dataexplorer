@@ -6,7 +6,7 @@ importScripts('../../vendor/github.js');
 importScripts('../util.js');
 importScripts('../../vendor/backbone.js');
 importScripts('../../vendor/recline/dist/recline.dataset.js');
-importScripts('../../vendor/recline/src/backend.csv.js');
+importScripts('../../vendor/csv.js/csv.js');
 
 // Convert all arguments to Strings (Objects will be JSONified).
 var print = function() {

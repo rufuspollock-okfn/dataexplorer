@@ -94,10 +94,6 @@ my.Application = Backbone.View.extend({
 
     this.loadView.bind('load', this.onLoadProject);
 
-    this.saveView = new DataExplorer.View.Save({});
-    this.saveView.render();
-    $('#main').append(this.saveView.el);
-
     return this;
   },
 
@@ -193,7 +189,6 @@ my.Application = Backbone.View.extend({
     this._loadProject(username, projectId, displayIt);
     function displayIt(err, project) {
       // housekeeping
-      self.saveView.project = project;
       self._setTitle(project.get('name'));
 
       // if this project does in fact have remote backing let's set the username so it is sharable

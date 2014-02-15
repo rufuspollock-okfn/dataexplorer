@@ -44,7 +44,7 @@ test('Project: loadSourceDataset', function () {
 });
 
 test('serializeProject', function () {
-  var csvData = 'Date,Yield\n2012,1.8\n';
+  var csvData = '"Date ""$""",Yield\n2012,1.8\n';
   var readme = 'This is the README';
   var project = new DataExplorer.Model.Project({
     name: 'test it',
@@ -90,13 +90,21 @@ test('serializeProject', function () {
   equal(dp.files, undefined, 'on datapackage.json datasets is named resources');
   equal(dp.resources[0].backend, 'csv');
   equal(dp.resources[0].data, undefined, 'We removed data attribute from the dataset');
-  equal(dp.resources[0].schema.fields[0].id, 'Date');
+  equal(dp.resources[0].schema.fields[0].id, 'Date "$"');
 
   // check the content
   deepEqual(out.files['main.js'].content, 'xyz');
-  // no longer including data in basic serialization
-  // deepEqual(out.files['data.csv'].content, csvData);
   equal(out.files['README.md'].content, readme, 'README content correct');
+  // no longer including data in basic serialization
+  ok(!('data.csv' in out.files));
+
+  // now set changes
+  project.unsavedChanges.set({datasets: true});
+  var outWithData = DataExplorer.Model.serializeProject(project); 
+  deepEqual(outWithData.files['data.csv'].content, csvData);
+
+  // ------------------------------------
+  // Test unserialize now ...
 
   // make some changes prior to unserializing
   var newScriptContent = 'request("...")';
@@ -111,7 +119,7 @@ test('serializeProject', function () {
   // no longer including data in basic serialization
   // equal(newProject.datasets.at(0).get('data'), csvData);
   equal(newProject.get('readme'), newReadme, 'readme attribute correct');
-  equal(newProject.get('datasets')[0].fields[0].id, 'Date');
+  equal(newProject.get('datasets')[0].fields[0].id, 'Date "$"');
 });
 
 })();
