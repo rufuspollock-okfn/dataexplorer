@@ -37,7 +37,6 @@ my.Project = Backbone.View.extend({
         </div> \
       </div> \
       <div class="top-panel"> \
-        <h4>Code</h4> \
         <div class="script-editor"></div> \
       </div> \
     </div> \
@@ -316,16 +315,22 @@ my.Project = Backbone.View.extend({
 
 my.ScriptEditor = Backbone.View.extend({
   template: ' \
-    <button class="btn btn-small btn-primary runsandbox">Run the Code</button> \
-    <button class="btn btn-small btn-danger clear">Clear Output</button> \
+    <div class="header"> \
+      <h4>Scripting</h4> \
+      <div class="buttons"> \
+        <a class="btn btn-small btn-primary runsandbox"><i class="icon-play-circle"></i> Run</a> \
+        <a class="btn btn-small btn-danger clear">Clear Output</a> \
+        <a class="btn btn-small" title="Scripting Help and Tutorials (opens in new window)" target="_blank" href="./doc/scripting.html"><i class="icon-info-sign"></i> Help</a> \
+      </div> \
+    </div> \
     <div class="script-editor-widget"> \
       <textarea class="content"></textarea> \
     </div> \
     <div class="output"></div> \
   ',
   events: {
-    'click button.clear': '_onClear',
-    'click button.runsandbox': '_onRunSandboxed'
+    'click a.clear': '_onClear',
+    'click a.runsandbox': '_onRunSandboxed'
   },
 
   initialize: function(options) {

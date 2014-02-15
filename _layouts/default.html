@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset='UTF-8'/>
+  <title>Data Explorer &middot; View, Clean and Share Data in the Browser</title>
+  <link rel='shortcut icon' href='images/favicon.ico' type='image/x-icon' />
+
+  <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+  <!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <link href="/vendor/bootstrap/2.3.1/bootstrap.min.css" rel="stylesheet">
+  <link href="https://netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
+
+  <!-- Our CSS -->
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="transformer-app">
+  <div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+      <div class="container">
+        <a class="brand logo" href="http://okfnlabs.org/" title="An Open Knowledge Foundation project">
+          <img src="http://assets.okfn.org/p/okfn/img/logo_28x30.png" alt="OKF logo" />
+        </a>
+        <a class="brand" href="./">
+          Data Explorer - <span class="subtitle">view, clean &amp; share data in the browser</span>
+        </a>
+        <ul class="nav pull-right user-status">
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class='container'>
+    <div class="content">
+      {{ content }}
+    </div> <!-- /content -->
+
+    <div id="footer">
+      An <a href="http://okfnlabs.org/">Open Knowledge Foundation Labs project</a>. Free &amp; open-source software &mdash; <a href="https://github.com/okfn/dataexplorer">source code</a>.
+    </div>
+  
+    <div class="feedback"><a href="https://github.com/okfn/dataexplorer/issues" target="_blank">Feedback</a></div>
+
+  </div> <!-- /container -->
+</div>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-33874954-13']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+</body>
+</html>
+
