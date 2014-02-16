@@ -1,0 +1,3 @@
+# exclude as much recline stuff as we can
+# unfortunately exclude seems pretty limited (no globbing, no full path matching etc)
+exclude: [download.markdown,tutorial-basics-events.markdown,tutorial-basics-query.markdown,docs]
