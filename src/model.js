@@ -24,6 +24,9 @@ my.Project = Backbone.Model.extend({
       state: 'active',
       created: new Date().toISOString(),
       sources: [],
+      profiles: {
+        "dataexplorer": "0.9"
+      },
       scripts: [
         {
           id: 'main.js',
@@ -36,7 +39,10 @@ my.Project = Backbone.Model.extend({
           id: 'grid',
           label: 'Grid',
           // must be in recline.View namespace for the present
-          type: 'SlickGrid'
+          type: 'SlickGrid',
+          state: {
+            gridOptions: gridOptions
+          }
         },
         {
           id: 'graph',
@@ -81,6 +87,19 @@ my.Project = Backbone.Model.extend({
       self.get('datasets'),
       function(datasetData) { return new recline.Model.Dataset(datasetData); }
     ));
+    if(this.datasets && this.datasets.at(0)){
+	this.datasets.at(0).records.bind('add change remove', function() {
+	  self.datasets.at(0)._store= new recline.Backend.Memory.Store(
+	    self.datasets.at(0).records.toJSON(), 
+	    self.datasets.at(0)._store.fields
+	  );
+	  self.set({datasets: self.datasets.toJSON()});
+        self.unsavedChanges.set({
+          any: true,
+          datasets: true
+        });
+      });
+    }
     this.datasets.bind('change add', function() {
       self.set({datasets: self.datasets.toJSON()});
       self.unsavedChanges.set({
@@ -313,8 +332,10 @@ my.serializeProject = function(project) {
   if (saveDatasets) {
     project.datasets.each(function (ds, idx) {
       var ds_meta = project.get("datasets")[idx];
-      var content = CSV.serialize(ds._store);
-      gistJSON.files[ds_meta.path] = {"content": content || "# No data"};
+      if(ds._store.fields){
+        var content = CSV.serialize(ds._store);
+        gistJSON.files[ds_meta.path] = {"content": content || "# No data"};
+	}
     });
   }
 
@@ -376,6 +397,8 @@ my.unserializeProject = function(serialized) {
     dp.username = serialized.user.login;
   }
 
+  upgradeDataExplorerProject(dp);
+
   var project = new my.Project(dp);
   project.gist_id = serialized.id;
   project.last_modified = new Date(serialized.updated_at);
@@ -386,6 +409,35 @@ my.unserializeProject = function(serialized) {
 
   return project;
 };
+
+// recline slickgrid grid options for editability
+var gridOptions = {
+  editable: true,
+  enabledAddRow: true,
+  enabledDelRow: true,
+  autoEdit: false,
+  enableCellNavigation: true
+};
+
+// perform upgrades on the structure of the DataExplorer object
+// to support changes in structure over time
+function upgradeDataExplorerProject(project) {
+  // before we had profiles (and hence version that we are implementing)
+  if (!project.profiles) {
+    project.profiles = {
+      dataexplorer: "0.9"
+    }
+  }
+  var version = project.profiles.dataexplorer;
+  // version 0.9 upgrade
+  if (version === "0.9") {
+    _.each(project.views, function(view) {
+      if (view.type === 'SlickGrid') {
+        view.state = _.extend({}, view.state, { gridOptions: gridOptions });
+      }
+    });
+  }
+}
 
 my.ProjectList = Backbone.Collection.extend({
   model: my.Project,

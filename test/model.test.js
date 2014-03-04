@@ -8,6 +8,8 @@ test('Project: basics', function () {
   equal(project.get('manifest_version'), 1);
   equal(project.datasets.length, 0);
   equal(project.get('views').length, 3);
+  equal(project.get('views')[0].state.gridOptions.editable, true);
+  equal(project.get('profiles').dataexplorer, "0.9");
 });
 
 test('Project: datasets', function () {
@@ -120,6 +122,7 @@ test('serializeProject', function () {
   // equal(newProject.datasets.at(0).get('data'), csvData);
   equal(newProject.get('readme'), newReadme, 'readme attribute correct');
   equal(newProject.get('datasets')[0].fields[0].id, 'Date "$"');
+  equal(newProject.get('views')[0].state.gridOptions.editable, true);
 });
 
 })();
