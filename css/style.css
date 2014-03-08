@@ -1,4 +1,4 @@
-@import url(http://fonts.googleapis.com/css?family=OpenSans:400,300,700);
+@import url(http://fonts.googleapis.com/css?family=Open+Sans:400,700);
 
 body {
   padding: 0;
@@ -8,7 +8,7 @@ body {
 body, p {
   font:13px/20px 'OpenSans', sans-serif;
   line-height: 1.5em;
-	font-family: OpenSans, sans-serif;
+	font-family: 'Open Sans', sans-serif;
   color: #516066;
   -webkit-font-smoothing: antialiased;
 }
@@ -164,7 +164,7 @@ i.gdrive {
 .view.project .header-nav .avatar {
   display: inline-block;
   font-size: 31.5px;
-  line-height: 40px;
+  line-height: 50px;
   float: left;
 }
 
@@ -174,15 +174,16 @@ i.gdrive {
 }
 
 .view.project .trail {
-  font-size: 14px;
+  font-size: 13px;
   margin: 0;
   font-weight: normal;
 }
 
 .view.project .project-name {
   margin: 0;
-  font-size: 24px;
+  font-size: 26px;
   line-height: 1.5em;
+  margin-top: -5px;
 }
 
 /**********************************************************
@@ -635,91 +636,98 @@ body.about .actions a {
   }
   .left-menu:hover {
     background-color:#3d494e;
+    *z-index:1000;
   }
+  .left-menu:hover .dropdown {
+    display:block;
+    }
+  .left-menu:hover .brand {
+  }
+
 
 .left-menu .brand {
   display: block;
-  background: #f8f8f8;
-  width: 55px;
-  height: 50px;
+  background: #3d494e;
+  width: 44px;
+  height: 44px;
   text-align: center;
-  margin-left: 5px;
-  margin-top: 5px;
+  margin-left: 10px;
+  margin-top: 8px;
 }
 
 .left-menu .brand a {
   font-size: 24px;
-  color: #516066;
+  font-weight: bold;
+  color: #fff;
   display: inline-block;
-  margin-top: 14px;
+  margin-top: 12px;
 }
 
 .left-menu .brand a:hover {
   text-decoration: none;
+  display: none;
+}
+
+.left-menu:hover .brand a {
+  display: none;
+}
+
+.left-menu .brand a.onhover {
+  display: none;
+}
+
+.left-menu .brand a.onhover span {
+  font-size: 16px;
+}
+
+.left-menu:hover .brand a.onhover {
+  display: inline-block;
 }
 
 .left-menu .user-status {
   padding-top: 25px;
 }
 
-.drop-menu {
-  position:relative;
+.dropdown {
+  background-color:#3d494e;
+  position:absolute;
+  right:0;
+  top: 100%;
+  z-index:1000;
+  padding:0 0 15px;
+  width:120px;
+  display: none;
   }
-  .application .dropdown {
-    -webkit-box-shadow:0 4px 10px rgba(0,0,0,0.15);
-            box-shadow:0 4px 10px rgba(0,0,0,0.15);
-    }
-  .dropdown {
-    background-color:#3d494e;
-    position:absolute;
-    top:100%;
-    right:0;
-    z-index:1000;
-    padding:0 0 15px;
-    width:120px;
-    display: none;
-    }
-    .dropdown li {
-      display:block;
-      }
-    .dropdown li.divider {
-      border-bottom:1px solid #202020;
-      margin:10px 0;
-      }
-    .dropdown li.authenticated {
-      display: none;
-      }
-    .authenticated .dropdown li.authenticated {
-      display: block;
-      }
-    .dropdown > li > a {
-      background:transparent;
-      color:#e0e7eb;
-      font-weight:400;
-      display:block;
-      padding:4px 15px;
-      float:none;
-      clear:both;
-      line-height:20px;
-      text-overflow:ellipsis;
-      white-space:nowrap;
-      overflow:hidden;
-      -webkit-font-smoothing:subpixel-antialiased;
-      }
-    .dropdown a.active,
-    .dropdown > li > a:hover,
-    .dropdown > li > a:focus {
-      background-color:#516066;
-      text-decoration:none;
-      }
-
-.left-menu:hover {
-  *z-index:1000;
-  }
-  .left-menu:hover .dropdown {
+  .dropdown li {
     display:block;
     }
-  .left-menu:hover .brand {
-    background: #fff;
-  }
-
+  .dropdown li.divider {
+    border-bottom:1px solid #202020;
+    margin:10px 0;
+    }
+  .dropdown li.authenticated {
+    display: none;
+    }
+  .authenticated .dropdown li.authenticated {
+    display: block;
+    }
+  .dropdown > li > a {
+    background:transparent;
+    color:#e0e7eb;
+    font-weight:400;
+    display:block;
+    padding:4px 15px;
+    float:none;
+    clear:both;
+    line-height:20px;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    overflow:hidden;
+    -webkit-font-smoothing:subpixel-antialiased;
+    }
+  .dropdown a.active,
+  .dropdown > li > a:hover,
+  .dropdown > li > a:focus {
+    background-color:#516066;
+    text-decoration:none;
+    }
