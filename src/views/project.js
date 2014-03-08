@@ -59,6 +59,13 @@ my.Project = Backbone.View.extend({
         <li> \
           <a class="" target="_blank" href="{{gist.url}}"><i class="icon-github-alt" title="See Github Gist for this Project"></i></a> \
         </li> \
+        <li class="divider"></li> \
+        <li> \
+          <a class="" target="_blank" href="./doc/guide.html" \
+            title="Guide and Help"> \
+            <i class="icon-info-sign"></i> \
+          </a> \
+        </li> \
       </ul> \
     </div> \
     <div class="flash"></div> \

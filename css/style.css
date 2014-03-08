@@ -311,8 +311,8 @@ button.editreadme, button.savereadme {
 }
 
 .nav li.divider {
-  border-bottom: 2px solid #ccc;
-  margin: 15px 10px;
+  border-bottom: 2px solid #eee;
+  margin: 15px 0px;
 }
 
 /**********************************************************
@@ -505,7 +505,7 @@ button.runsandbox {
   *********************************************************/
 
 .brand.logo img {
-  margin-top: -3px;
+  margin-top: -5px;
 }
 
 .brand.logo {
@@ -519,7 +519,7 @@ button.runsandbox {
 
 .navbar-inner .brand {
   color: #434C50;
-  padding-top: 7px;
+  padding-top: 9px;
   padding-bottom: 6px;
 }
 
