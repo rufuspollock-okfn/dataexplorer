@@ -60,9 +60,15 @@ To learn more about the the code see doc/developers.md
 
 ### Deploying
 
-For github login
+For github login you will need to set up your own gatekeeper instance as per above.
 
 ## License and Credits
+
+The first version of this app was built by Michael Aufreiter and Rufus Pollock.
+It reused several portions of [Prose][] including github login and portions of
+the styling.
+
+[Prose]: https://github.com/prose/prose
 
 Licensed under the MIT license.
 

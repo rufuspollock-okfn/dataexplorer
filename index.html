@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset='UTF-8'/>
-  <title>Data Explorer &middot; View, Clean and Share Data in the Browser</title>
+  <title>Data Edit &middot; Edit and Manipulate Data in the Browser</title>
   <link rel='shortcut icon' href='images/favicon.ico' type='image/x-icon' />
 
   <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
@@ -42,78 +42,49 @@
 </head>
 <body>
 <div class="transformer-app">
-  <div class="navbar navbar-fixed-top">
-    <div class="navbar-inner">
-      <div class="container-fluid">
-        <a class="brand logo" href="http://okfnlabs.org/" title="An Open Knowledge Foundation project">
-          <img src="http://assets.okfn.org/p/okfn/img/logo_28x30.png" alt="OKF logo" />
-        </a>
-        <a class="brand" href="./">
-          Data Explorer - <span class="subtitle">view, clean &amp; share data in the browser</span>
-        </a>
-        <ul class="nav pull-right user-status">
-          <li class="logged-in"><a class="username" href="#dashboard"></a></li>
-          <li class="logged-in"><a class="logout" href="#" title="sign out"><i class="icon-signout"></i></a></li>
-          <li class="not-logged-in">
-            <a class="login" href="#">Sign in using GitHub</a>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </div>
 
-  <div class='container-fluid'><div class="content">
-    <div id='main'>
-      <div class="view about" style="display: none;">
-        <div class="page-header">
-          <h1>
-            Data Explorer
-            <small>View, Clean and Share Data in the Browser</small>
-          </h1>
-        </div>
-        <div class="row-fluid instructions">
-          <div class="span4">
-            <div class="well">
-              <h3>Explore &amp; Visualize</h2>
-              <p>Load data from <strong>Google Docs, CSVs, DataHub, GitHub</strong> and more.</p>
-              <p>Explore the data in a <strong>rich tabular interface</strong>, create <strong>graphs and maps</strong></p>
-            </div>
+<div class="left-menu">
+  <div class="brand round">
+    <a href="./">
+      T
+    </a>
+  </div>
+  <ul class="dropdown user-status">
+    <li>
+      <a href="/doc/about.html">About</a>
+    </li>
+    <li>
+      <a href="http://github.com/okfn/dataexplorer">Developers</a>
+    </li>
+    <li class="logged-in">
+    <!-- <a class="username" href="#dashboard"></a> -->
+    </li>
+    <li class="divider"></li>
+    <li class="logged-in">
+      <a class="logout" href="#" title="sign out">
+        Logout
+      </a>
+    </li>
+    <li class="not-logged-in">
+      <a class="login" href="#">Sign in using GitHub</a>
+    </li>
+  </ul>
+</div>
+
+    <div id="main">
+      <div class="view start" style="display: none;">
+        <div class="round splash">
+          <h2 class="icon landing">Tabularum</h2>
+          <div class="inner">
+            <p>Tabularum is an in-browser data editor for tabular data on GitHub.</p>
+            <p><a href="/doc/about.html">Learn more</a></p>
+            <a class="btn btn-large login" href="#">Authorize on GitHub</a>
           </div>
-          <div class="span4">
-            <div class="well">
-              <h3>Clean and Transform</h2>
-              <p>Write <strong>simple javascript</strong> to <strong>clean &amp; transform</strong> data in the browser.</p>
-              <p>Full library of functions provided including <strong>underscore, ajax and custom helpers</strong>.</p>
-            </div>
-          </div>
-          <div class="span4">
-            <div class="well">
-              <h3>Save and Share</h3>
-              <p>Everything you do can be <strong>saved and shared</strong> with a persistent, sharable URL.</p>
-              <p>Material is saved to <strong>Gists</strong> and data can be exported to <strong>CSV, GitHub</strong> etc.</p>
-            </div>
-          </div>
-        </div>
-        <h2 class="followup">And all of this from within your browser &mdash; nothing to install, no backend to worry about !</h2>
-        <p class="actions">
-          <a class="btn btn-primary btn-large" href="#rgrp/e3e0b0f18dfe151f9f7e">
-            Check out an example<br />(house prices) <i class="icon-double-angle-right"></i>
-          </a>
-          &mdash;
-          <a class="btn btn-primary btn-large" href="#load">
-            Get started with your<br />own data <i class="icon-double-angle-right"></i>
-          </a>
-        </p>
-        <div id="footer">
-          An <a href="http://okfnlabs.org/">Open Knowledge Foundation Labs project</a>. Free &amp; open-source software &mdash; <a href="https://github.com/okfn/dataexplorer">source code</a>.
         </div>
       </div>
     </div><!-- /main -->
 
     <div class="processing-notice" style="display: none;"><span class="msg">Processing</span> <img src="http://assets.okfn.org/images/icons/ajaxload-circle.gif" alt="Processing ..." /></div>
-
-    <div class="feedback"><a href="https://github.com/okfn/dataexplorer/issues" target="_blank">Feedback</a></div>
-  </div></div> <!-- /content /container -->
 </div>
 
   <!-- 3rd party JS libraries -->

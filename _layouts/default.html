@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset='UTF-8'/>
-  <title>Data Explorer &middot; View, Clean and Share Data in the Browser</title>
+  <title>{{page.title}} - Data Explorer &middot; View, Clean and Share Data in the Browser</title>
   <link rel='shortcut icon' href='images/favicon.ico' type='image/x-icon' />
 
   <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
@@ -14,8 +14,13 @@
 
   <!-- Our CSS -->
   <link rel="stylesheet" href="/css/style.css">
+  <style type="text/css">
+    body {
+      padding-top: 60px;
+    }
+  </style>
 </head>
-<body>
+<body class="{{page.bodyclass}}">
 <div class="transformer-app">
   <div class="navbar navbar-fixed-top">
     <div class="navbar-inner">
@@ -40,9 +45,6 @@
     <div id="footer">
       An <a href="http://okfnlabs.org/">Open Knowledge Foundation Labs project</a>. Free &amp; open-source software &mdash; <a href="https://github.com/okfn/dataexplorer">source code</a>.
     </div>
-  
-    <div class="feedback"><a href="https://github.com/okfn/dataexplorer/issues" target="_blank">Feedback</a></div>
-
   </div> <!-- /container -->
 </div>
 <script type="text/javascript">

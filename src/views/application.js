@@ -50,11 +50,11 @@ my.Application = Backbone.View.extend({
       if (self.authenticated) {
         self.router.navigate('dashboard', {trigger: true});
       } else {
-        self.router.navigate('about', {trigger: true});
+        self.router.navigate('start', {trigger: true});
       }
     });
-    this.router.route('about', 'about', function() {
-      self.switchView('about');
+    this.router.route('start', 'start', function() {
+      self.switchView('start');
     });
     this.router.route('dashboard', 'dashboard', function() {
       self.switchView('dashboard');
