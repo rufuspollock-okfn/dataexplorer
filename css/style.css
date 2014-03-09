@@ -267,7 +267,7 @@ button.editreadme, button.savereadme {
   * Project Side Nav
   *********************************************************/
 
-.nav li a {
+.right-menu li a {
   background-color:#f8f8f8;
   color:#a8afb2;
   display:block;
@@ -279,20 +279,20 @@ button.editreadme, button.savereadme {
   position:relative;
   z-index:10;
   }
-  .nav li a:hover {
+  .right-menu li a:hover {
     background-color:#f0f0f0;
     }
-  .nav li a:active {
+  .right-menu li a:active {
     -webkit-box-shadow:inset 0 2px 2px rgba(0,0,0,0.15);
             box-shadow:inset 0 2px 2px rgba(0,0,0,0.15);
     }
-    .nav li a.active {
+    .right-menu li a.active {
       background-color:#526066;
       color:#fff;
       -webkit-box-shadow:inset 0 2px 2px rgba(0,0,0,0.15);
               box-shadow:inset 0 2px 2px rgba(0,0,0,0.15);
       }
-  .nav li a.btn-success {
+  .right-menu li a.btn-success {
     color: #fff;
   }
 
@@ -310,7 +310,7 @@ button.editreadme, button.savereadme {
   background-color: inherit;
 }
 
-.nav li.divider {
+.right-menu li.divider {
   border-bottom: 2px solid #eee;
   margin: 15px 0px;
 }
