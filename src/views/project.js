@@ -5,22 +5,19 @@ my.Project = Backbone.View.extend({
   className: 'view project',
   template: ' \
     <div class="header-nav"> \
-      <h2 class="project-name"> \
-        <span class="js-edit-name">{{name}}</span> \
-        {{#currentUserIsOwner}} \
-        <sup><a href="#" class="js-edit-name-pencil" style="font-size: 14px;"><i class="icon-edit"></i></a></sup> \
-        <a class="btn btn-success disabled js-save-button">All Saved</a> \
-        {{/currentUserIsOwner}} \
-      </h2> \
-      <div id="top-row-buttons"> \
-        <div class="btn-group"> \
-          <a class="btn" target="_blank" href="{{gist.url}}/raw//current.csv"><i class="icon-download-alt"></i> Data</a> \
-          <a class="btn" target="_blank" href="{{gist.url}}/raw//datapackage.json"><i class="icon-download"></i> Metadata</a> \
-          <a class="btn" target="_blank" href="{{gist.url}}"><i class="icon-github-alt"></i> Gist</a> \
-          {{^currentUserIsOwner}} \
-          <a class="btn forkme" {{^authenticated}}disabled title="Sign in to fork"{{/authenticated}}><i class="icon-code-fork"></i> Fork</a> \
+      <div class="round avatar"> \
+        <i class="icon-file-text-alt"></i> \
+      </div> \
+      <div class="details"> \
+        <h4 class="trail"> \
+          <a href="/#{{username}}">{{username}}</a> / {{gist.id}} \
+        </h4> \
+        <h2 class="project-name"> \
+          <span class="js-edit-name">{{name}}</span> \
+          {{#currentUserIsOwner}} \
+          <sup><a href="#" class="js-edit-name-pencil" style="font-size: 14px;"><i class="icon-edit"></i></a></sup> \
           {{/currentUserIsOwner}} \
-        </div> \
+        </h2> \
       </div> \
       <div id="fork"> \
         {{#fork_of}} \
@@ -28,18 +25,60 @@ my.Project = Backbone.View.extend({
         {{/fork_of}} \
       </div> \
     </div> \
-    <div class="top-row"> \
-      <div class="top-panel"> \
-        <div class="meta"> \
-          <button class="btn btn-small editreadme">Edit</button> \
-          <div class="readme"></div> \
-          <div class="info"></div> \
-        </div> \
-      </div> \
-      <div class="top-panel"> \
-        <div class="script-editor"></div> \
-      </div> \
+    \
+    <div class="right-menu"> \
+      <ul class="nav"> \
+        <li> \
+          {{#currentUserIsOwner}} \
+          <a class="btn-success round disabled js-save-button" title="All Saved" href="#"> \
+            <i class="icon-save"></i> \
+          </a> \
+          {{/currentUserIsOwner}} \
+        </li> \
+        <li> \
+          <a class="round js-show-script-editor" href="#" title="Show Scripting"><i class="icon-pencil"></i></a> \
+        </li> \
+        <li> \
+          <a class="round js-show-readme" href="#" title="Show README">R</a> \
+        </li> \
+        <li> \
+          {{^currentUserIsOwner}} \
+          <a class="round forkme" \
+            {{^authenticated}}disabled title="Sign in to fork"{{/authenticated}} \
+            title="Fork this Project"> \
+              <i class="icon-code-fork"></i> \
+          </a> \
+          {{/currentUserIsOwner}} \
+        </li> \
+        <li class="divider"></li> \
+      </ul> \
+      <ul class="nav"> \
+        <li> \
+          <a class="" target="_blank" href="{{gist.url}}/raw//current.csv" title="Download Data (as CSV)"><i class="icon-download-alt"></i></a> \
+        </li> \
+        <li> \
+          <a class="" target="_blank" href="{{gist.url}}"><i class="icon-github-alt" title="See Github Gist for this Project"></i></a> \
+        </li> \
+        <li class="divider"></li> \
+        <li> \
+          <a class="" target="_blank" href="./doc/guide.html" \
+            title="Guide and Help"> \
+            <i class="icon-info-sign"></i> \
+          </a> \
+        </li> \
+      </ul> \
     </div> \
+    <div class="flash"></div> \
+    \
+    <div class="meta"> \
+      <h3> \
+        README \
+        <button class="btn btn-small editreadme">Edit</button> \
+      </h3> \
+      <div class="readme"></div> \
+      <div class="info"></div> \
+    </div> \
+    <div class="script-editor"></div> \
     <div id="data-app" class="data-app"> \
       <div class="header"> \
         <div class="navigation"> \
@@ -65,7 +104,9 @@ my.Project = Backbone.View.extend({
     'click .js-go-to-data': '_onGoToData',
     'click .forkme': 'forkProject',
     'click .top-row-toggle': '_toggleTopRow',
-    'click .js-save-button': '_onSaveProject'
+    'click .js-save-button': '_onSaveProject',
+    'click .js-show-script-editor': '_toggleScriptEditor',
+    'click .js-show-readme': '_toggleReadme'
   },
 
   initialize: function(options) {
@@ -77,15 +118,16 @@ my.Project = Backbone.View.extend({
     });
     this.listenTo(this.model.unsavedChanges, 'change', function(changes) {
       var $saveButton = self.$el.find('.js-save-button');
+      $saveButton.find('i').attr('class', 'icon-save');
       // reset text which may have got set to 'Saving ...'
       if (changes.attributes.any) {
-        $saveButton.text('Save Changes');
+        $saveButton.attr('title', 'Save Changes');
         $saveButton.removeClass('disabled');
         window.onbeforeunload = function(e) {
           return 'You have UNSAVED changes to your project';
         }
       } else {
-        $saveButton.text('All Saved');
+        $saveButton.attr('title', 'All Saved');
         $saveButton.addClass('disabled');
         window.onbeforeunload = null;
       }
@@ -289,7 +331,8 @@ my.Project = Backbone.View.extend({
   },
 
   _onSaveProject: function(e) {
-    this.$el.find('.js-save-button').text('Saving ...');
+    e.preventDefault();
+    this.$el.find('.js-save-button i').attr('class', 'icon-spinner icon-spin');
     this.model.save()
       .done(function(e) {
       })
@@ -299,9 +342,17 @@ my.Project = Backbone.View.extend({
       ;
   },
 
-  _toggleTopRow: function (e) {
+  _toggleScriptEditor: function (e) {
     e.preventDefault();
-    $(".top-row").slideToggle();
+    $('.script-editor').slideToggle();
+    // need to call refresh for stuff to properly show
+    var $el = this.$el.find('.script-editor .CodeMirror')[0];
+    $el.CodeMirror.refresh();
+  },
+
+  _toggleReadme: function (e) {
+    e.preventDefault();
+    $('.meta').slideToggle();
   },
 
   forkProject: function () {

@@ -29,7 +29,7 @@ my.Load = Backbone.View.extend({
       // TODO: we could be fancy and first check we can get load from original
       // URL first (this might matter because of performance and not overloading datapipes)
       else if (backend === 'csv') {
-      url = 'http://datapipes.okfnlabs.org/csv/raw/?url=' + encodeURIComponent(url);
+      url = 'http://datapipes.okfnlabs.org/csv/?url=' + encodeURIComponent(url);
     }
 
     $.ajax(url, {
@@ -319,7 +319,7 @@ my.Preview = Backbone.View.extend({
     // cache raw data somewhere so as we change config we can reload)
     if (this.model.get('backend') === 'csv' && this.model.get('url')) {
       console.log(this.model.get('url'));
-      var tmpurl = 'http://datapipes.okfnlabs.org/csv/raw/?url=' + encodeURIComponent(this.model.get('url'));
+      var tmpurl = 'http://datapipes.okfnlabs.org/csv/?url=' + encodeURIComponent(this.model.get('url'));
       $.get(tmpurl, function(data) {
         self.model.set('data', data);
         fetchIt();

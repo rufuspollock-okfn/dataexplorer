@@ -5,7 +5,6 @@ test('Project: basics', function () {
   var project = new DataExplorer.Model.Project({name: 'abc'});
   equal(project.get('name'), 'abc');
   equal(project.scripts.length, 1);
-  equal(project.get('manifest_version'), 1);
   equal(project.datasets.length, 0);
   equal(project.get('views').length, 3);
   equal(project.get('views')[0].state.gridOptions.editable, true);
