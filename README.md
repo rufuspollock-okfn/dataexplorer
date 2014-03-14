@@ -39,6 +39,11 @@ listed there).
 
 If you are running or nginx or apache on your local machine setting up an alias
 like this to your local src directory should be easy.
+Also if you have python installed , you can run SimpleHTTPServer from src 's parent 
+directory.
+
+    python -m  SimpleHTTPServer 80
+
 
 ### Github Login
 
