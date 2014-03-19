@@ -129,6 +129,7 @@ my.Application = Backbone.View.extend({
     self.authenticated = true;
     window.authenticated = true;
     this.projectList.load();
+    self.switchView('dashboard');
   },
 
   onLoadProject: function(project) {
