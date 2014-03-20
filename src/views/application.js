@@ -118,7 +118,7 @@ my.Application = Backbone.View.extend({
 
   _setTitle: function(title) {
     title = title[0].toUpperCase() + title.slice(1);
-    document.title = title + ' - Open Knowledge Foundation Data Explorer';
+    document.title = title + ' - DataDeck - Open Knowledge Foundation';
   },
 
   finishUserSetup: function() {

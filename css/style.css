@@ -374,6 +374,14 @@ button.editreadme, button.savereadme {
   * Dashboard
   *********************************************************/
 
+.dashboard {
+  margin-top: -10px;
+}
+
+.dashboard .page-header {
+  border-bottom: none;
+}
+
 .dashboard .load-btn {
   float: right;
 }
@@ -629,7 +637,7 @@ body.about .actions a {
 }
 
 .left-menu {
-  width:120px;
+  width:150px;
   position:fixed;
   z-index:5000;
   top:0;
@@ -697,7 +705,7 @@ body.about .actions a {
   top: 100%;
   z-index:1000;
   padding:0 0 15px;
-  width:120px;
+  width:150px;
   display: none;
   }
   .dropdown li {
