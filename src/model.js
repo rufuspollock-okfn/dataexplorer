@@ -383,7 +383,7 @@ my.unserializeProject = function(serialized) {
   // note we remove this again when we save
   dp.gist = {
     id: serialized.id,
-    user: serialized.user,
+    user: serialized.owner,
     forks: serialized.forks,
     history: serialized.history,
     apiUrl: serialized.url,
@@ -392,8 +392,8 @@ my.unserializeProject = function(serialized) {
   // need to check this really is a gist to avoid erroring ...
   if (serialized.git_push_url) {
     // unfortunately html_url attribute does not include username for some reason so we have to construct ourselves
-    dp.gist.url = 'https://gist.github.com/' + serialized.user.login + '/' + serialized.id;
-    dp.username = serialized.user.login;
+    dp.gist.url = 'https://gist.github.com/' + serialized.owner.login + '/' + serialized.id;
+    dp.username = serialized.owner.login;
   }
 
   upgradeDataExplorerProject(dp);
@@ -402,7 +402,7 @@ my.unserializeProject = function(serialized) {
   project.gist_id = serialized.id;
   project.last_modified = new Date(serialized.updated_at);
   if (serialized.fork_of) {
-    project.fork_of = {id: serialized.fork_of.id, owner: serialized.fork_of.user.login};
+    project.fork_of = {id: serialized.fork_of.id, owner: serialized.fork_of.owner.login};
   }
   // project.currentUserIsOwner (set elsewhere)
 
