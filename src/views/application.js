@@ -161,7 +161,7 @@ my.Application = Backbone.View.extend({
       var gist = DataExplorer.Model.github().getGist(projectId);
       gist.read(function(err, gist) {
         var project = DataExplorer.Model.unserializeProject(gist);
-        project.currentUserIsOwner = (self.username === gist.user.login);
+        project.currentUserIsOwner = (self.username === gist.owner.login);
         checkDatasetLoaded(project);
       });
     }
