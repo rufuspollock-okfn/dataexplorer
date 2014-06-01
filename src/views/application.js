@@ -68,6 +68,8 @@ my.Application = Backbone.View.extend({
     // project
     this.router.route(':username/:projectId', 'project', this.projectShow);
     this.router.route(':username/:projectId/view/:viewId', 'projectWithView', this.projectShow);
+    // github standard files ...
+    this.router.route(':username/:projectId/edit/*path', 'githubFile', this.projectShowForGithub);
   },
 
   // Should be rendered just once
@@ -161,7 +163,7 @@ my.Application = Backbone.View.extend({
       var gist = DataExplorer.Model.github().getGist(projectId);
       gist.read(function(err, gist) {
         var project = DataExplorer.Model.unserializeProject(gist);
-        project.currentUserIsOwner = (self.username === gist.user.login);
+        project.currentUserIsOwner = (self.username === gist.owner.login);
         checkDatasetLoaded(project);
       });
     }
@@ -200,6 +202,62 @@ my.Application = Backbone.View.extend({
           {replace: true}
           );
       }
+
+      if (err) {
+        // this.notify('error', 'The requested resource could not be found.');
+        console.log('We were unable to load the gist');
+        return;
+      }
+      var ds = new DataExplorer.View.Project({
+        model: project,
+        state: projectViewState
+      });
+
+      $('#main').append(ds.el);
+      ds.render();
+      self.currentProject = ds;
+      self.hideProcessing();
+    }
+  },
+
+  // ### github show
+  //
+  // The router for showing a github file
+  projectShowForGithub: function(username, projectId, path) {
+    var self = this;
+    // HACK: need to fix adding of view/grid in project.js
+    path = path.replace('/view/grid', '');
+    // TODO: this is dumb - we have to set the path to where we are already at 
+    // suspect switchView needs refatoring
+    self.switchView('project', username + '/' + projectId + '/edit/' + path);
+
+    // if path is not a csv tell them its not possible ...
+    if (path.indexOf('.csv') != path.length-4) {
+      alert('We can only edit CSV files and this file does not end with .csv');
+      return;
+    }
+
+    // self.switchView('project', username + '/' + projectId);
+    self.showProcessing('Loading');
+    
+    var projectViewState = {};
+
+    var project = new DataExplorer.Model.Project({
+      name: path.split('/').pop(),
+      datasets: [{
+        id: 'it-does-not-matter',
+        backend: 'github',
+        url: 'https://github.com/' + username + '/' + projectId + '/blob/' + path
+      }]
+    });
+    project.loadSourceDataset(function(err, p) {
+      console.log(project);
+      displayIt(err, project);
+    });
+
+    function displayIt(err, project) {
+      // housekeeping
+      self._setTitle(project.get('name'));
 
       if (err) {
         // this.notify('error', 'The requested resource could not be found.');
