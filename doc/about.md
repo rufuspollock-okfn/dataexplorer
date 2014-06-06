@@ -36,11 +36,11 @@ bodyclass: about
 
 <h2 class="followup">And all of this from within your browser &mdash; nothing to install, no backend to worry about !</h2>
 <p class="actions">
-  <a class="btn btn-primary btn-large" href="#rgrp/e3e0b0f18dfe151f9f7e">
+  <a class="btn btn-primary btn-large" href="./../../#rgrp/e3e0b0f18dfe151f9f7e">
     Check out an example<br />(house prices) <i class="icon-double-angle-right">&nbsp;</i>
   </a>
   &mdash;
-  <a class="btn btn-primary btn-large" href="#load">
+  <a class="btn btn-primary btn-large" href="./../../#load">
     Get started with your<br />own data <i class="icon-double-angle-right">&nbsp;</i>
   </a>
 </p>
