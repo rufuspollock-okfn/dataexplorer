@@ -6,8 +6,8 @@ bodyclass: about
 
 <div class="page-header">
   <h1>
-    Data Explorer
-    <small>View, Clean and Share Data in the Browser</small>
+    DataDeck
+    <small>View, Clean and Remix Tabular Data in the Browser</small>
   </h1>
 </div>
 <div class="row-fluid instructions">
