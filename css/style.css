@@ -278,6 +278,7 @@ button.editreadme, button.savereadme {
   margin:10px;
   position:relative;
   z-index:10;
+  font-size: 30px;
   }
   .right-menu li a:hover {
     background-color:#f0f0f0;

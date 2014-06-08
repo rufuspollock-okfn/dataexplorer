@@ -86,13 +86,15 @@ my.Project = Backbone.Model.extend({
       self.get('datasets'),
       function(datasetData) { return new recline.Model.Dataset(datasetData); }
     ));
-    if(this.datasets && this.datasets.at(0)){
-	this.datasets.at(0).records.bind('add change remove', function() {
-	  self.datasets.at(0)._store= new recline.Backend.Memory.Store(
-	    self.datasets.at(0).records.toJSON(), 
-	    self.datasets.at(0)._store.fields
-	  );
-	  self.set({datasets: self.datasets.toJSON()});
+    if(this.datasets && this.datasets.at(0)) {
+      // TODO: this is not robust to reset of the datasets
+      // i.e. if are project initialize we add / remove datasets in position 0 this bind won't re-run ...
+      self.datasets.at(0).records.bind('add change remove', function() {
+        self.datasets.at(0)._store= new recline.Backend.Memory.Store(
+          self.datasets.at(0).records.toJSON(), 
+          self.datasets.at(0)._store.fields
+        );
+        self.set({datasets: self.datasets.toJSON()});
         self.unsavedChanges.set({
           any: true,
           datasets: true
@@ -107,7 +109,6 @@ my.Project = Backbone.Model.extend({
       });
     });
     this.bind('change:readme change:name change:views', function(e) {
-      console.log('triggered');
       self.unsavedChanges.set({
         any: true,
         metadata: true
@@ -184,45 +185,56 @@ my.Project = Backbone.Model.extend({
 
   save: function() {
     if (window.authenticated && this.currentUserIsOwner) {
-      return this.saveToGist();
+      if (this.get('type') === 'github') {
+        return this._saveToGithub();
+      } else {
+        return this.saveToGist();
+      }
     } else {
+      // TODO: alert that we did not save?
+      alert('You are not logged in so we cannot save. Please login via the main menu on the left');
       var deferred = new $.Deferred();
       deferred.resolve();
       return deferred;
     }
   },
 
+  _saveToGithub: function() {
+    var self = this
+      , gh = my.github()
+      , deferred = new $.Deferred()
+      , dataset = self.toJSON().datasets[0]
+      , content = CSV.serialize(self.datasets.at(0)._store)
+      , url = dataset.url
+      , user =  url.split("/")[3]
+      , repo = url.split("/")[4]
+      , branch = url.split("/")[6]
+      , path = url.split('/').slice(7).join('/')
+      , message = 'DataDeck update'
+      , repo = getRepo(user, repo)
+      ;
+
+    repo.write(branch, path, content, message, function(err) {
+      if (err) {
+        alert('Failed to save to github');
+        console.log(err);
+        deferred.reject();
+      } else {
+        self._resetUnsaved();
+        deferred.resolve();
+      }
+    });
+
+    return deferred;
+  },
+
   // load source dataset info
   loadSourceDataset: function(cb) {
     var self = this;
     var datasetInfo = self.datasets.at(0).toJSON();
-    if (datasetInfo.backend == 'github') {
-      self.loadGithubDataset(datasetInfo.url, function(err, whocares) {
-        self.datasets.at(0).fetch().done(function() {
-          cb(null, self);
-        });
-      });
-    } else {
-      self.datasets.at(0).fetch().done(function() {
-        // TODO: should we set dataset metadata onto project source?
-        cb(null, self);
-      });
-    }
-  },
-
-  loadGithubDataset: function(url, cb) {
-    var self = this;
-    var user =  url.split("/")[3];
-    var repo = url.split("/")[4];
-    var branch = url.split("/")[6];
-    var path = url.split('/').slice(7).join('/');
-
-    repo = getRepo(user, repo);
-
-    repo.read(branch, path, function(err, raw_csv) {
-      // TODO: need to do this properly ...
-      self.datasets.reset([new recline.Model.Dataset({data: raw_csv, backend: 'csv'})]);
-      cb(err, self.dataset);
+    self.datasets.at(0).fetch().done(function() {
+      // TODO: should we set dataset metadata onto project source?
+      cb(null, self);
     });
   },
 
@@ -327,14 +339,14 @@ my.serializeProject = function(project) {
 
   // we try to be efficient and only serialize data into gist json if we
   // really need to (i.e. it has changed)
-  var saveDatasets = project.unsavedChanges.get('datasets')
+  var saveDatasets = project.unsavedChanges.get('datasets');
   if (saveDatasets) {
     project.datasets.each(function (ds, idx) {
       var ds_meta = project.get("datasets")[idx];
-      if(ds._store.fields){
+      if(ds._store.fields) {
         var content = CSV.serialize(ds._store);
         gistJSON.files[ds_meta.path] = {"content": content || "# No data"};
-	}
+      }
     });
   }
 
@@ -414,6 +426,7 @@ var gridOptions = {
   editable: true,
   enabledAddRow: true,
   enabledDelRow: true,
+  enableReOrderRow:true,
   autoEdit: false,
   enableCellNavigation: true
 };
@@ -515,6 +528,16 @@ function getRepo(user, repo) {
 
   return currentRepo.instance;
 }
+
+my.getGithubData = function(url, cb) {
+  var user =  url.split("/")[3]
+    , repo = url.split("/")[4]
+    , branch = url.split("/")[6]
+    , path = url.split('/').slice(7).join('/')
+    , repo = getRepo(user, repo)
+    ;
+  repo.read(branch, path, cb);
+};
 
 function loadGithubFile(url, cb) {
   var user =  url.split("/")[3];
