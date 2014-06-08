@@ -5,7 +5,7 @@ title: Scripting
 
 # Scripting
 
-Data Explorer gives you full access to the power of Javascript to analyse and
+DataDeck gives you full access to the power of Javascript to analyse and
 transform your data.
 
 ## Getting Started
