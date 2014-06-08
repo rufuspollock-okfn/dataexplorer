@@ -244,6 +244,7 @@ my.Application = Backbone.View.extend({
 
     var project = new DataExplorer.Model.Project({
       name: path.split('/').pop(),
+      type: 'github',
       datasets: [{
         id: 'current',
         backend: 'github',

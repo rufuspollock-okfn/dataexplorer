@@ -183,12 +183,47 @@ my.Project = Backbone.Model.extend({
 
   save: function() {
     if (window.authenticated && this.currentUserIsOwner) {
-      return this.saveToGist();
+      if (this.get('type') === 'github') {
+        return this._saveToGithub();
+      } else {
+        return this.saveToGist();
+      }
     } else {
+      // TODO: alert that we did not save?
+      alert('You are not logged in so we cannot save. Please login via the main menu on the left');
       var deferred = new $.Deferred();
       deferred.resolve();
       return deferred;
     }
+  },
+
+  _saveToGithub: function() {
+    var self = this
+      , gh = my.github()
+      , deferred = new $.Deferred()
+      , dataset = self.toJSON().datasets[0]
+      , content = CSV.serialize(self.datasets.at(0)._store)
+      , url = dataset.url
+      , user =  url.split("/")[3]
+      , repo = url.split("/")[4]
+      , branch = url.split("/")[6]
+      , path = url.split('/').slice(7).join('/')
+      , message = 'DataDeck update'
+      , repo = getRepo(user, repo)
+      ;
+
+    repo.write(branch, path, content, message, function(err) {
+      if (err) {
+        alert('Failed to save to github');
+        console.log(err);
+        deferred.reject();
+      } else {
+        self._resetUnsaved();
+        deferred.resolve();
+      }
+    });
+
+    return deferred;
   },
 
   // load source dataset info
@@ -220,7 +255,13 @@ my.Project = Backbone.Model.extend({
 
     repo.read(branch, path, function(err, raw_csv) {
       // TODO: need to do this properly ...
-      self.datasets.reset([new recline.Model.Dataset({data: raw_csv, backend: 'csv'})]);
+      self.datasets.reset([
+        new recline.Model.Dataset({
+          data: raw_csv,
+          url: url,
+          backend: 'csv'
+        })
+      ]);
       cb(err, self.dataset);
     });
   },
