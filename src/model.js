@@ -86,13 +86,13 @@ my.Project = Backbone.Model.extend({
       self.get('datasets'),
       function(datasetData) { return new recline.Model.Dataset(datasetData); }
     ));
-    if(this.datasets && this.datasets.at(0)){
-	this.datasets.at(0).records.bind('add change remove', function() {
-	  self.datasets.at(0)._store= new recline.Backend.Memory.Store(
-	    self.datasets.at(0).records.toJSON(), 
-	    self.datasets.at(0)._store.fields
-	  );
-	  self.set({datasets: self.datasets.toJSON()});
+    if(this.datasets && this.datasets.at(0)) {
+      this.datasets.at(0).records.bind('add change remove', function() {
+        self.datasets.at(0)._store= new recline.Backend.Memory.Store(
+          self.datasets.at(0).records.toJSON(), 
+          self.datasets.at(0)._store.fields
+        );
+        self.set({datasets: self.datasets.toJSON()});
         self.unsavedChanges.set({
           any: true,
           datasets: true
@@ -326,14 +326,14 @@ my.serializeProject = function(project) {
 
   // we try to be efficient and only serialize data into gist json if we
   // really need to (i.e. it has changed)
-  var saveDatasets = project.unsavedChanges.get('datasets')
+  var saveDatasets = project.unsavedChanges.get('datasets');
   if (saveDatasets) {
     project.datasets.each(function (ds, idx) {
       var ds_meta = project.get("datasets")[idx];
-      if(ds._store.fields){
+      if(ds._store.fields) {
         var content = CSV.serialize(ds._store);
         gistJSON.files[ds_meta.path] = {"content": content || "# No data"};
-	}
+      }
     });
   }
 
