@@ -245,12 +245,25 @@ my.Application = Backbone.View.extend({
     var project = new DataExplorer.Model.Project({
       name: path.split('/').pop(),
       datasets: [{
-        id: 'it-does-not-matter',
+        id: 'current',
         backend: 'github',
         url: 'https://github.com/' + username + '/' + projectId + '/blob/' + path
       }]
     });
     project.loadSourceDataset(function(err, p) {
+      // Create 'original' dataset that dupes current dataset
+      // We have to have a dataset called original becuase that is how project view is setup atm
+      // TODO: this is sort of painful and should be refactored
+      // This dupes code in load.js
+      var dataset = project.datasets.at(0);
+      var origDS = dataset.toJSON();
+      origDS.id = 'original';
+      origDS =  new recline.Model.Dataset(origDS);
+      origDS.fields.reset(dataset.fields.toJSON());
+      origDS._store = $.extend({}, dataset._store, true);
+      origDS.query();
+      project.datasets.add(origDS);
+
       displayIt(err, project);
     });
 
