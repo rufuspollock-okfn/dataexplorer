@@ -509,6 +509,16 @@ button.runsandbox {
   padding: 15px;
 }
 
+.start .github-file-load {
+  display: none;
+  width: 500px;
+  margin: 45px auto;
+}
+
+.start .github-file-load input {
+  width: 100%;
+}
+
 /**********************************************************
   * Jekyll pages
   *********************************************************/

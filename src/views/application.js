@@ -12,11 +12,14 @@ my.Application = Backbone.View.extend({
 
   events: {
     'click a.logout': '_logout',
-    'click a.login': '_login'
+    'click a.login': '_login',
+    'click .js-github-show-form': '_onShowGithubShowForm',
+    'submit .js-github-file-load': '_onGithubFileLoad'
   },
 
   _logout: function() {
     DataExplorer.Model.logout();
+    this.router.navigate('start', {trigger: true});
     window.location.reload();
     return false;
   },
@@ -25,6 +28,24 @@ my.Application = Backbone.View.extend({
     e.preventDefault();
     var url = 'https://github.com/login/oauth/authorize?client_id=' + DataExplorer.app.config.oauth_client_id + '&scope=repo, user, gist';
     window.open(url, 'Data Explorer - GitHub Login', 'height=750,width=1000');
+  },
+
+  _onShowGithubShowForm: function(e) {
+    e.preventDefault();
+    $('.github-file-load').show();
+  },
+
+  _onGithubFileLoad: function(e) {
+    e.preventDefault();
+    var $form = $(e.target)
+      , url = $form.find('input').val()
+      , user =  url.split("/")[3]
+      , repo = url.split("/")[4]
+      , branch = url.split("/")[6]
+      , path = url.split('/').slice(7).join('/')
+      , ourpath = [user, repo, 'edit', branch, path].join('/')
+      ;
+    this.router.navigate(ourpath, {trigger: true});
   },
 
   // Initialize
@@ -131,7 +152,9 @@ my.Application = Backbone.View.extend({
     self.authenticated = true;
     window.authenticated = true;
     this.projectList.load();
-    self.switchView('dashboard');
+    if (Backbone.history.fragment == 'start') {
+      self.switchView('dashboard');
+    }
   },
 
   onLoadProject: function(project) {

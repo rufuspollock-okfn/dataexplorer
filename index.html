@@ -82,11 +82,18 @@
         <div class="round splash">
           <h2 class="icon landing">DataDeck</h2>
           <div class="inner">
-            <p>DataDeck is an in-browser 'workbench' for editing, cleaning, and remixing tabular data</title>
+            <p>DataDeck is an in-browser 'workbench' for editing, cleaning, and remixing tabular data</p>
+            <p>You can load your own data from various sources or use it to edit existing CSV files on GitHub</p>
             <p><a href="/doc/about.html">Learn more</a></p>
             <a class="btn btn-large login" href="#">Login with GitHub</a>
+            <h3>Or</h3>
+            <a class="btn btn-large js-github-show-form" href="#">Edit an existing Github CSV</a>
           </div>
         </div>
+        <form class="js-github-file-load github-file-load">
+          <input type="text" placeholder="Paste your github CSV file url here" />
+          <button type="submit" class="btn btn-primary">Edit</button>
+        </form>
       </div>
     </div><!-- /main -->
 
