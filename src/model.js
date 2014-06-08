@@ -87,7 +87,9 @@ my.Project = Backbone.Model.extend({
       function(datasetData) { return new recline.Model.Dataset(datasetData); }
     ));
     if(this.datasets && this.datasets.at(0)) {
-      this.datasets.at(0).records.bind('add change remove', function() {
+      // TODO: this is not robust to reset of the datasets
+      // i.e. if are project initialize we add / remove datasets in position 0 this bind won't re-run ...
+      self.datasets.at(0).records.bind('add change remove', function() {
         self.datasets.at(0)._store= new recline.Backend.Memory.Store(
           self.datasets.at(0).records.toJSON(), 
           self.datasets.at(0)._store.fields
@@ -230,39 +232,9 @@ my.Project = Backbone.Model.extend({
   loadSourceDataset: function(cb) {
     var self = this;
     var datasetInfo = self.datasets.at(0).toJSON();
-    if (datasetInfo.backend == 'github') {
-      self.loadGithubDataset(datasetInfo.url, function(err, whocares) {
-        self.datasets.at(0).fetch().done(function() {
-          cb(null, self);
-        });
-      });
-    } else {
-      self.datasets.at(0).fetch().done(function() {
-        // TODO: should we set dataset metadata onto project source?
-        cb(null, self);
-      });
-    }
-  },
-
-  loadGithubDataset: function(url, cb) {
-    var self = this;
-    var user =  url.split("/")[3];
-    var repo = url.split("/")[4];
-    var branch = url.split("/")[6];
-    var path = url.split('/').slice(7).join('/');
-
-    repo = getRepo(user, repo);
-
-    repo.read(branch, path, function(err, raw_csv) {
-      // TODO: need to do this properly ...
-      self.datasets.reset([
-        new recline.Model.Dataset({
-          data: raw_csv,
-          url: url,
-          backend: 'csv'
-        })
-      ]);
-      cb(err, self.dataset);
+    self.datasets.at(0).fetch().done(function() {
+      // TODO: should we set dataset metadata onto project source?
+      cb(null, self);
     });
   },
 
@@ -556,6 +528,16 @@ function getRepo(user, repo) {
 
   return currentRepo.instance;
 }
+
+my.getGithubData = function(url, cb) {
+  var user =  url.split("/")[3]
+    , repo = url.split("/")[4]
+    , branch = url.split("/")[6]
+    , path = url.split('/').slice(7).join('/')
+    , repo = getRepo(user, repo)
+    ;
+  repo.read(branch, path, cb);
+};
 
 function loadGithubFile(url, cb) {
   var user =  url.split("/")[3];

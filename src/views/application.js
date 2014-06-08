@@ -242,32 +242,34 @@ my.Application = Backbone.View.extend({
     
     var projectViewState = {};
 
-    var project = new DataExplorer.Model.Project({
-      id: projectId,
-      name: path.split('/').pop(),
-      username: username,
-      type: 'github',
-      datasets: [{
-        id: 'current',
-        backend: 'github',
-        url: 'https://github.com/' + username + '/' + projectId + '/blob/' + path
-      }]
-    });
-    project.loadSourceDataset(function(err, p) {
-      // Create 'original' dataset that dupes current dataset
-      // We have to have a dataset called original becuase that is how project view is setup atm
-      // TODO: this is sort of painful and should be refactored
-      // This dupes code in load.js
-      var dataset = project.datasets.at(0);
-      var origDS = dataset.toJSON();
-      origDS.id = 'original';
-      origDS =  new recline.Model.Dataset(origDS);
-      origDS.fields.reset(dataset.fields.toJSON());
-      origDS._store = $.extend({}, dataset._store, true);
-      origDS.query();
-      project.datasets.add(origDS);
+    var githubFileUrl = 'https://github.com/' + username + '/' + projectId + '/blob/' + path;
 
-      displayIt(err, project);
+    DataExplorer.Model.getGithubData(githubFileUrl, function(err, csvdata) {
+      var project = new DataExplorer.Model.Project({
+        id: projectId,
+        name: path.split('/').pop(),
+        username: username,
+        type: 'github',
+        datasets: [
+          {
+            id: 'current',
+            backend: 'csv',
+            data: csvdata,
+            url: 'https://github.com/' + username + '/' + projectId + '/blob/' + path
+          },
+          // Create 'original' dataset that dupes current dataset
+          // We have to have a dataset called original becuase that is how project view is setup atm
+          // TODO: this is sort of painful and should be refactored
+          {
+            id: 'original',
+            backend: 'csv',
+            data: csvdata
+          }
+        ]
+      });
+      project.loadSourceDataset(function(err, p) {
+        displayIt(err, project);
+      });
     });
 
     function displayIt(err, project) {
