@@ -539,16 +539,6 @@ my.getGithubData = function(url, cb) {
   repo.read(branch, path, cb);
 };
 
-function loadGithubFile(url, cb) {
-  var user =  url.split("/")[3];
-  var repo = url.split("/")[4];
-  var branch = url.split("/")[6];
-  var path = url.split('/').slice(7).join('/');
-
-  repo = getRepo(user, repo);
-  repo.read(branch, path, cb);
-};
-
 // Load Application
 // -------
 // 
