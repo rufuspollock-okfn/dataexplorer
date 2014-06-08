@@ -454,6 +454,7 @@ var gridOptions = {
   editable: true,
   enabledAddRow: true,
   enabledDelRow: true,
+  enableReOrderRow:true,
   autoEdit: false,
   enableCellNavigation: true
 };
