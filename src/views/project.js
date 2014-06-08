@@ -10,7 +10,7 @@ my.Project = Backbone.View.extend({
       </div> \
       <div class="details"> \
         <h4 class="trail"> \
-          <a href="/#{{username}}">{{username}}</a> / {{gist.id}} \
+          <a href="/#{{username}}">{{username}}</a> / {{projectId}} \
         </h4> \
         <h2 class="project-name"> \
           <span class="js-edit-name">{{name}}</span> \
@@ -157,6 +157,9 @@ my.Project = Backbone.View.extend({
     if (this.model.fork_of) {
       tmplData.fork_of = "#" + this.model.fork_of.owner + "/" + this.model.fork_of.id;
     }
+    // TODO: probably normalize this further up the line ...
+    // gist id for gist based projects and project id otherwise
+    tmplData.projectId = tmplData.gist ? tmplData.gist.id : tmplData.id;
     tmplData.currentUserIsOwner = this.model.currentUserIsOwner;
     tmplData.authenticated = window.authenticated;
     var tmpl = Mustache.render(this.template, tmplData);

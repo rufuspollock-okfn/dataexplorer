@@ -243,7 +243,9 @@ my.Application = Backbone.View.extend({
     var projectViewState = {};
 
     var project = new DataExplorer.Model.Project({
+      id: projectId,
       name: path.split('/').pop(),
+      username: username,
       type: 'github',
       datasets: [{
         id: 'current',
