@@ -251,7 +251,6 @@ my.Application = Backbone.View.extend({
       }]
     });
     project.loadSourceDataset(function(err, p) {
-      console.log(project);
       displayIt(err, project);
     });
 

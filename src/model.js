@@ -107,7 +107,6 @@ my.Project = Backbone.Model.extend({
       });
     });
     this.bind('change:readme change:name change:views', function(e) {
-      console.log('triggered');
       self.unsavedChanges.set({
         any: true,
         metadata: true
