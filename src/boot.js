@@ -82,7 +82,7 @@ window.args = _(this.DataExplorer.app).toArray();
     $('.navbar').hide();
     $('#main').html(html);
     // complete the login process
-    $.getJSON(DataExplorer.app.config.gatekeeper_url + '/authenticate/'+match[1], function(data) {
+    $.getJSON(DataExplorer.app.config.gatekeeper_url + 'authenticate/'+match[1], function(data) {
       window.opener.postMessage({token: data.token}, window.location);
       window.close();
     });
