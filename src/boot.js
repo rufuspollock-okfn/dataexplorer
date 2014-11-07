@@ -1,7 +1,7 @@
 this.DataExplorer = this.DataExplorer || {};
 this.DataExplorer.app = {
     config: {
-      gatekeeper_url: 'http://transformer-datahub-gatekeeper.herokuapp.com/',
+      gatekeeper_url: 'http://transformer-datahub-gatekeeper.herokuapp.com',
       oauth_client_id: 'de55312927208bfe772e'
     },
     models: {},
