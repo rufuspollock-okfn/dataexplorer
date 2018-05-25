@@ -28,7 +28,7 @@
   <!-- Recline CSS components -->
   <link rel="stylesheet" href="vendor/recline/dist/recline.css">
   <!-- /Recline CSS components -->
-
+</p></p>
   <script src="http://www.google.com/jsapi"></script>
   <script type="text/javascript">
     // setup gdocs file picker
@@ -41,6 +41,11 @@
   <!--[if lte IE 8]>
   <script language="javascript" type="text/javascript" src="vendor/recline/vendor/flot/excanvas.min.js"></script>
   <![endif]-->
+
+  <!-- Consent manager -->
+  <script>var okiConsent = {analyticsTrackingID: 'UA-33874954-13'}</script>
+  <script src="https://a.okfn.org/html/oki/consent/assets/js/consent.js"></script>
+
 </head>
 <body>
 <div class="transformer-app">
@@ -87,6 +92,7 @@
             <p>DataDeck is an in-browser 'workbench' for editing, cleaning, and remixing tabular data</p>
             <p>You can load your own data from various sources or use it to edit existing CSV files on GitHub</p>
             <p><a href="/doc/about.html">Learn more</a></p>
+            <p><a href="https://okfn.org/privacy-policy/">Privacy policy</a></p>
             <a class="btn btn-large login" href="#">Login with GitHub</a>
             <h3>Or</h3>
             <a class="btn btn-large js-github-show-form" href="#">Edit an existing Github CSV</a>
@@ -123,6 +129,29 @@
   <script type="text/javascript" src="vendor/recline/vendor/slickgrid/2.0.1/jquery-ui-1.8.16.custom.min.js"></script>
   <script type="text/javascript" src="vendor/recline/vendor/slickgrid/2.0.1/jquery.event.drag-2.0.min.js"></script>
 
+153
+<script type="text/javascript">
+154
+  var _gaq = _gaq || [];
+155
+  _gaq.push(['_setAccount', 'UA-33874954-13']);
+156
+  _gaq.push(['_trackPageview']);
+157
+​
+158
+  (function() {
+159
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+160
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+161
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+162
+  })();
+163
+</script>
+
   <script type="text/javascript" src="vendor/recline/vendor/slickgrid/2.0.1/jquery.event.drag-2.2.js"></script>
   <script type="text/javascript" src="vendor/recline/vendor/slickgrid/2.0.1/jquery.event.drop-2.2.js"></script>
   <script type="text/javascript" src="vendor/recline/vendor/slickgrid/2.0.1/slick.core.js"></script>
@@ -149,16 +178,5 @@
   <script src='src/views/project.js'></script>
   <script src='src/views/load.js'></script>
 
-<script type="text/javascript">
-  var _gaq = _gaq || [];
-  _gaq.push(['_setAccount', 'UA-33874954-13']);
-  _gaq.push(['_trackPageview']);
-
-  (function() {
-    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-  })();
-</script>
 </body>
 </html>
